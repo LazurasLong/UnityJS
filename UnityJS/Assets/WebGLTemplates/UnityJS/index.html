@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Unity-JS Bridge | %UNITY_WEB_NAME%</title>
+    <link rel="stylesheet" type="text/css" href="StreamingAssets/bridge.css"/>
+    <script src="%UNITY_WEBGL_LOADER_URL%"></script>
+    <script type="text/javascript" src="StreamingAssets/jquery-1.10.2.js"></script>
+<!--
+    <script type="text/javascript" src="StreamingAssets/socket.io.js"></script>
+    <script type="text/javascript" src="StreamingAssets/three.js"></script>
+-->
+    <script type="text/javascript" src="StreamingAssets/unity.js"></script>
+    <script type="text/javascript" src="StreamingAssets/bridge.js"></script>
+    <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+    <script type="text/javascript" src="StreamingAssets/google-spreadsheet.js"></script>
+    <script>
+      var gameInstance = UnityLoader.instantiate("gameContainer", "%UNITY_WEBGL_BUILD_URL%");
+    </script>
+  </head>
+
+  <body>
+
+    <div id="gameContainer" style="width: %UNITY_WIDTH%px; height: %UNITY_HEIGHT%px; margin: auto"></div>
+
+    <h1>Unity-JS Bridge</h1>
+
+    <p id="message"/>
+
+    <button id="authorize-button" style="display: none;">Authorize</button>
+    <button id="signout-button" style="display: none;">Sign Out</button>
+
+    <pre id="content"></pre>
+
+  </body>
+
+</html>
