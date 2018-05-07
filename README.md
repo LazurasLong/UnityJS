@@ -1,10 +1,13 @@
 # UnityJS
 
-UnityJS is a plugin for Unity 5 that integrates JavaScript and
-web browser components into Unity.
-It works on Android, iOS, macOS and Windows.
+UnityJS is a plugin for Unity 5 that integrates JavaScript
+and web browser components into Unity,
+including a JSON messaging system
+and a C# bridge, using JSON.net.
 
-unity-js is derived from gree's unity-webview
+It works on WebGL, Android, iOS, macOS, and Windows [TODO].
+
+UnityJS is derived from gree's unity-webview
 https://github.com/gree/unity-webview
 
 unity-webview is derived from keijiro-san's

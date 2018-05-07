@@ -74,7 +74,7 @@ public class BridgeTransport : MonoBehaviour
     }
     
 
-    public void SendJSToUnityEvents(string evListString)
+    public virtual void SendJSToUnityEvents(string evListString)
     {
         //Debug.Log("BridgeTransport: SendJSToUnityEvents: evListString: " + evListString);
 
@@ -82,7 +82,7 @@ public class BridgeTransport : MonoBehaviour
     }
 
 
-    public string ReceiveJSToUnityEvents()
+    public virtual string ReceiveJSToUnityEvents()
     {
         if (jsToUnityEventQueue.Count == 0) {
             return null;
@@ -99,7 +99,7 @@ public class BridgeTransport : MonoBehaviour
     }
 
 
-    public void SendUnityToJSEvents(string evListString)
+    public virtual void SendUnityToJSEvents(string evListString)
     {
         Debug.Log("BridgeTransport: SendUnityToJSEvents: evListString: " + evListString);
 
@@ -107,7 +107,7 @@ public class BridgeTransport : MonoBehaviour
     }
 
 
-    public string ReceiveUnityToJSEvents()
+    public virtual string ReceiveUnityToJSEvents()
     {
         if (unityToJSEventQueue.Count == 0) {
             return null;
@@ -124,7 +124,7 @@ public class BridgeTransport : MonoBehaviour
     }
 
 
-    public void DistributeJSEvents()
+    public virtual void DistributeJSEvents()
     {
         if (!startedJS) {
             return;
@@ -153,7 +153,7 @@ public class BridgeTransport : MonoBehaviour
 
     public virtual void EvaluateJS(string js)
     {
-        //Debug.Log("BridgeTransport: EvaluateJS: js: " + js);
+        Debug.LogError("BridgeTransport: TODO: EvaluateJS: js: " + js);
     }
 
 

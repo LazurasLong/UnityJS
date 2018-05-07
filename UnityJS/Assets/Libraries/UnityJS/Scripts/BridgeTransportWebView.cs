@@ -52,7 +52,7 @@ public class BridgeTransportWebView : BridgeTransport
     {
         Debug.Log("BridgeTransportWebView: StartWebView: url: " + url);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
         //Debug.Log("BridgeTransportWebView: StartWebView: Android");
 
         string sourceDir = Application.streamingAssetsPath;
@@ -166,7 +166,7 @@ public class BridgeTransportWebView : BridgeTransport
 
             cleanURL =
                 "file://" + 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
                 Application.persistentDataPath + 
 #else
                 Application.streamingAssetsPath +
