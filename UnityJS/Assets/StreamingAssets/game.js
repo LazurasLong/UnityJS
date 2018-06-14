@@ -17,9 +17,6 @@ window.onerror = function(message, source, line, column, error) {
 // Globals
 
 
-globals.corsProxyPrefix =
-    'http://donhopkins.com/home/_p/miniProxy.php?';
-
 globals.sheetURLs = {
     world: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=0',
     texturePaths: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=580619937',
@@ -93,6 +90,7 @@ function LoadWorld()
             var sheetURL = 
                 globals.sheetURLs[sheetName];
             var url =
+                'http://donhopkins.com/home/_p/miniProxy.php?' + 
                 globals.corsProxyPrefix + 
                 sheetURL +
                 "&rand=" + 
