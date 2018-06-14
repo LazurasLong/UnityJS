@@ -91,7 +91,6 @@ function LoadWorld()
                 globals.sheetURLs[sheetName];
             var url =
                 'http://donhopkins.com/home/_p/miniProxy.php?' + 
-                globals.corsProxyPrefix + 
                 sheetURL +
                 "&rand=" + 
                 Math.random();
