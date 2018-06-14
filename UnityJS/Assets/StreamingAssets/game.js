@@ -23,6 +23,10 @@ globals.sheetURLs = {
     prefabMap: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=1469835123',
     bowConfigs_outline: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=650116669',
     bowConfigs_table: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=233501381',
+    twoDeeArray: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=1423929352',
+    threeDeeArray: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=669397076',
+    fourDeeArray: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=894939244',
+    vectorArrayDict: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=325407406',
     test: 'https://docs.google.com/spreadsheets/u/0/d/1TxWvkOkeqij4AygDaKfcO4LdrLYSKkPrXOHlAOwEtRc/export?format=tsv&id=1TxWvkOkeqij4AygDaKfcO4LdrLYSKkPrXOHlAOwEtRc&gid=0'
 };
 
@@ -197,8 +201,14 @@ function SheetToScope(sheetName)
         columnCount: sheet[0].length
     };
 
-    var result =
+    scope.resultScope =
         LoadJSONFromSheet(scope);
+
+    if (scope.resultScope) {
+        if (scope.resultScope.error) {
+            scope.error = scope.resultScope.error;
+        }
+    }
 
     return scope;
 }
@@ -227,8 +237,6 @@ function LoadJSONFromSheet(scope)
             return scope; // error
         }
     }
-
-    var value = null;
 
     //console.log("LoadJSONFromSheet: row " + scope.row + " col " + scope.col + " rowCount " + scope.rowCount + " colCount " + scope.colCount + " typeName " + scope.typeName + " currentRow " + scope.currentRow + " currentColumn " + scope.currentColumn + " value " + value);
 
@@ -489,46 +497,52 @@ function LoadJSONFromSheet(scope)
 
             scope.rowValues = scope.sheet[scope.currentRow];
 
+            var header;
+            var headerColumn;
+
             // Make sure the next indented row of headers is not missing.
             scope.previousColumn = scope.currentColumn - (scope.alreadyIndented ? 1 : 0);
-            for (i = 0; i <= scope.previousColumn; i++) {
-                if (("" + scope.rowValues[i]).trim() != "") {
+            for (headerColumn = 0; headerColumn <= scope.previousColumn; headerColumn++) {
+                header = ("" + scope.rowValues[headerColumn]).trim();
+                if (header != "") {
                     scope.error = "Type table should be follow by an indented row of table headers, not an unindented row.";
                     return scope;
                 }
             }
 
             // Make sure there are one or more indented headers.
-            if (("" + scope.rowValues[i]).trim() == "") {
+            header = ("" + scope.rowValues[headerColumn]).trim();
+
+            if (header == "") {
                 scope.error = "Type table should be follow by an indented row of table headers. Missing the first header.";
                 return scope;
             }
 
             // Gather the headers, skipping columns with empty headers.
             var headers = [];
-            for (; i < scope.lastColumn; i++) {
-                var header = ("" + scope.rowValues[i]).trim();
+            for (; headerColumn < scope.lastColumn; headerColumn++) {
+                header = ("" + scope.rowValues[headerColumn]).trim();
                 if (header == "") {
                     continue;
                 }
-                headers.push([i, header]);
+                headers.push([header, headerColumn]);
             }
 
-            // Parse headers into tokens.
+            // Parse the column headers into tokens associated with columns.
             var tokens = [];
             for (var headersIndex = 0, headersLength = headers.length; headersIndex < headersLength; headersIndex++) {
 
-                var headerInfo = headers[headersIndex];
-                var tokenColumn = headerInfo[0];
-                var header = headerInfo[1];
                 var token = "";
+                var headerInfo = headers[headersIndex];
+                header = headerInfo[0];
+                headerColumn = headerInfo[1];
 
                 function finishToken()
                 {
                     if (token == "") {
                         return;
                     }
-                    tokens.push([token, tokenColumn]);
+                    tokens.push([token, headerColumn]);
                     token = "";
                 }
 
@@ -542,7 +556,7 @@ function LoadJSONFromSheet(scope)
                         case '[':
                         case ']':
                             finishToken();
-                            tokens.push([ch, tokenColumn]);
+                            tokens.push([ch, headerColumn]);
                             break;
 
                         case ' ':
@@ -604,7 +618,6 @@ function LoadJSONFromSheet(scope)
                 {
                     var tokenInfo = NextTokenInfo();
                     var token = tokenInfo[0];
-                    var tokenColumn = tokenInfo[1];
                     value = null;
                     switch (token) {
 
@@ -662,12 +675,11 @@ function LoadJSONFromSheet(scope)
                             default:
 
                                 var key = token;
-                                var keyColumn = tokenColumn;
-                                var valueTokenInfo = NextTokenInfo();
-                                var valueToken = valueTokenInfo[0];
-                                var valueColumn = valueTokenInfo[1];
+                                var typeTokenInfo = NextTokenInfo();
+                                var typeToken = typeTokenInfo[0];
+                                var typeColumn = typeTokenInfo[1];
 
-                                switch (valueToken) {
+                                switch (typeToken) {
 
                                     case '{':
 
@@ -686,7 +698,6 @@ function LoadJSONFromSheet(scope)
                                     case '[':
 
                                         valueStack.push(value);
-                                        value = [];
 
                                         if (!ParseArray()) {
                                             return false;
@@ -705,13 +716,13 @@ function LoadJSONFromSheet(scope)
                                         return false;
 
                                     default:
-                                        var typeName = valueToken;
+                                        var typeName = typeToken;
                                         
                                         subScope = {
                                             sheetName: scope.sheetName,
                                             sheet: scope.sheet,
                                             row: scope.currentRow,
-                                            column: valueColumn,
+                                            column: typeColumn,
                                             rowCount: 1,
                                             columnCount: 1,
                                             typeName: typeName
@@ -807,7 +818,7 @@ function LoadJSONFromSheet(scope)
                                     return false;
                                 }
 
-                                value.push(scope.value);
+                                value.push(subScope.value);
 
                                 break;
                         }
@@ -826,7 +837,6 @@ function LoadJSONFromSheet(scope)
 
             }
 
-
             scope.rowsUsed = scope.currentRow - scope.row;
 
             return null; // success
@@ -840,6 +850,11 @@ function LoadJSONFromSheet(scope)
             }
 
             scope.resultScope = SheetToScope(sheetName);
+            if (!scope.resultScope) {
+                scope.error = "Could not find sheet: " + sheetName;
+                return scope;
+            }
+
             scope.resultScope.parentScope = scope;
             scope.subScopes = [scope.resultScope];
 
