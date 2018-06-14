@@ -45,7 +45,6 @@ function CreateObjects()
 }
 
 
-
 function CreateInterface(createCamera)
 {
     if (createCamera) {
@@ -54,7 +53,7 @@ function CreateInterface(createCamera)
             obj: {
                 doNotDelete: true
             },
-            config: { // config
+            config: {
                 "transform/localPosition": {x: 0, y: 200, z: -200},
                 "transform/localRotation": {pitch: 45}
             }
@@ -201,18 +200,34 @@ function SheetToScope(sheetName)
         columnCount: sheet[0].length
     };
 
-    scope.resultScope =
+    scope.errorScope =
         LoadJSONFromSheet(scope);
 
-    if (scope.resultScope) {
-        if (scope.resultScope.error) {
-            scope.error = scope.resultScope.error;
+    if (scope.errorScope) {
+        if (scope.errorScope.error) {
+            scope.error = scope.errorScope.error;
         }
     }
 
     return scope;
 }
 
+
+// Recursively loads JSON from a spreadsheet.
+// The scope is an object with the following input keys:
+//   sheetName: name of the sheet
+//   sheet: the spreadsheet, an array of arrays of strings
+//   row: the row to read from
+//   column: the column to read from
+//   rowCount: the number of rows to consider
+//   columnCount: the number of columns to consider
+// The scope will be returned with the following output keys:
+//   value: the value if there was no error
+//   rowsUsed: the number of rows used
+//   error: a string error message if there was an error
+//   errorScope: the scope containing the error
+// Returns null on success, or a scope with an error.
+// The location of the error in the spreadsheet can be determined by the row and column of the errorScope.
 
 function LoadJSONFromSheet(scope)
 {
@@ -229,8 +244,26 @@ function LoadJSONFromSheet(scope)
     scope.rowsUsed = 1;
     scope.fixedType = !!scope.typeName;
 
+    function GetColumnString(column, doNotTrim)
+    {
+        var result = scope.rowValues[column];
+        if (!result) {
+            return "";
+        }
+
+        result = "" + result;
+
+        if (!doNotTrim) {
+            result = result.trim();
+        }
+
+        return result;
+    }
+
+    // If a fixed type was not passed in, then pick up the type from
+    // the cell in the spreadsheet and move to the next cell to the right.
     if (!scope.fixedType) {
-        scope.typeName = scope.rowValues[scope.currentColumn].trim();
+        scope.typeName = GetColumnString(scope.currentColumn);
         scope.valueColumn++;
         if (!scope.typeName) {
             scope.error = "Expected a typeName.";
@@ -247,15 +280,15 @@ function LoadJSONFromSheet(scope)
             return null; // success
 
         case "boolean":
-            scope.value = ("" + scope.rowValues[scope.valueColumn]).toLowerCase() == "true";
+            scope.value = GetColumnString(scope.valueColumn).toLowerCase() == "true";
             return null; // success
 
         case "string":
-            scope.value = "" + scope.rowValues[scope.valueColumn];
+            scope.value = GetColumnString(scope.valueColumn, true);
             return null; // success
 
         case "json":
-            scope.value = "" + scope.rowValues[scope.valueColumn];
+            scope.value = "" + GetColumnString(scope.valueColumn, true);
             try {
                 scope.value = JSON.parse();
             } catch (e) {
@@ -265,11 +298,11 @@ function LoadJSONFromSheet(scope)
 
         case "number":
         case "float":
-            scope.value = parseFloat(scope.rowValues[scope.valueColumn]);
+            scope.value = parseFloat(GetColumnString(scope.valueColumn) || 0);
             return null; // success
 
         case "integer":
-            scope.value = parseInt(scope.rowValues[scope.valueColumn]);
+            scope.value = parseInt(GetColumnString(scope.valueColumn) || 0);
             return null; // success
 
         case "grid":
@@ -279,7 +312,7 @@ function LoadJSONFromSheet(scope)
                 return scope; // error
             }
 
-            var gridTypeName = scope.rowValues[scope.currentColumn + 1];
+            var gridTypeName = GetColumnString(scope.valueColumn + 1);
             if (gridTypeName) {
                 gridTypeName = ("" + gridTypeName).trim();
             }
@@ -288,7 +321,7 @@ function LoadJSONFromSheet(scope)
                 return scope; // error
             }
 
-            var gridColumns = scope.rowValues[scope.currentColumn + 2];
+            var gridColumns = GetColumnString(scope.valueColumn + 2);
             if (gridColumns) {
                 gridColumns = parseInt(gridColumns);
             }
@@ -297,7 +330,7 @@ function LoadJSONFromSheet(scope)
                 return scope; // error
             }
 
-            var gridRows = scope.rowValues[scope.currentColumn + 3];
+            var gridRows = GetColumnString(scope.valueColumn + 3);
             if (gridRows) {
                 gridRows = parseInt(gridRows);
             }
@@ -309,7 +342,6 @@ function LoadJSONFromSheet(scope)
             scope.value = [];
             scope.subScopes = [];
             scope.currentRow++;
-            scope.rowsUsed += gridRows;
 
             for (var gridRow = 0; gridRow < gridRows; gridRow++) {
 
@@ -333,9 +365,9 @@ function LoadJSONFromSheet(scope)
 
                     scope.subScopes.push(subScope);
 
-                    scope.resultScope = LoadJSONFromSheet(subScope);
-                    if (scope.resultScope) {
-                        return scope.resultScope; // error
+                    scope.errorScope = LoadJSONFromSheet(subScope);
+                    if (scope.errorScope) {
+                        return scope.errorScope; // error
                     }
 
                     gridRowValues.push(subScope.value);
@@ -343,6 +375,9 @@ function LoadJSONFromSheet(scope)
                 }
 
             }
+
+            // Return the number of rows actually used.
+            scope.rowsUsed += 1 + gridRows;
 
             return null; // success
 
@@ -359,13 +394,15 @@ function LoadJSONFromSheet(scope)
             scope.currentRow++;
             scope.lastRow = scope.row + scope.rowCount;
             scope.lastColumn = scope.column + scope.columnCount;
+
             while (scope.currentRow < scope.lastRow) {
                 scope.rowValues = scope.sheet[scope.currentRow];
 
+                // If this row is unindented, then we are done.
                 unindented = false;
                 scope.previousColumn = scope.currentColumn - (scope.alreadyIndented ? 1 : 0);
                 for (i = 0; i <= scope.previousColumn; i++) {
-                    if (("" + scope.rowValues[i]).trim() != "") {
+                    if (GetColumnString(i) != "") {
                         unindented = true;
                         break;
                     }
@@ -375,7 +412,7 @@ function LoadJSONFromSheet(scope)
                 }
 
                 scope.startColumn = scope.currentColumn + (scope.alreadyIndented ? 0 : 1);
-                name = ("" + scope.rowValues[scope.startColumn]).trim();
+                name = GetColumnString(scope.startColumn);
                 if (name == "") {
                     scope.currentRow++;
                 } else {
@@ -393,9 +430,9 @@ function LoadJSONFromSheet(scope)
 
                     scope.subScopes.push(subScope);
 
-                    scope.resultScope = LoadJSONFromSheet(subScope);
-                    if (scope.resultScope) {
-                        return scope.resultScope; // error
+                    scope.errorScope = LoadJSONFromSheet(subScope);
+                    if (scope.errorScope) {
+                        return scope.errorScope; // error
                     }
 
                     scope.value[name] = subScope.value;
@@ -405,6 +442,7 @@ function LoadJSONFromSheet(scope)
                 }
             }
 
+            // Return the number of rows actually used.
             scope.rowsUsed = scope.currentRow - scope.row;
 
             return null; // success
@@ -426,10 +464,11 @@ function LoadJSONFromSheet(scope)
             while (scope.currentRow < scope.lastRow) {
                 scope.rowValues = scope.sheet[scope.currentRow];
 
+                // If this row is unindented, then we are done. 
                 unindented = false;
                 scope.previousColumn = scope.currentColumn - (scope.alreadyIndented ? 1 : 0);
                 for (i = 0; i <= scope.previousColumn; i++) {
-                    if (("" + scope.rowValues[i]).trim() != "") {
+                    if (GetColumnString(i) != "") {
                         unindented = true;
                         break;
                     }
@@ -439,7 +478,7 @@ function LoadJSONFromSheet(scope)
                 }
 
                 scope.startColumn = scope.currentColumn + (scope.alreadyIndented ? 0 : 1);
-                name = ("" + scope.rowValues[scope.startColumn]).trim();
+                name = GetColumnString(scope.startColumn);
                 if (name == "") {
                     scope.currentRow++;
                 } else {
@@ -456,9 +495,9 @@ function LoadJSONFromSheet(scope)
 
                     scope.subScopes.push(subScope);
 
-                    scope.resultScope = LoadJSONFromSheet(subScope);
-                    if (scope.resultScope) {
-                        return scope.resultScope; // error
+                    scope.errorScope = LoadJSONFromSheet(subScope);
+                    if (scope.errorScope) {
+                        return scope.errorScope; // error
                     }
 
                     scope.value.push(subScope.value);
@@ -469,6 +508,7 @@ function LoadJSONFromSheet(scope)
 
             }
 
+            // Return the number of rows actually used.
             scope.rowsUsed = scope.currentRow - scope.row;
 
             return null; // success
@@ -503,7 +543,7 @@ function LoadJSONFromSheet(scope)
             // Make sure the next indented row of headers is not missing.
             scope.previousColumn = scope.currentColumn - (scope.alreadyIndented ? 1 : 0);
             for (headerColumn = 0; headerColumn <= scope.previousColumn; headerColumn++) {
-                header = ("" + scope.rowValues[headerColumn]).trim();
+                header = GetColumnString(headerColumn);
                 if (header != "") {
                     scope.error = "Type table should be follow by an indented row of table headers, not an unindented row.";
                     return scope;
@@ -511,7 +551,7 @@ function LoadJSONFromSheet(scope)
             }
 
             // Make sure there are one or more indented headers.
-            header = ("" + scope.rowValues[headerColumn]).trim();
+            header = GetColumnString(headerColumn);
 
             if (header == "") {
                 scope.error = "Type table should be follow by an indented row of table headers. Missing the first header.";
@@ -521,7 +561,7 @@ function LoadJSONFromSheet(scope)
             // Gather the headers, skipping columns with empty headers.
             var headers = [];
             for (; headerColumn < scope.lastColumn; headerColumn++) {
-                header = ("" + scope.rowValues[headerColumn]).trim();
+                header = GetColumnString(headerColumn);
                 if (header == "") {
                     continue;
                 }
@@ -584,10 +624,11 @@ function LoadJSONFromSheet(scope)
 
                 scope.rowValues = scope.sheet[scope.currentRow];
 
+                // If this row is unindented, then we are done.
                 unindented = false;
                 scope.previousColumn = scope.currentColumn - (scope.alreadyIndented ? 1 : 0);
                 for (i = 0; i <= scope.previousColumn; i++) {
-                    if (("" + scope.rowValues[i]).trim() != "") {
+                    if (GetColumnString(i) != "") {
                         unindented = true;
                         break;
                     }
@@ -604,6 +645,7 @@ function LoadJSONFromSheet(scope)
                 var value = null;
                 var valueStack = [];
 
+                // Get the next tokenInfo, containing the token and the column in which it occurred.
                 function NextTokenInfo()
                 {
                     if (tokenIndex >= tokens.length) {
@@ -614,11 +656,14 @@ function LoadJSONFromSheet(scope)
                     return tokenInfo;
                 }
 
+                // Parse the top level structure, either an array or an object, into value.
+                // Returns true if successful, false if not.
+                // Sets value on success, or error on failure.
                 function ParseTop()
                 {
                     var tokenInfo = NextTokenInfo();
                     var token = tokenInfo[0];
-                    value = null;
+
                     switch (token) {
 
                         case '{':
@@ -649,7 +694,9 @@ function LoadJSONFromSheet(scope)
                     return true;
                 }
 
-
+                // Parse an object into value.
+                // Returns true if successful, false if not.
+                // Sets value on success, or error on failure.
                 function ParseObject()
                 {
                     value = {};
@@ -730,8 +777,8 @@ function LoadJSONFromSheet(scope)
 
                                         scope.subScopes.push(subScope);
 
-                                        scope.resultScope = LoadJSONFromSheet(subScope);
-                                        if (scope.resultScope) {
+                                        scope.errorScope = LoadJSONFromSheet(subScope);
+                                        if (scope.errorScope) {
                                             return false;
                                         }
 
@@ -748,7 +795,9 @@ function LoadJSONFromSheet(scope)
 
                 }
 
-
+                // Parse an array into value.
+                // Returns true if successful, false if not.
+                // Sets value on success, or error on failure.
                 function ParseArray()
                 {
                     value = [];
@@ -813,8 +862,8 @@ function LoadJSONFromSheet(scope)
 
                                 scope.subScopes.push(subScope);
 
-                                scope.resultScope = LoadJSONFromSheet(subScope);
-                                if (scope.resultScope) {
+                                scope.errorScope = LoadJSONFromSheet(subScope);
+                                if (scope.errorScope) {
                                     return false;
                                 }
 
@@ -826,6 +875,7 @@ function LoadJSONFromSheet(scope)
                     }
                 }
 
+                // Now parse this row into an array or object into value.
                 if (ParseTop()) {
                     scope.value.push(value);
                 } else {
@@ -833,36 +883,39 @@ function LoadJSONFromSheet(scope)
                     return scope; // error
                 }
 
+                // Go to the next row.
                 scope.currentRow++;
 
             }
 
+            // Return the number of rows actually used.
             scope.rowsUsed = scope.currentRow - scope.row;
 
             return null; // success
 
         case "sheet":
 
-            var sheetName = ("" + scope.rowValues[scope.currentColumn + 1]).trim();
+            var sheetName = GetColumnString(scope.currentColumn + 1);
             if (sheetName == "") {
                 scope.error = "Expected 'sheet sheetName'.";
                 return scope;
             }
 
-            scope.resultScope = SheetToScope(sheetName);
-            if (!scope.resultScope) {
+            scope.sheetScope = SheetToScope(sheetName);
+            if (!scope.sheetScope) {
                 scope.error = "Could not find sheet: " + sheetName;
                 return scope;
             }
 
-            scope.resultScope.parentScope = scope;
-            scope.subScopes = [scope.resultScope];
+            scope.sheetScope.parentScope = scope;
+            scope.subScopes = [scope.sheetScope];
 
-            if (scope.resultScope.error) {
-                return scope.resultScope; // error
+            if (scope.sheetScope.error) {
+                scope.errorScope = scope.sheetScope;
+                return scope.errorScope; // error
             }
 
-            scope.value = scope.resultScope.value;
+            scope.value = scope.sheetScope.value;
             return null; // success
 
         default:
