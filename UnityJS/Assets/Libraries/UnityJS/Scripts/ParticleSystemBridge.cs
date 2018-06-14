@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 
-public class ParticleSystemBridge : BridgeObjectTracker {
+public class ParticleSystemHelper : Tracker {
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ public class ParticleSystemBridge : BridgeObjectTracker {
 
 
     ////////////////////////////////////////////////////////////////////////
-    // ParticleSystemBridge properties
+    // ParticleSystemHelper properties
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -37,17 +37,17 @@ public class ParticleSystemBridge : BridgeObjectTracker {
     {
         base.HandleEvent(ev);
 
-        Debug.Log("ParticleSystemBridge: HandleEvent: this: " + this + " ev: " + ev, this);
+        Debug.Log("ParticleSystemHelper: HandleEvent: this: " + this + " ev: " + ev, this);
 
         string eventName = (string)ev["event"];
-        //Debug.Log("ParticleSystemBridge: HandleEvent: eventName: " + eventName, this);
+        //Debug.Log("ParticleSystemHelper: HandleEvent: eventName: " + eventName, this);
         if (string.IsNullOrEmpty(eventName)) {
-            Debug.LogError("ParticleSystemBridge: HandleEvent: missing event name in ev: " + ev);
+            Debug.LogError("ParticleSystemHelper: HandleEvent: missing event name in ev: " + ev);
             return;
         }
 
         JObject data = (JObject)ev["data"];
-        //Debug.Log("ParticleSystemBridge: HandleEvent: eventName: " + eventName, this);
+        //Debug.Log("ParticleSystemHelper: HandleEvent: eventName: " + eventName, this);
 
         switch (eventName) {
 
@@ -61,7 +61,7 @@ public class ParticleSystemBridge : BridgeObjectTracker {
 
     public override void HandleMouseUpAsButton()
     {
-        //Debug.Log("ParticleSystemBridge: HandleMouseUpAsButton", this);
+        //Debug.Log("ParticleSystemHelper: HandleMouseUpAsButton", this);
 
         base.HandleMouseUpAsButton();
     }
@@ -89,7 +89,7 @@ public class ParticleSystemBridge : BridgeObjectTracker {
     void OnParticleCollision(GameObject obj)
     {
         if (ps == null) {
-            Debug.LogError("ParticleSystemBridge: OnParticleCollision: null ps");
+            Debug.LogError("ParticleSystemHelper: OnParticleCollision: null ps");
             return;
         }
 
@@ -102,11 +102,11 @@ public class ParticleSystemBridge : BridgeObjectTracker {
         collisionEvents.Clear();
         collisionCount = ps.GetCollisionEvents(obj, collisionEvents);
 
-        //Debug.Log("ParticleSystemBridge: OnParticleCollision: obj: " + obj + " ps: " + ps + " collisionCount: " + collisionCount + " collisionObject: " + collisionObject + " collisionCollider: " + collisionCollider);
+        //Debug.Log("ParticleSystemHelper: OnParticleCollision: obj: " + obj + " ps: " + ps + " collisionCount: " + collisionCount + " collisionObject: " + collisionObject + " collisionCollider: " + collisionCollider);
 
         for (int i = 0; i < collisionCount; i++) {
             ParticleCollisionEvent collision = collisionEvents[i];
-            //Debug.Log("ParticleSystemBridge: OnParticleCollision: i: " + i + " collision: " + collision + " colliderComponent: " + collision.colliderComponent + " intersection: " + collision.intersection.x + " " + collision.intersection.y + " " + collision.intersection.z + " " + " normal: " + collision.normal.x + " " + collision.normal.y + " " + collision.normal.x + " velocity: " + collision.velocity.x + " " + collision.velocity.y + " " + collision.velocity.z);
+            //Debug.Log("ParticleSystemHelper: OnParticleCollision: i: " + i + " collision: " + collision + " colliderComponent: " + collision.colliderComponent + " intersection: " + collision.intersection.x + " " + collision.intersection.y + " " + collision.intersection.z + " " + " normal: " + collision.normal.x + " " + collision.normal.y + " " + collision.normal.x + " velocity: " + collision.velocity.x + " " + collision.velocity.y + " " + collision.velocity.z);
             float r = 0.1f;
             Debug.DrawLine(collision.intersection - (Vector3.up * r), collision.intersection + (Vector3.up * r), Color.red, 1.0f, false);
             Debug.DrawLine(collision.intersection - (Vector3.forward * r), collision.intersection + (Vector3.forward * r), Color.red, 1.0f, false);
@@ -122,13 +122,13 @@ public class ParticleSystemBridge : BridgeObjectTracker {
         get {
             ParticleSystem.Particle[] particlesArray = new ParticleSystem.Particle[ps.particleCount];
             int count = ps.GetParticles(particlesArray);
-            Debug.Log("ParticleSystemBridge: particles: get: count: " + count);
+            Debug.Log("ParticleSystemHelper: particles: get: count: " + count);
             return particlesArray;
         }
 
         set {
             int count = value.Length;
-            Debug.Log("ParticleSystemBridge: particles: set: count: " + count);
+            Debug.Log("ParticleSystemHelper: particles: set: count: " + count);
             if (count == 0) {
                 ParticleSystem.Particle[] particles = new ParticleSystem.Particle[1];
                 particles [0].startSize = 0.0f;
@@ -145,12 +145,12 @@ public class ParticleSystemBridge : BridgeObjectTracker {
         get {
             List<ParticleSystemVertexStream> streams = new List<ParticleSystemVertexStream>();
             psr.GetActiveVertexStreams(streams);
-            Debug.Log("ParticleSystemBridge: activeVertexStreams: get: streams: " + streams.Count + " " + streams);
+            Debug.Log("ParticleSystemHelper: activeVertexStreams: get: streams: " + streams.Count + " " + streams);
             return streams;
         }
 
         set {
-            Debug.Log("ParticleSystemBridge: activeVertexStreams: set: value: " + value.Count + " " + value);
+            Debug.Log("ParticleSystemHelper: activeVertexStreams: set: value: " + value.Count + " " + value);
             psr.SetActiveVertexStreams(value);
         }
 

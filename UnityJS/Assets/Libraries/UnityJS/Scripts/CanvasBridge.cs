@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class CanvasBridge: BridgeObjectTracker {
+public class CanvasBridge: Tracker {
 
 
     ////////////////////////////////////////////////////////////////////////

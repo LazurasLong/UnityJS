@@ -1,0 +1,879 @@
+<OPENOPOLY
+	NAME="Micropoly"
+	OUTPUTFILE="micropoly">
+	<BLURB>The Microsoft Monopoly Game!</BLURB>
+	<PROPERTIES>
+		<PROPERTY NAME="AetherSphere"
+			INDEX="0"
+			NAME1=" AETHERSPHERE" NAME2="" NAME3=""
+			COLOR="purple"
+			RED="80" GREEN="15" BLUE="111"
+			COST="60"
+			RENT="2"
+			HOUSE1="10"
+			HOUSE2="30"
+			HOUSE3="90"
+			HOUSE4="160"
+			HOTEL="250"
+			MORTGAGE="30"
+			HOUSECOST="50"
+			HOTELCOST="50"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Lush Creations"
+			INDEX="1"
+			NAME1="LUSH" NAME2="CREATIONS" NAME3=""
+			COLOR="purple"
+			RED="80" GREEN="15" BLUE="111"
+			COST="60"
+			RENT="4"
+			HOUSE1="20"
+			HOUSE2="60"
+			HOUSE3="180"
+			HOUSE4="320"
+			HOTEL="450"
+			MORTGAGE="30"
+			HOUSECOST="50"
+			HOTELCOST="50"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Motorola"
+			INDEX="2"
+			NAME1="MOTOROLA" NAME2="" NAME3=""
+			COLOR="lightblue"
+			RED="144" GREEN="208" BLUE="239"
+			COST="100"
+			RENT="6"
+			HOUSE1="30"
+			HOUSE2="90"
+			HOUSE3="270"
+			HOUSE4="400"
+			HOTEL="550"
+			MORTGAGE="50"
+			HOUSECOST="50"
+			HOTELCOST="50"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Compaq"
+			INDEX="3"
+			NAME1="COMPAQ" NAME2="" NAME3=""
+			COLOR="lightblue"
+			RED="144" GREEN="208" BLUE="239"
+			COST="100"
+			RENT="6"
+			HOUSE1="30"
+			HOUSE2="90"
+			HOUSE3="270"
+			HOUSE4="400"
+			HOTEL="550"
+			MORTGAGE="50"
+			HOUSECOST="50"
+			HOTELCOST="50"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Dell"
+			INDEX="4"
+			NAME1="DELL" NAME2="" NAME3=""
+			COLOR="lightblue"
+			RED="144" GREEN="208" BLUE="239"
+			COST="120"
+			RENT="8"
+			HOUSE1="40"
+			HOUSE2="100"
+			HOUSE3="300"
+			HOUSE4="450"
+			HOTEL="600"
+			MORTGAGE="60"
+			HOUSECOST="50"
+			HOTELCOST="50"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Netscape"
+			INDEX="5"
+			NAME1="NETSCAPE" NAME2="" NAME3=""
+			COLOR="magenta"
+			RED="160" GREEN="15" BLUE="127"
+			COST="140"
+			RENT="10"
+			HOUSE1="50"
+			HOUSE2="150"
+			HOUSE3="450"
+			HOUSE4="625"
+			HOTEL="750"
+			MORTGAGE="70"
+			HOUSECOST="100"
+			HOTELCOST="100"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Oracle"
+			INDEX="6"
+			NAME1="ORACLE" NAME2="" NAME3=""
+			COLOR="magenta"
+			RED="160" GREEN="15" BLUE="127"
+			COST="140"
+			RENT="10"
+			HOUSE1="50"
+			HOUSE2="150"
+			HOUSE3="450"
+			HOUSE4="625"
+			HOTEL="750"
+			MORTGAGE="70"
+			HOUSECOST="100"
+			HOTELCOST="100"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Adobe"
+			INDEX="7"
+			NAME1="ADOBE" NAME2="" NAME3=""
+			COLOR="magenta"
+			RED="160" GREEN="15" BLUE="127"
+			COST="160"
+			RENT="12"
+			HOUSE1="60"
+			HOUSE2="180"
+			HOUSE3="500"
+			HOUSE4="700"
+			HOTEL="900"
+			MORTGAGE="80"
+			HOUSECOST="100"
+			HOTELCOST="100"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Novell"
+			INDEX="8"
+			NAME1="NOVELL" NAME2="" NAME3=""
+			COLOR="orange"
+			RED="255" GREEN="159" BLUE="15"
+			COST="180"
+			RENT="14"
+			HOUSE1="70"
+			HOUSE2="200"
+			HOUSE3="550"
+			HOUSE4="750"
+			HOTEL="950"
+			MORTGAGE="90"
+			HOUSECOST="100"
+			HOTELCOST="100"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Cisco"
+			INDEX="9"
+			NAME1="CISCO" NAME2="" NAME3=""
+			COLOR="orange"
+			RED="255" GREEN="159" BLUE="15"
+			COST="180"
+			RENT="14"
+			HOUSE1="70"
+			HOUSE2="200"
+			HOUSE3="550"
+			HOUSE4="750"
+			HOTEL="950"
+			MORTGAGE="90"
+			HOUSECOST="100"
+			HOTELCOST="100"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="3Com"
+			INDEX="10"
+			NAME1="3COM" NAME2="" NAME3=""
+			COLOR="orange"
+			RED="255" GREEN="159" BLUE="15"
+			COST="200"
+			RENT="16"
+			HOUSE1="80"
+			HOUSE2="220"
+			HOUSE3="600"
+			HOUSE4="800"
+			HOTEL="1000"
+			MORTGAGE="100"
+			HOUSECOST="100"
+			HOTELCOST="100"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Xerox"
+			INDEX="11"
+			NAME1="XEROX" NAME2="" NAME3=""
+			COLOR="red"
+			RED="224" GREEN="15" BLUE="15"
+			COST="220"
+			RENT="18"
+			HOUSE1="90"
+			HOUSE2="250"
+			HOUSE3="700"
+			HOUSE4="875"
+			HOTEL="1050"
+			MORTGAGE="110"
+			HOUSECOST="150"
+			HOTELCOST="150"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="SGI"
+			INDEX="12"
+			NAME1="SGI" NAME2="" NAME3=""
+			COLOR="red"
+			RED="224" GREEN="15" BLUE="15"
+			COST="240"
+			RENT="20"
+			HOUSE1="100"
+			HOUSE2="300"
+			HOUSE3="750"
+			HOUSE4="925"
+			HOTEL="1100"
+			MORTGAGE="120"
+			HOUSECOST="150"
+			HOTELCOST="150"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Apple"
+			INDEX="13"
+			NAME1="APPLE" NAME2="" NAME3=""
+			COLOR="red"
+			RED="224" GREEN="15" BLUE="15"
+			COST="220"
+			RENT="18"
+			HOUSE1="90"
+			HOUSE2="250"
+			HOUSE3="700"
+			HOUSE4="875"
+			HOTEL="1050"
+			MORTGAGE="110"
+			HOUSECOST="150"
+			HOTELCOST="150"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Real Networks"
+			INDEX="14"
+			NAME1="REAL" NAME2="NETWORKS" NAME3=""
+			COLOR="yellow"
+			RED="255" GREEN="255" BLUE="15"
+			COST="260"
+			RENT="22"
+			HOUSE1="110"
+			HOUSE2="330"
+			HOUSE3="800"
+			HOUSE4="975"
+			HOTEL="1150"
+			MORTGAGE="130"
+			HOUSECOST="150"
+			HOTELCOST="150"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Amazon"
+			INDEX="15"
+			NAME1="AMAZON" NAME2="" NAME3=""
+			COLOR="yellow"
+			RED="255" GREEN="255" BLUE="15"
+			COST="260"
+			RENT="22"
+			HOUSE1="110"
+			HOUSE2="330"
+			HOUSE3="800"
+			HOUSE4="975"
+			HOTEL="1150"
+			MORTGAGE="130"
+			HOUSECOST="150"
+			HOTELCOST="150"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Yahoo"
+			INDEX="16"
+			NAME1="YAHOO" NAME2="" NAME3=""
+			COLOR="yellow"
+			RED="255" GREEN="255" BLUE="15"
+			COST="280"
+			RENT="24"
+			HOUSE1="120"
+			HOUSE2="360"
+			HOUSE3="850"
+			HOUSE4="1025"
+			HOTEL="1200"
+			MORTGAGE="140"
+			HOUSECOST="150"
+			HOTELCOST="150"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="HP"
+			INDEX="17"
+			NAME1="HP" NAME2="" NAME3=""
+			COLOR="green"
+			RED="15" GREEN="160" BLUE="15"
+			COST="300"
+			RENT="26"
+			HOUSE1="130"
+			HOUSE2="390"
+			HOUSE3="900"
+			HOUSE4="1100"
+			HOTEL="1275"
+			MORTGAGE="150"
+			HOUSECOST="200"
+			HOTELCOST="200"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="IBM"
+			INDEX="18"
+			NAME1="IBM" NAME2="" NAME3=""
+			COLOR="green"
+			RED="15" GREEN="160" BLUE="15"
+			COST="300"
+			RENT="26"
+			HOUSE1="130"
+			HOUSE2="390"
+			HOUSE3="900"
+			HOUSE4="110"
+			HOTEL="1275"
+			MORTGAGE="150"
+			HOUSECOST="200"
+			HOTELCOST="200"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Sun"
+			INDEX="19"
+			NAME1="SUN" NAME2="" NAME3=""
+			COLOR="green"
+			RED="15" GREEN="160" BLUE="15"
+			COST="320"
+			RENT="28"
+			HOUSE1="150"
+			HOUSE2="450"
+			HOUSE3="1000"
+			HOUSE4="1200"
+			HOTEL="1400"
+			MORTGAGE="160"
+			HOUSECOST="200"
+			HOTELCOST="200"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Intel"
+			INDEX="20"
+			NAME1="INTEL" NAME2="" NAME3=""
+			COLOR="blue"
+			RED="16" GREEN="95" BLUE="159"
+			COST="350"
+			RENT="35"
+			HOUSE1="175"
+			HOUSE2="500"
+			HOUSE3="1100"
+			HOUSE4="1300"
+			HOTEL="1500"
+			MORTGAGE="175"
+			HOUSECOST="200"
+			HOTELCOST="200"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+		<PROPERTY NAME="Microsoft"
+			INDEX="21"
+			NAME1="MICROSOFT" NAME2="" NAME3=""
+			COLOR="blue"
+			RED="16" GREEN="95" BLUE="159"
+			COST="400"
+			RENT="50"
+			HOUSE1="200"
+			HOUSE2="600"
+			HOUSE3="1400"
+			HOUSE4="1700"
+			HOTEL="2000"
+			MORTGAGE="200"
+			HOUSECOST="200"
+			HOTELCOST="200"
+			HOUSES="4"
+			FRAME="DrawMicropolyPropertyFrame"/>
+	</PROPERTIES>
+	<UTILITIES>
+		<UTILITY NAME="Computer Network"
+			INDEX="0"
+			NAME1="COMPUTER" NAME2="NETWORK" NAME3=""
+			TYPE="Network"
+			COMPANY="Network Solutions"
+			COMPANY1="NETWORK"
+			COMPANY2="SOLUTIONS"
+			COST="150"
+			RENT1="4"
+			RENT2="10"
+			MORTGAGE="75"/>
+		<UTILITY NAME="TV Network"
+			INDEX="1"
+			NAME1="TELEVISION" NAME2="NETWORK" NAME3=""
+			TYPE="Network"
+			COMPANY="MSNBC"
+			COMPANY1="MSNBC"
+			COMPANY2=""
+			COST="150"
+			RENT1="4"
+			RENT2="10"
+			MORTGAGE="75"/>
+	</UTILITIES>
+	<RAILROADS>
+		<RAILROAD NAME="Internet Service Provider"
+			  INDEX="0"
+			  NAME1="INTERNET" NAME2="SERVICE" NAME3="PROVIDER"
+			  TYPE="ISP"
+			  COMPANY1="MINDSPRING"
+			  COMPANY2=""
+			  COST="200"
+			  RENT1="25"
+			  RENT2="50"
+			  RENT3="100"
+			  RENT4="200"
+			  MORTGAGE="100"/>
+		<RAILROAD NAME="Internet Service Provider"
+			  INDEX="1"
+			  NAME1="INTERNET" NAME2="SERVICE" NAME3="PROVIDER"
+			  TYPE="ISP"
+			  COMPANY1="UUNET"
+			  COMPANY2=""
+			  COST="200"
+			  RENT1="25"
+			  RENT2="50"
+			  RENT3="100"
+			  RENT4="200"
+			  MORTGAGE="100"/>
+		<RAILROAD NAME="Internet Service Provider"
+			  INDEX="2"
+			  NAME1="INTERNET" NAME2="SERVICE" NAME3="PROVIDER"
+			  TYPE="ISP"
+			  COMPANY1="AOL"
+			  COMPANY2=""
+			  COST="200"
+			  RENT1="25"
+			  RENT2="50"
+			  RENT3="100"
+			  RENT4="200"
+			  MORTGAGE="100"/>
+		<RAILROAD NAME="Internet Service Provider"
+			  INDEX="3"
+			  NAME1="INTERNET" NAME2="SERVICE" NAME3="PROVIDER"
+			  TYPE="ISP"
+			  COMPANY1="MSN"
+			  COMPANY2=""
+			  COST="200"
+			  RENT1="25"
+			  RENT2="50"
+			  RENT3="100"
+			  RENT4="200"
+			  MORTGAGE="100"/>
+	</RAILROADS>
+	<TAXES>
+		<TAX NAME="Deposition"
+			  INDEX="0"
+			  NAME1="DEPOSITION" NAME2=""
+			  PENALTY1="PAY 10%"
+			  PENALTY2="OR"
+			  PENALTY3="$200"/>
+		<TAX NAME="Antitrust Ruling"
+			  INDEX="1"
+			  NAME1="ANTITRUST" NAME2="RULING"
+			  PENALTY1="PAY $75"
+			  PENALTY2=""
+			  PENALTY3=""/>
+	</TAXES>
+	<CHESTS>
+		<CHEST NAME="Open Sources"
+			  INDEX="0"
+			  NAME1="OPEN" NAME2="SOURCES"
+			  INSTRUCTIONS1="FOLLOW"
+			  INSTRUCTIONS2="INSTRUCTIONS"
+			  INSTRUCTIONS3="ON TOP CARD"/>
+		<CHEST NAME="Open Sources"
+			  INDEX="1"
+			  NAME1="OPEN" NAME2="SOURCES"
+			  INSTRUCTIONS1="FOLLOW"
+			  INSTRUCTIONS2="INSTRUCTIONS"
+			  INSTRUCTIONS3="ON TOP CARD"/>
+		<CHEST NAME="Open Sources"
+			  INDEX="2"
+			  NAME1="OPEN" NAME2="SOURCES"
+			  INSTRUCTIONS1="FOLLOW"
+			  INSTRUCTIONS2="INSTRUCTIONS"
+			  INSTRUCTIONS3="ON TOP CARD"/>
+	</CHESTS>
+	<CHANCES>
+		<CHANCE NAME="Download"
+			  INDEX="0"
+			  NAME1="DOWNLOAD" 
+			  INSTRUCTIONS1="FOLLOW"
+			  INSTRUCTIONS2="INSTRUCTIONS"
+			  INSTRUCTIONS3="ON TOP CARD"/>
+		<CHANCE NAME="Download"
+			  INDEX="1"
+			  NAME1="DOWNLOAD" 
+			  INSTRUCTIONS1="FOLLOW"
+			  INSTRUCTIONS2="INSTRUCTIONS"
+			  INSTRUCTIONS3="ON TOP CARD"/>
+		<CHANCE NAME="Download"
+			  INDEX="2"
+			  NAME1="DOWNLOAD" 
+			  INSTRUCTIONS1="FOLLOW"
+			  INSTRUCTIONS2="INSTRUCTIONS"
+			  INSTRUCTIONS3="ON TOP CARD"/>
+	</CHANCES>
+	<CORNERS>
+		<CORNER NAME="Start Menu"
+			  INDEX="0"
+			  NAME1="START" NAME2="MENU" NAME3=""
+			  CAPTION1="COLLECT" 
+			  CAPTION2="$200 SALARY" 
+			  CAPTION3="AS YOU PASS"
+			  IMAGE="DrawMicropolyStartMenuCorner"/>
+		<CORNER NAME="Reinstall Windows"
+			  INDEX="1"
+			  NAME1=" REINSTALL" NAME2=" WINDOWS" NAME3=""
+			  CAPTION1="JUST" CAPTION2="REBOOTING" CAPTION3=""
+			  IMAGE="DrawMicropolyReinstallWindowsCorner"/>
+		<CORNER NAME="Free Software"
+			  INDEX="2"
+			  NAME1=" FREE" NAME2=" SOFTWARE" NAME3=""
+			  CAPTION1="" CAPTION2="" CAPTION3=""
+			  IMAGE="DrawMicropolyFreeSoftwareCorner"/>
+		<CORNER NAME="Goto Reinstall"
+			  INDEX="3"
+			  NAME1=" CORRUPTED" NAME2=" REGISTRY" NAME3=""
+			  CAPTION1=" GOTO" CAPTION2=" REINSTALL" CAPTION3=""
+			  IMAGE="DrawMicropolyCrashAndReinstallCorner"/>
+	</CORNERS>
+	<CHESTCARDS>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">Release Old Buggy Software Under a</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">New Name, collect $50 from every</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">player for upgrade license fee.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">You take over a small company,</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">fire everyone immediately,</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">and find $100 in a desk drawer.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">From sale of banner ads</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">you get $45.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="55" SIZE="10">You have won second prize</TEXT>
+			<TEXT X="10" Y="40" SIZE="10">in a rigged benchmark.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">You didn't cheat hard enough.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Collect $10.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Reboot to the Start menu</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">(Collect $200).</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">You are assessed for Y2K upgrades.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">$40 per desktop,</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">$115 per server.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Pentium division error in your favor.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Collect $200.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">Sell your customer database</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">and personality profiles</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">to spammers for $20.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="55" SIZE="10">Goto Reinstall Windows.</TEXT>
+			<TEXT X="10" Y="40" SIZE="10">Reboot directly to reinstall.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">Do not pass Start.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Do not collect $200.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Pie in your face!</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Pay drycleaners $100.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">Your customers are so fanatical,</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">the IRS classified you as a church.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Collect $20 income tax refund.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Golden Parachute deploys.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Collect $100.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Stock options mature.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Collect $100.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="10" SIZE="10">Pay Domain Name Registration Fee of $150.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">Reinstall Windows free.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">This card may be kept until needed,</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">or sold.</TEXT>
+		</CHESTCARD>
+		<CHESTCARD TITLE="Open Sources">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">Cracker finds massive security hole</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">in your newly released software.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Pay $50 hush money.</TEXT>
+		</CHESTCARD>
+	</CHESTCARDS>
+	<CHANCECARDS>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">You've been elected Chief Executive Officer.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Bribe each player $50.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="85" SIZE="10">Advance token to the</TEXT>
+			<TEXT X="10" Y="70" SIZE="10">nearest ISP and</TEXT>
+			<TEXT X="10" Y="55" SIZE="10">pay owner Twice the</TEXT>
+			<TEXT X="10" Y="40" SIZE="10">Rental to which he/she is otherwise entitled.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">If ISP is UNOWNED,</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">you may buy it from the Bank.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Get a little flaccid for Microsoft.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Advance token to Microsoft.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="85" SIZE="10">Advance token to</TEXT>
+			<TEXT X="10" Y="70" SIZE="10">nearest network.</TEXT>
+			<TEXT X="10" Y="55" SIZE="10">If UNOWNED you</TEXT>
+			<TEXT X="10" Y="40" SIZE="10">may buy it from the Bank.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">If OWNED, throw dice and pay owner</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">a total ten times the amount thrown.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">Make Y2K Upgrades For All Your Companies.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">For each desktop pay $25.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">For each server $100.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">This card may be kept until needed, or sold.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Reinstall Windows free.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Spell diferent.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Advance to Apple.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="85" SIZE="10">Advance token to the</TEXT>
+			<TEXT X="10" Y="70" SIZE="10">nearest ISP and</TEXT>
+			<TEXT X="10" Y="55" SIZE="10">pay owner Twice the</TEXT>
+			<TEXT X="10" Y="40" SIZE="10">Rental to which he/she is otherwise entitled.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">If ISP is UNOWNED,</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">you may buy it from the Bank.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Advance to Netscape.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">If you pass Go, collect $200.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="10" SIZE="10">Go back 3 places.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Your stock options mature.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">Collect $150.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Advance to Start.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">(Collect $200.)</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="25" SIZE="10">Go To Hell on AOL.</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">If you pass Start collect $200.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="10" SIZE="10">Pay Net Day tax of $15.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="130" Y="70" SCALE="0.55" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="40" SIZE="10">Go directly to Reinstall Windows.</TEXT>
+			<TEXT X="10" Y="25" SIZE="10">Do not pass Start,</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">do not collect $200.</TEXT>
+		</CHANCECARD>
+		<CHANCECARD TITLE="Download">
+			<IMAGE X="125" Y="65" SCALE="0.6" EPSFILE="graphics/gatespie.eps"/>
+			<TEXT X="10" Y="24" SIZE="10">Software developers pay you</TEXT>
+			<TEXT X="10" Y="10" SIZE="10">protection fee of $50.</TEXT>
+		</CHANCECARD>
+	</CHANCECARDS>
+	<POSTSCRIPT>
+
+
+/DrawMicropolyPropertyFrame {
+  (windows/)
+  $COLOR
+  (frame.eps) AppendStrings AppendStrings
+  gsave
+    .5 .5 translate
+    .59 .59 scale
+    run
+  grestore
+} def
+
+
+/DrawMicropolyStartMenuCorner {
+  /x PropHeight 2 div def
+  /y PropHeight GoLogoY sub def
+
+  PropHeight 2 div 
+  dup dup translate
+  45 rotate
+  neg dup translate
+
+  gsave
+    x y translate
+    2.8 2.8 scale
+    -27 -11 translate
+    (startbutton.eps) run
+  grestore
+
+  /x PropHeight 2 div def
+  /y PropHeight GoInstructionsY sub def
+
+  GoFont GoFontSize UseFont
+  $CAPTION1 x y CenterShow
+
+  NewLine
+  $CAPTION2 x y CenterShow
+  NewLine
+  $CAPTION3 x y CenterShow
+
+} def
+
+
+/DrawMicropolyReinstallWindowsCorner {
+  1 32 div inches setlinewidth
+
+  0 setgray
+  0 JailBar moveto
+  PropHeight JailBar sub JailBar lineto
+  PropHeight JailBar sub PropHeight lineto
+  stroke
+
+  JailCaptionFont JailCaptionFontSize UseFont
+
+  /x PropHeight JailBar sub 2 div def
+%  /x PropHeight 2 div def
+  /y JailJustY def
+  $CAPTION1 x y CenterShow
+
+  gsave
+    PropHeight 0 translate
+    90 rotate
+%    /x PropHeight JailBar sub 2 div JailBar add def
+    /x PropHeight 2 div def
+    $CAPTION2 x y CenterShow
+  grestore
+
+  PropHeight 2 div 
+  dup dup translate
+  45 rotate
+  neg dup translate
+
+  gsave
+    /x PropHeight 2 div def
+    /y PropHeight JailPictureY sub def
+    x y translate
+    1 1 scale
+    -27 -11 translate
+    (startbutton.eps) run
+  grestore
+
+  /x PropHeight 2 div def
+  /y PropHeight JailInY sub def
+
+  JailFont JailFontSize UseFont
+  $NAME1 x y CenterShow
+
+  /y PropHeight JailJailY sub def
+
+  $NAME2 x y CenterShow
+
+} def
+
+
+/DrawMicropolyFreeSoftwareCorner {
+  PropHeight 2 div 
+  dup dup translate
+  45 rotate
+  neg dup translate
+
+  FreeParkingFont FreeParkingFontSize UseFont
+
+  gsave
+    /x PropHeight 2 div def
+    /y PropHeight FreeParkingPictureY sub def
+    x y translate
+    1 1 scale
+    -27 -11 translate
+    (startbutton.eps) run
+  grestore
+
+
+  /x PropHeight 2 div def
+  /y PropHeight FreeParkingFreeY sub def
+
+  $NAME1 x y CenterShow
+
+  /y PropHeight FreeParkingParkingY sub def
+
+  $NAME2 x y CenterShow
+
+} def
+
+
+/DrawMicropolyCrashAndReinstallCorner {
+  PropHeight 2 div 
+  dup dup translate
+  45 rotate
+  neg dup translate
+
+  GoToJailFont GoToJailFontSize UseFont
+
+  gsave
+    /x PropHeight 2 div def
+    /y PropHeight GoToJailPictureY sub def
+    x y translate
+    1 1 scale
+    -27 -11 translate
+    (startbutton.eps) run
+  grestore
+
+  /x PropHeight 2 div def
+  /y PropHeight GoToJailCaption1Y sub def
+
+  $NAME1 x y CenterShow
+  NewLine
+  $NAME2 x y CenterShow
+
+  /y PropHeight GoToJailCaption2Y sub def
+
+  $CAPTION1 x y CenterShow
+  NewLine
+  $CAPTION2 x y CenterShow
+
+} def
+
+
+	</POSTSCRIPT>
+</OPENOPOLY>

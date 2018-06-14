@@ -46,6 +46,125 @@ public class Bridge : MonoBehaviour {
     public BridgeTransport transport;
 
 
+    ////////////////////////////////////////////////////////////////////////
+    // Static Methods
+    
+
+    public static string GetStringDefault(JObject obj, string key, string def = null)
+    {
+        var valueToken = obj[key];
+        if (valueToken == null) {
+            return def;
+        }
+
+        string str = (string)valueToken;
+        if (str == null) {
+            return def;
+        }
+
+        return str;
+    }
+
+
+    public static JObject GetJObjectDefault(JObject obj, string key, JObject def = null)
+    {
+        var valueToken = obj[key];
+        if (valueToken == null) {
+            return def;
+        }
+
+        JObject jobj = valueToken as JObject;
+        if (jobj == null) {
+            return def;
+        }
+
+        return jobj;
+    }
+
+
+    public static JArray GetJArrayDefault(JObject obj, string key, JArray def = null)
+    {
+        var valueToken = obj[key];
+        if (valueToken == null) {
+            return def;
+        }
+
+        JArray jarr = valueToken as JArray;
+        if (jarr == null) {
+            return def;
+        }
+
+        return jarr;
+    }
+
+
+    public static bool ConvertToEnum<EnumType>(object obj, ref EnumType result)
+    {
+        if (obj is JToken) {
+            JToken token = (JToken)obj;
+            switch (token.Type) {
+                case JTokenType.String:
+                    obj = (string)token.ToString();
+                    break;
+            }
+        }
+
+        if (obj is string) {
+
+            var str = (string)obj;
+            
+            result =
+                (EnumType)Enum.Parse(
+                    typeof(EnumType), 
+                    str);
+
+            //Debug.Log("BridgeManager: ConvertToEnum: EnumType: " + typeof(EnumType) + " str: " + str + " result: " + result);
+
+            return true;
+        }
+
+        int i = 0;
+        if (obj is int) {
+            i = (int)obj;
+        } else if (obj is byte) {
+            i = (int)(byte)obj;
+        } else if (obj is short) {
+            i = (int)(short)obj;
+        } else if (obj is long) {
+            i = (int)(long)obj;
+        } else if (obj is float) {
+            i = (int)(float)obj;
+        } else if (obj is double) {
+            i = (int)(double)obj;
+        } else {
+            return false;
+        }
+
+        result = 
+            (EnumType)Enum.ToObject(
+                typeof(EnumType), 
+                i);
+
+        //Debug.Log("BridgeManager: ConvertToEnum: EnumType: " + typeof(EnumType) + " i: " + i + " result: " + result);
+
+        return true;
+    }
+
+
+    public static string ConvertFromEnum<EnumType>(EnumType value)
+    {
+        string result =
+            Enum.Format(
+                typeof(EnumType), 
+                value, 
+                "g");
+
+        //Debug.Log("BridgeManager: ConvertFromEnum: EnumType: " + typeof(EnumType) + " value: " + value + " result: " + result);
+
+        return result;
+    }
+
+
     //////////////////////////////////////////////////////////////////////////////////
     // Instance Methods
     
@@ -87,7 +206,7 @@ public class Bridge : MonoBehaviour {
     public void CreateTransport()
     {
         if (transport != null) {
-            Debug.Log("Bridge: CreateTransport: called multiple times!");
+            Debug.LogError("Bridge: CreateTransport: called multiple times!");
             return;
         }
 
@@ -122,18 +241,18 @@ public class Bridge : MonoBehaviour {
 
     public void HandleTransportStarted()
     {
-        Debug.Log("Bridge: HandleTransportStarted");
+        //Debug.Log("Bridge: HandleTransportStarted");
 
         string js =
             "StartBridge(\"" + transport.driver + "\");";
-        Debug.Log("Bridge: HandleTransportStarted: EvaluateJS: " + js);
+        //Debug.Log("Bridge: HandleTransportStarted: EvaluateJS: " + js);
 
         transport.EvaluateJS(js);
 
         JObject ev = new JObject();
         ev.Add("event", "StartedUnity");
 
-        Debug.Log("Bridge: HandleStart: sending StartedUnity ev: " + ev);
+        //Debug.Log("Bridge: HandleStart: sending StartedUnity ev: " + ev);
         SendEvent(ev);
     }
     
@@ -169,6 +288,8 @@ public class Bridge : MonoBehaviour {
         JArray evList = JArray.Parse(json);
         //Debug.Log("Bridge: DistributeUnityEvents: evList: " + evList);
 
+        Debug.Log("Bridge: DistributeUnityEvents: evList.Count: " + evList.Count + " json.Length: " + json.Length);
+
         foreach (JObject ev in evList) {
             DistributeUnityEvent(ev);
         }
@@ -197,7 +318,7 @@ public class Bridge : MonoBehaviour {
 
                 string line = (string)data["line"];
 
-                Debug.Log("Bridge: DistributeUnityEvent: Log: line: " + line);
+                Debug.Log ("Bridge: DistributeUnityEvent: Log: line: " + line);
 
                 break;
 
@@ -205,35 +326,61 @@ public class Bridge : MonoBehaviour {
 
             case "Create": {
 
-                string prefab = (string)data["prefab"];
-                string id = (string)data["id"];
-                JObject config = (JObject)data["config"];
-                JObject interests = (JObject)data["interests"];
-                JArray preEvents = (JArray)data["preEvents"];
-                JArray postEvents = (JArray)data["postEvents"];
+                string prefab = GetStringDefault(data, "prefab");
+                string component = GetStringDefault(data, "component");
+                string id = GetStringDefault(data, "id");
+                JObject config = GetJObjectDefault(data, "config");
+                JObject interests = GetJObjectDefault(data, "interests");
+                JArray preEvents = GetJArrayDefault(data, "preEvents");
+                JArray postEvents = GetJArrayDefault(data, "postEvents");
 
-                //Debug.Log("Bridge: DistributeUnityEvent: Create: prefab: " + prefab + " id: " + id + " config: " + config + " interests: " + interests + " preEvents: " + preEvents + " postEvents: " + postEvents);
+                Debug.Log("Bridge: DistributeUnityEvent: Create: prefab: " + prefab + " id: " + id + " config: " + config + " interests: " + interests + " preEvents: " + preEvents + " postEvents: " + postEvents);
 
-                string prefabPath = "Prefabs/" + prefab;
-                GameObject prefabObject = Resources.Load<GameObject>(prefabPath);
-                //Debug.Log("Bridge: DistributeUnityEvent: Create: prefabPath: " + prefabPath + " prefabObject: " + prefabObject);
-                if (prefabObject == null) {
-                    Debug.LogError("Bridge: DistributeUnityEvent: Create: Can't find prefab: " + prefab);
-                    return;
+                GameObject instance = null;
+                if (string.IsNullOrEmpty(prefab)) {
+                    instance = new GameObject();
+                } else {
+                    GameObject prefabObject = Resources.Load<GameObject>(prefab);
+                    //Debug.Log("Bridge: DistributeUnityEvent: Create: prefab: " + prefab + " prefabObject: " + prefabObject);
+                    if (prefabObject == null) {
+                        Debug.LogError("Bridge: DistributeUnityEvent: Create: Can't find prefab: " + prefab);
+                        return;
+                    }
+                    instance = Instantiate(prefabObject);
+                    //Debug.Log("Bridge: DistributeUnityEvent: Create: instance: " + instance);
+                    if (instance == null) {
+                        Debug.LogError("Bridge: DistributeUnityEvent: Create: Can't instantiate prefab: " + prefab + " prefabObject: " + prefabObject);
+                        return;
+                    }
                 }
 
-                GameObject instance = Instantiate(prefabObject);
-                //Debug.Log("Bridge: DistributeUnityEvent: Create: instance: " + instance);
-                if (instance == null) {
-                    Debug.LogError("Bridge: DistributeUnityEvent: Create: Can't instantiate prefab: " + prefab + " prefabObject: " + prefabObject);
-                    return;
-                }
+                BridgeObject bridgeObject;
 
-                BridgeObject bridgeObject = instance.GetComponent<BridgeObject>();
-                //Debug.Log("Bridge: DistributeUnityEvent: Create: bridgeObject: " + bridgeObject);
+                if (string.IsNullOrEmpty(component)) {
 
-                if (bridgeObject == null) {
-                    bridgeObject = instance.AddComponent<BridgeObject>();
+                    bridgeObject = instance.GetComponent<BridgeObject>();
+                    //Debug.Log("Bridge: DistributeUnityEvent: Create: bridgeObject: " + bridgeObject);
+
+                    if (bridgeObject == null) {
+                        bridgeObject = instance.AddComponent<BridgeObject>();
+                    }
+
+                } else {
+
+                    Type componentType = Type.GetType(component);
+
+                    if (componentType == null) {
+                        Debug.LogError("Bridge: DistributeUnityEvent: Create: undefined component class: " + component);
+                        return;
+                    }
+
+                    if ((componentType != typeof(BridgeObject)) &&
+                        (!componentType.IsSubclassOf(typeof(BridgeObject)))) {
+                        Debug.LogError("Bridge: DistributeUnityEvent: Create: component class is not subclass of BridgeObject: " + component);
+                        return;
+                    }
+
+                    bridgeObject = (BridgeObject)instance.AddComponent(componentType);
                 }
 
                 instance.name = id;
@@ -245,10 +392,19 @@ public class Bridge : MonoBehaviour {
 
                 //Debug.Log("Bridge: DistributeUnityEvent: Create: created, position: " + bridgeObject.transform.position.x + " " + bridgeObject.transform.position.y + " " + bridgeObject.transform.position.z + " bridgeObject: " + bridgeObject);
 
-                bridgeObject.HandleEvents(preEvents);
-                bridgeObject.LoadConfig(config);
+                if (preEvents != null) {
+                    bridgeObject.HandleEvents(preEvents);
+                }
+
+                if (config != null) {
+                    bridgeObject.LoadConfig(config);
+                }
+
                 bridgeObject.SendEventName("Created");
-                bridgeObject.HandleEvents(postEvents);
+
+                if (postEvents != null) {
+                    bridgeObject.HandleEvents(postEvents);
+                }
 
                 //Debug.Log("Bridge: DistributeUnityEvent: Create: done, position: " + bridgeObject.transform.position.x + " " + bridgeObject.transform.position.y + " " + bridgeObject.transform.position.z + " bridgeObject: " + bridgeObject);
 

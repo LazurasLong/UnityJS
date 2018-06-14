@@ -153,10 +153,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d8269a2173b040b183ab3cb142db312, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startedUnity: 0
   startedJS: 0
-  driver: Unknown
-  url: http://192.168.0.52/sample/bridge.html
-  jsToUnityEventQueue: []
-  unityToJSEventQueue: []
-  bridgeWebView: {fileID: 0}
+  transport: {fileID: 0}

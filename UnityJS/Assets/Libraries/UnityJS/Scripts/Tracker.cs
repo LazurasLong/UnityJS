@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-// BridgeObjectTracker.cs
+// Tracker.cs
 // Copyright (C) 2018 by Don Hopkins, Ground Up Software.
 
 
@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 
-public class BridgeObjectTracker : BridgeObject {
+public class Tracker : BridgeObject {
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -64,10 +64,14 @@ public class BridgeObjectTracker : BridgeObject {
            return;
        }
 
+       if (Camera.main == null) {
+           return;
+       }
+
        mouseRay = Camera.main.ScreenPointToRay(mousePosition);
        mouseRaycastResult = Physics.Raycast(mouseRay, out mouseRaycastHit, mouseRayMaxDistance, mouseRayLayerMask, mouseRayQueryTriggerInteraction);
 
-       //Debug.Log("BridgeObjectTracker: TrackMousePosition: mouseRaycastResult: " + mouseRaycastResult + " mouseRaycastHitPoint: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z);
+       //Debug.Log("Tracker: TrackMousePosition: mouseRaycastResult: " + mouseRaycastResult + " mouseRaycastHitPoint: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z);
 
        if (!mouseRaycastResult) {
 
@@ -100,14 +104,14 @@ public class BridgeObjectTracker : BridgeObject {
                    : mouseRaycastHitBridgeObject.id;
        }
 
-       //Debug.Log("BridgeObjectTracker: TrackMousePosition: cameraPosition: " + cameraPosition.x + " " + cameraPosition.y + " " + cameraPosition.z + " point: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z + " offset: " + offset.x + " " + offset.y + " " + offset.z + " direction: " + direction);
+       //Debug.Log("Tracker: TrackMousePosition: cameraPosition: " + cameraPosition.x + " " + cameraPosition.y + " " + cameraPosition.z + " point: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z + " offset: " + offset.x + " " + offset.y + " " + offset.z + " direction: " + direction);
 
     }
 
 
     public virtual void SetMouseEntered(bool mouseEntered0)
     {
-        //Debug.Log("BridgeObjectTracker: SetMouseEntered: mouseEntered0: " + mouseEntered0, this);
+        //Debug.Log("Tracker: SetMouseEntered: mouseEntered0: " + mouseEntered0, this);
         mouseEntered = mouseEntered0;
     }
 
@@ -118,7 +122,7 @@ public class BridgeObjectTracker : BridgeObject {
             return;
         }
 
-        //Debug.Log("BridgeObjectTracker: OnMouseEnter", this);
+        //Debug.Log("Tracker: OnMouseEnter", this);
 
         TrackMousePosition();
 
@@ -132,7 +136,7 @@ public class BridgeObjectTracker : BridgeObject {
 
     public virtual void HandleMouseEnter()
     {
-        //Debug.Log("BridgeObjectTracker: HandleMouseEnter", this);
+        //Debug.Log("Tracker: HandleMouseEnter", this);
         SendEventName("MouseEnter");
     }
     
@@ -143,7 +147,7 @@ public class BridgeObjectTracker : BridgeObject {
             return;
         }
 
-        //Debug.Log("BridgeObjectTracker: OnMouseExit", this);
+        //Debug.Log("Tracker: OnMouseExit", this);
 
         TrackMousePosition();
 
@@ -155,14 +159,14 @@ public class BridgeObjectTracker : BridgeObject {
 
     public virtual void HandleMouseExit()
     {
-        //Debug.Log("BridgeObjectTracker: HandleMouseExit", this);
+        //Debug.Log("Tracker: HandleMouseExit", this);
         SendEventName("MouseExit");
     }
     
 
     public virtual void SetMouseDown(bool mouseDown0)
     {
-        //Debug.Log("BridgeObjectTracker: SetMouseDown: mouseDown0: " + mouseDown0, this);
+        //Debug.Log("Tracker: SetMouseDown: mouseDown0: " + mouseDown0, this);
         mouseDown = mouseDown0;
     }
 
@@ -173,7 +177,7 @@ public class BridgeObjectTracker : BridgeObject {
             return;
         }
 
-        //Debug.Log("BridgeObjectTracker: OnMouseDown", this);
+        //Debug.Log("Tracker: OnMouseDown", this);
 
         TrackMousePosition();
 
@@ -185,7 +189,7 @@ public class BridgeObjectTracker : BridgeObject {
 
     public virtual void HandleMouseDown()
     {
-        //Debug.Log("BridgeObjectTracker: HandleMouseDown", this);
+        //Debug.Log("Tracker: HandleMouseDown", this);
         SendEventName("MouseDown");
     }
 
@@ -196,7 +200,7 @@ public class BridgeObjectTracker : BridgeObject {
             return;
         }
 
-        //Debug.Log("BridgeObjectTracker: OnMouseUp", this);
+        //Debug.Log("Tracker: OnMouseUp", this);
 
         TrackMousePosition();
 
@@ -208,7 +212,7 @@ public class BridgeObjectTracker : BridgeObject {
 
     public virtual void HandleMouseUp()
     {
-        //Debug.Log("BridgeObjectTracker: HandleMouseUp", this);
+        //Debug.Log("Tracker: HandleMouseUp", this);
         SendEventName("MouseUp");
     }
 
@@ -219,7 +223,7 @@ public class BridgeObjectTracker : BridgeObject {
             return;
         }
 
-        //Debug.Log("BridgeObjectTracker: OnMouseUpAsButton", this);
+        //Debug.Log("Tracker: OnMouseUpAsButton", this);
 
         TrackMousePosition();
 
@@ -231,7 +235,7 @@ public class BridgeObjectTracker : BridgeObject {
 
     public virtual void HandleMouseUpAsButton()
     {
-        //Debug.Log("BridgeObjectTracker: HandleMouseUpAsButton", this);
+        //Debug.Log("Tracker: HandleMouseUpAsButton", this);
         SendEventName("MouseUpAsButton");
     }
 
@@ -242,7 +246,7 @@ public class BridgeObjectTracker : BridgeObject {
             return;
         }
 
-        //Debug.Log("BridgeObjectTracker: OnMouseDrag", this);
+        //Debug.Log("Tracker: OnMouseDrag", this);
 
         TrackMousePosition();
 
@@ -252,14 +256,14 @@ public class BridgeObjectTracker : BridgeObject {
 
     public virtual void HandleMouseDrag()
     {
-        //Debug.Log("BridgeObjectTracker: HandleMouseDrag", this);
+        //Debug.Log("Tracker: HandleMouseDrag", this);
         SendEventName("MouseDrag");
     }
 
 
     public virtual void OnMouseOver()
     {
-        //Debug.Log("BridgeObjectTracker: OnMouseOver", this);
+        //Debug.Log("Tracker: OnMouseOver", this);
 
         TrackMousePosition();
 
@@ -269,7 +273,7 @@ public class BridgeObjectTracker : BridgeObject {
 
     public virtual void HandleMouseOver()
     {
-        //Debug.Log("BridgeObjectTracker: HandleMouseOver", this);
+        //Debug.Log("Tracker: HandleMouseOver", this);
         SendEventName("MouseOver");
     }
 
@@ -282,7 +286,7 @@ public class BridgeObjectTracker : BridgeObject {
          EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
 #if false
          foreach (RaycastResult result in results) {
-             Debug.Log("BridgeObjectTracker: IsPointerOverUIObject: " + result);
+             Debug.Log("Tracker: IsPointerOverUIObject: " + result);
          }
 #endif
          return results.Count > 0;

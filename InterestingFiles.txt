@@ -1,0 +1,65 @@
+TODO: update -- this is out of date
+
+Unity Bridge C# Source:
+
+unity/HyperJaunt/Assets/Code/BridgeManager.cs
+unity/HyperJaunt/Assets/Code/BridgeObject.cs
+unity/HyperJaunt/Assets/Code/BridgeWebView.cs
+unity/HyperJaunt/Assets/Code/CameraHolder.cs
+unity/HyperJaunt/Assets/Code/GUIHolder.cs
+unity/HyperJaunt/Assets/Code/GameState.cs
+unity/HyperJaunt/Assets/Code/GazeResponderBridgeObject.cs
+unity/HyperJaunt/Assets/Code/KineticText.cs
+unity/HyperJaunt/Assets/Code/MagicBall.cs
+unity/HyperJaunt/Assets/Code/Poster.cs
+unity/HyperJaunt/Assets/Code/QuadTile.cs
+unity/HyperJaunt/Assets/Code/SocketIOTest.cs
+unity/HyperJaunt/Assets/Code/TextureViewer.cs
+unity/HyperJaunt/Assets/Code/World.cs
+
+Unity Libraries:
+
+unity/HyperJaunt/Assets/Libraries/FullSerializer
+unity/HyperJaunt/Assets/Libraries/FullSerializer/fsData.cs
+unity/HyperJaunt/Assets/Libraries/FullSerializer/fsSerializer.cs
+unity/HyperJaunt/Assets/Libraries/GoogleVR
+unity/HyperJaunt/Assets/Libraries/JsonDotNet
+unity/HyperJaunt/Assets/Libraries/SocketIO
+unity/HyperJaunt/Assets/Libraries/TextMesh Pro
+unity/HyperJaunt/Assets/Libraries/iTween
+unity/HyperJaunt/Assets/Libraries/iTweenPath
+unity/HyperJaunt/Assets/Libraries/unity-webview
+unity/HyperJaunt/Assets/Libraries/unity-webview/Plugins/WebViewObject.cs
+unity/HyperJaunt/Assets/Libraries/unity-webview/Plugins/iOS/WebView.mm -> ../../../../../../unity-webview/plugins/Mac/Sources/WebView.mm
+
+Streaming Assets for Web Browser:
+
+unity/HyperJaunt/Assets/StreamingAssets/bridge.css
+unity/HyperJaunt/Assets/StreamingAssets/bridge.html
+unity/HyperJaunt/Assets/StreamingAssets/bridge.js
+unity/HyperJaunt/Assets/StreamingAssets/jquery-1.10.2.js
+unity/HyperJaunt/Assets/StreamingAssets/jquery-pie-demo.html
+unity/HyperJaunt/Assets/StreamingAssets/jquery-pie-demo.js
+unity/HyperJaunt/Assets/StreamingAssets/jquery-pie.css
+unity/HyperJaunt/Assets/StreamingAssets/jquery-pie.js
+unity/HyperJaunt/Assets/StreamingAssets/jquery.ui.widget.js
+unity/HyperJaunt/Assets/StreamingAssets/simple-demo.html
+unity/HyperJaunt/Assets/StreamingAssets/socket.io.js
+unity/HyperJaunt/Assets/StreamingAssets/titles.js
+
+Built Unity Application Projects
+
+unity/HyperJaunt/Builds/Android/HyperJaunt.apk
+unity/HyperJaunt/Builds/iOS/Unity-iPhone.xcodeproj
+
+Unity WebView Extension Project for Android with Java, JNI, C++, WebView
+
+unity/unity-webview/plugins/Android/unitywebview/src/main/cpp/UnityWebView.cpp
+unity/unity-webview/plugins/Android/unitywebview/src/main/java/com/jauntvr/unitywebview/CWebViewPlugin.java
+unity/unity-webview/plugins/Android/unitywebview/src/main/java/com/jauntvr/unitywebview/ExternalSurface.java
+
+Unity WebView Extension Project for OS/X with Objective C, WkWebView
+(Shares WebView.mm source code with iOS Unity plugin, included directly in XCode app project.)
+
+unity/unity-webview/plugins/Mac/Sources/WebView.mm
+unity/unity-webview/plugins/Mac/WebView.xcodeproj

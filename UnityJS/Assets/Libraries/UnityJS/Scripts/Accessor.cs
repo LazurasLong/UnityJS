@@ -19,14 +19,18 @@ public class Accessor {
     public enum AccessorType {
         Undefined,
         Constant,
+        JArray,
         Array,
         List,
+        JObject,
         Dictionary,
         Field,
         Property,
         Transform,
         Component,
+        Resource,
         BridgeObject,
+        Method,
     };
 
 
@@ -36,33 +40,15 @@ public class Accessor {
 
     public AccessorType type;
     public bool conditional;
-
-    public object constantObject;
-
-    public object[] arrayObject;
-    public int arrayIndex;
-
-    public List<object> listObject;
-    public int listIndex;
-
-    public Dictionary<string, object> dictionaryObject;
-    public string dictionaryKey;
-
-    public object fieldObject;
-    public string fieldName;
+    public bool excited;
+    public int index;
+    public string str;
+    public object obj;
+    public object[] objArray;
+    public List<object> objList;
+    public Dictionary<string, object> objDict;
     public FieldInfo fieldInfo;
-
-    public object propertyObject;
-    public string propertyName;
     public PropertyInfo propertyInfo;
-
-    public object transformObject;
-    public string transformName;
-
-    public object componentObject;
-    public string componentName;
-
-    public string bridgeObjectID;
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -80,68 +66,153 @@ public class Accessor {
         }
 
         accessor = new Accessor();
-        accessor.InitConstant(firstObj, false);
+        accessor.Init_Constant(firstObj, false, false);
 
-        string[] names = path.Split('/');
-        int n = names.Length;
+        string[] steps = path.Split('/');
 
-        for (int i = 0; i < n; i++) {
-            string name = names[i];
+        for (int stepIndex = 0, stepCount = steps.Length;
+             stepIndex < stepCount; 
+             stepIndex++) {
+            string step = steps[stepIndex];
 
-            if ((name == "") || (name == "?")) {
-                Debug.LogError("Accessor: FindAccessor: empty name in path: " + path);
+            bool conditional = false;
+            bool excited = false;
+            bool done = false;
+            int chomped = 0;
+
+            // Chomp and remember any suffix punctuation.
+            while (!done && (step.Length > 1)) {
+
+                char lastChar = 
+                    step[step.Length - chomped - 1];
+
+                switch (lastChar) {
+                    case '?':
+                        conditional = true;
+                        chomped++;
+                        break;
+                    case '!':
+                        excited = true;
+                        chomped++;
+                        break;
+                    default:
+                        done = true;
+                        break;
+                }
+
+            }
+
+            // Chomp off any punctuation.
+            if (chomped > 0) {
+                step = step.Substring(0, step.Length - chomped);
+            }
+
+            // Unescape URL percent encoded characters if necessary.
+            if (step.IndexOf('%') != -1) {
+                step = Uri.UnescapeDataString(step);
+            }
+
+            // Empty steps are not allowed in paths.
+            if (step == "") {
+                Debug.LogError("Accessor: FindAccessor: empty step in path: " + path);
                 return false;
             }
 
-            bool conditional = name[name.Length - 1] == '?';
-            if (conditional) {
-                name = name.Substring(0, name.Length - 1);
-            }
-
             object nextObj = null;
+
+            // Try to get the next object from the accessor.
             if (!accessor.Get(ref nextObj)) {
                 if (!accessor.conditional) {
                     Debug.LogError("Accessor: FindAccessor: error getting accessor: " + accessor + " for path: " + path + " firstObj: " + firstObj + " nextObj: " + nextObj);
                     return false;
                 } else {
                     //Debug.Log("Accessor: FindAccessor: ignoring error getting conditional accessor: " + accessor + " for path: " + path + " firstObj: " + firstObj + " nextObj: " + nextObj);
-                    accessor.InitConstant(null, true);
+                    accessor.Init_Constant(null, true, false);
                     return true;
                 }
             }
 
-            //Debug.Log("Accessor: FindAccessor: FOO: GOT nextObj: " + nextObj + " == null: " + (nextObj == null) + " equals null: " + nextObj.Equals(null) + " type: " + ((nextObj == null) ? "null" : ("" + nextObj.GetType())) + " accessor: " + accessor + " " + accessor.type + " " + accessor.conditional + " path: " + path + " name: " + name);
+            //Debug.Log("Accessor: FindAccessor: Got 1: nextObj: " + nextObj + " == null: " + (nextObj == null) + " equals null: " + nextObj.Equals(null) + " type: " + ((nextObj == null) ? "null" : ("" + nextObj.GetType())) + " accessor: " + accessor + " " + accessor.type + " " + accessor.conditional + " path: " + path + " step: " + step);
 
-            if ((nextObj == null) || nextObj.Equals(null)) {
-                //Debug.Log("Accessor: FindAccessor: BAR: null nextObj: " + nextObj + " accessor: " + accessor + " " + accessor.type + " " + accessor.conditional + " path: " + path + " name: " + name);
+            // Handle null results by returning null constant accessor.
+            if ((nextObj == null) ||
+                nextObj.Equals(null)) {
+                //Debug.Log("Accessor: FindAccessor: Got 2: null nextObj: " + nextObj + " accessor: " + accessor + " " + accessor.type + " " + accessor.conditional + " path: " + path + " step: " + step);
                 if (!accessor.conditional) {
-                    Debug.LogError("Accessor: FindAccessor: null object in path: " + path + " i: " + i + " name: " + name + " firstObj: " + firstObj + " nextObj: " + nextObj);
+                    Debug.LogError("Accessor: FindAccessor: null object in path: " + path + " stepIndex: " + stepIndex + " step: " + step + " firstObj: " + firstObj + " nextObj: " + nextObj);
                    return false;
                 } else {
                     //Debug.Log("Accessor: FindAccessor: ignoring null from conditional accessor: " + accessor + " for path: " + path + " firstObj: " + firstObj + " nextObj: " + nextObj);
-                    accessor.InitConstant(null, true);
+                    accessor.Init_Constant(null, true, false);
                     return true;
                 }
             }
-            //Debug.Log("Accessor: FindAccessor: BAZ: got nextObj: " + nextObj + " accessor: " + accessor + " " + accessor.type + " " + accessor.conditional + " path: " + path + " name: " + name);
 
-            string[] parts = name.Split(new char[] { ':' }, 2);
+            //Debug.Log("Accessor: FindAccessor: Got 3: nextObj: " + nextObj + " accessor: " + accessor + " " + accessor.type + " " + accessor.conditional + " path: " + path + " step: " + step);
+
+            // Parse out the accessor type prefix, defaulting to "member" if not specified.
+            string[] parts =
+                step.Split(new char[] { ':' }, 2);
             string prefix = 
                 (parts.Length == 1)
-                    ? "object"
+                    ? "member"
                     : parts[0];
-            string rest = parts[parts.Length - 1];
+            string rest = 
+                parts[parts.Length - 1];
 
-            //Debug.Log("Accessor: FindAccessor: name: " + name + " parts length: " + parts.Length + " prefix: " + prefix + " rest: " + rest);
+            //Debug.Log("Accessor: FindAccessor: step: " + step + " parts length: " + parts.Length + " prefix: " + prefix + " rest: " + rest);
+
+            // Handle each accessor type prefix.
+            // Note that there is not necessarily a 1:1 mapping from accessor prefix to AccessorType.
+            // For example:
+            // "string:", "float:", "integer:", "int:", "boolean:", "bool:", "null:" and "json:" get a Constant.
+            // "property:" gets Property and "field:" gets Field, but "member:" is generic and figures out which to use at runtime.
+            // "array:" gets Array and "list:" gets List, "jarray:" get JArray, but "index:" is generic and figures out which to use at runtime.
+            // "dict:" and "dictionary:" get Array, "jobject:" gets JObject, but "map:" is generic and figures out which to use at runtime.
+            // "dictionary" and "dict" are synonyms for Dictionary.
+            // "bridgeobject" and "object" are synonyms for BridgeObject.
 
             switch (prefix) {
 
-                case "index": // Array or List index
-                case "array": // Array or List index
-                case "list": // Array or List index
+                case "string": // Constant string.
+                    accessor.Init_Constant(rest, false, false);
+                    break;
 
-                    bool searchArray = (prefix == "array") || (prefix == "index");
-                    bool searchList = (prefix == "list") || (prefix == "index");
+                case "float": // Constant float.
+                    float f = float.Parse(rest);
+                    accessor.Init_Constant(f, false, false);
+                    break;
+
+                case "int": // Constant int.
+                case "integer": // Constant int.
+                    int i = int.Parse(rest);
+                    accessor.Init_Constant(i, false, false);
+                    break;
+
+                case "bool": // Constant bool.
+                case "boolean": // Constant bool.
+                    bool b = rest.ToLower() == "true";
+                    accessor.Init_Constant(b, false, false);
+                    break;
+
+                case "null": // Constant null.
+                    accessor.Init_Constant(null, false, false);
+                    break;
+
+                case "json": // Constant JToken.
+                    JToken token = JToken.Parse(rest);
+                    accessor.Init_Constant(token, false, false);
+                    break;
+
+                case "index": // Array, List or JArray index
+                case "jarray": // JArray index
+                case "array": // Array index
+                case "list": // List index
+
+                    bool searchIndex = prefix == "index";
+                    bool searchArray = searchIndex || (prefix == "array");
+                    bool searchList = searchIndex || (prefix == "list");
+                    bool searchJArray = searchIndex || (prefix == "jarray");
                     int index = 0;
 
                     bool isInteger = int.TryParse(rest, out index);
@@ -151,17 +222,29 @@ public class Accessor {
                         return false;
                     }
 
-                    if (searchArray && (nextObj is Array)) {
+                    if (searchJArray && (nextObj is JArray)) {
+
+                        JArray jarray = (JArray)nextObj;
+                        //Debug.Log("Accessor: FindAccessor: prefix: " + prefix + " jarray: " + jarray + " index: " + index + " path: " + path);
+                        if (jarray == null) {
+                            Debug.LogError("Accessor: FindAccessor: prefix: " + prefix + " expected JArray: " + rest + " path: " + path);
+                            accessor = null;
+                            return false;
+                        }
+
+                        accessor.Init_JArray(jarray, index, conditional, excited);
+
+                    } else if (searchArray && (nextObj is Array)) {
 
                         object[] array = (object[])nextObj;
-                        //Debug.Log("Accessor: FindAccessor: prefix: " + prefix + " array: " + array + " length: " + array.Length + " index: " + index + " path: " + path);
+                        //Debug.Log("Accessor: FindAccessor: prefix: " + prefix + " array: " + array + " index: " + index + " path: " + path);
                         if (array == null) {
                             Debug.LogError("Accessor: FindAccessor: prefix: " + prefix + " expected array: " + rest + " path: " + path);
                             accessor = null;
                             return false;
                         }
 
-                        accessor.InitArray(array, index, conditional);
+                        accessor.Init_Array(array, index, conditional, excited);
 
                     } else if (searchList && (nextObj is List<object>)) {
 
@@ -172,7 +255,7 @@ public class Accessor {
                             return false;
                         }
 
-                        accessor.InitList(list, index, conditional);
+                        accessor.Init_List(list, index, conditional, excited);
 
                     } else {
                         Debug.LogError("Accessor: FindAccessor: prefix: " + prefix + " expected indexed array or list nextObj: " + nextObj + " path: " + path);
@@ -182,43 +265,71 @@ public class Accessor {
 
                     break;
 
+                case "map": // C# Dictionary<string, object> or JObject key
                 case "dict": // C# Dictionary<string, object> key
+                case "dictionary": // C# Dictionary<string, object> key
+                case "jobject": // JObject key
 
-                    Dictionary<string, object> dict = nextObj as Dictionary<string, object>;
-                    if (dict == null) {
-                        Debug.LogError("Accessor: FindAccessor: prefix: dict expected Dictionary<string, object>: " + rest + " path: " + path + " but got nextObj: " + nextObj + " type: " + nextObj.GetType());
-                        accessor = null;
-                        return false;
+                    bool searchMap = prefix == "map";
+                    bool searchDictionary = searchMap || (prefix == "dict") || (prefix == "dictionary");
+                    bool searchJObject = searchMap || (prefix == "jobject");
+
+                    if (searchJObject && (nextObj is JObject)) {
+
+                        JObject jobject = nextObj as JObject;
+                        if (jobject == null) {
+                            Debug.LogError("Accessor: FindAccessor: prefix: jobject expected JObject: " + rest + " path: " + path + " but got nextObj: " + nextObj + " type: " + nextObj.GetType());
+                            accessor = null;
+                            return false;
+                        }
+
+                        accessor.Init_JObject(jobject, rest, conditional, excited);
+
+                    } else if (searchDictionary && (nextObj is Dictionary<string, object>)) {
+
+                        Dictionary<string, object> dict = nextObj as Dictionary<string, object>;
+                        if (dict == null) {
+                            Debug.LogError("Accessor: FindAccessor: prefix: dict expected Dictionary<string, object>: " + rest + " path: " + path + " but got nextObj: " + nextObj + " type: " + nextObj.GetType());
+                            accessor = null;
+                            return false;
+                        }
+
+                        accessor.Init_Dictionary(dict, rest, conditional, excited);
                     }
-                    accessor.InitDictionary(dict, rest, conditional);
 
                     break;
 
                 case "transform": // Unity Transform name or index
 
-                    accessor.InitTransform(nextObj, rest, conditional);
+                    accessor.Init_Transform(nextObj, rest, conditional, excited);
 
                     break;
 
                 case "component": // Unity MonoBehaviour component class name
 
-                    accessor.InitComponent(nextObj, rest, conditional);
+                    accessor.Init_Component(nextObj, rest, conditional, excited);
 
                     break;
 
-                case "object": // C# object Field or Property name
-                case "field": // C# object Field or Property name
-                case "property": // C# object Field or Property name
+                case "resource": // Unity resource path
+
+                    accessor.Init_Resource(rest, conditional, excited);
+
+                    break;
+
+                case "member": // C# object Field or Property name
+                case "field": // C# object Field name
+                case "property": // C# object Property name
 
                     FieldInfo fieldInfo = null;
                     PropertyInfo propertyInfo = null;
-                    bool searchField = (prefix == "field") || (prefix == "object");
-                    bool searchProperty = (prefix == "property") || (prefix == "object");
-
+                    bool searchMember = prefix == "member";
+                    bool searchField = searchMember || (prefix == "field");
+                    bool searchProperty = searchMember || (prefix == "property");
                     System.Type objectType = nextObj.GetType();
                     System.Type searchType = objectType;
 
-                     //Debug.Log("Accessor: FindAccessor: prefix: " + prefix + " name: " + name + " objectType: " + objectType);
+                     //Debug.Log("Accessor: FindAccessor: prefix: " + prefix + " rest: " + rest + " objectType: " + objectType);
 
                     while (searchType != null) {
 
@@ -241,16 +352,16 @@ public class Accessor {
 #endif
 
                         if (searchProperty) {
-                            fieldInfo = searchType.GetField(name);
-                            //Debug.Log("Accessor: FindAccessor: searching searchType: " + searchType + " for name: " + name + " and got fieldInfo: " + fieldInfo);
+                            fieldInfo = searchType.GetField(rest);
+                            //Debug.Log("Accessor: FindAccessor: searching searchType: " + searchType + " for rest: " + rest + " and got fieldInfo: " + fieldInfo);
                             if (fieldInfo != null) {
                                 break;
                             }
                         }
 
                         if (searchField) {
-                            propertyInfo = searchType.GetProperty(name);
-                            //Debug.Log("Accessor: FindAccessor: searching searchType: " + searchType + " for name: " + name + " and got propertyInfo: " + propertyInfo);
+                            propertyInfo = searchType.GetProperty(rest);
+                            //Debug.Log("Accessor: FindAccessor: searching searchType: " + searchType + " for rest: " + rest + " and got propertyInfo: " + propertyInfo);
                             if (propertyInfo != null) {
                                 break;
                             }
@@ -262,21 +373,28 @@ public class Accessor {
 
                     if (fieldInfo != null) {
                         //Debug.Log("Accessor: FindAccessor: found fieldInfo: " + fieldInfo);
-                        accessor.InitField(nextObj, name, fieldInfo, conditional);
+                        accessor.Init_Field(nextObj, rest, fieldInfo, conditional, excited);
                     } else if (propertyInfo != null) {
                         //Debug.Log("Accessor: FindAccessor: found propertyInfo: " + propertyInfo);
-                        accessor.InitProperty(nextObj, name, propertyInfo, conditional);
+                        accessor.Init_Property(nextObj, rest, propertyInfo, conditional, excited);
                     } else {
-                        Debug.LogError("Accessor: FindAccessor: undefined field or property name: " + name + " firstObj: " + firstObj + " nextObj: " + nextObj);
+                        Debug.LogError("Accessor: FindAccessor: undefined field or property rest: " + rest + " firstObj: " + firstObj + " nextObj: " + nextObj);
                         accessor = null;
                         return false;
                     }
 
                     break;
 
+                case "object": // BridgeObject id
                 case "bridgeobject": // BridgeObject id
 
-                    accessor.InitBridgeObject(rest, conditional);
+                    accessor.Init_BridgeObject(rest, conditional, excited);
+
+                    break;
+
+                case "method": // method name
+
+                    accessor.Init_Method(nextObj, rest, conditional, excited);
 
                     break;
 
@@ -340,7 +458,7 @@ public class Accessor {
 
         object value = null;
         Type targetType = accessor.GetTargetType();
-        //Debug.Log("Accessor: SetProperty: accessor: " + accessor + " targetType: " + targetType);
+        //Debug.Log("Accessor: SetProperty: accessor: " + accessor + " conditional: " + accessor.conditional + " excited: " + accessor.excited + " targetType: " + targetType);
 
         if (targetType == null) {
             if (!accessor.conditional) {
@@ -352,14 +470,58 @@ public class Accessor {
             }
         }
 
-        if (!Bridge.bridge.ConvertToType(jsonValue, targetType, ref value)) {
-            if (!accessor.conditional) {
-                Debug.LogError("Accessor: SetProperty: can't convert jsonValue: " + jsonValue + " to targetType: " + targetType);
+        if (accessor.excited) {
+            
+            string path = (string)jsonValue;
+            //Debug.Log("Accessor: SetProperty: excited: jsonValue: " + jsonValue + " path: " + path);
+            if (string.IsNullOrEmpty(path)) {
+                Debug.LogError("Accessor: SetProperty: excited: value should be a string");
                 return false;
-            } else {
-                //Debug.Log("Accessor: SetProperty: conditional accessor could not convert type jsonValue: " + jsonValue + " to targetType: " + targetType + " target: " + target + " name: " + name);
-                return true;
             }
+
+            Accessor pathAccessor = null;
+            if (!Accessor.FindAccessor(
+                    target,
+                    path,
+                    ref pathAccessor)) {
+
+                Debug.LogError("Accessor: SetProperty: excited: can't find path accessor for target: " + target + " path: " + path);
+                return false;
+
+            } else {
+
+                //Debug.Log("Accessor: SetProperty: excited: getting from pathAccessor: " + pathAccessor);
+                if (!pathAccessor.Get(ref value)) {
+
+                    //Debug.Log("Accessor: SetProperty: excited: failed to get from pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
+
+                    if (!pathAccessor.conditional) {
+                        Debug.LogError("BridgeObject: HandleEvent: SetParent: can't get pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
+                        return false;
+                    }
+
+                    value = null;
+
+                } else {
+
+                    //Debug.Log("Accessor: SetProperty: excited: got from pathAccessor: " + pathAccessor + " target: " + target + " path: " + path + " value: " + value);
+
+                }
+
+            }
+
+        } else {
+
+            if (!Bridge.bridge.ConvertToType(jsonValue, targetType, ref value)) {
+                if (!accessor.conditional) {
+                    Debug.LogError("Accessor: SetProperty: can't convert jsonValue: " + jsonValue + " to targetType: " + targetType);
+                    return false;
+                } else {
+                    //Debug.Log("Accessor: SetProperty: conditional accessor could not convert type jsonValue: " + jsonValue + " to targetType: " + targetType + " target: " + target + " name: " + name);
+                    return true;
+                }
+            }
+
         }
 
         //Debug.Log("Accessor: SetProperty: value: " + value);
@@ -432,511 +594,6 @@ public class Accessor {
     }
 
 
-    ////////////////////////////////////////////////////////////////////////
-    // Instance Methods
-
-
-    public void Clear()
-    {
-        type = AccessorType.Undefined;
-        constantObject = null;
-        arrayObject = null;
-        arrayIndex = 0;
-        listObject = null;
-        listIndex = 0;
-        dictionaryObject = null;
-        dictionaryKey = null;
-        fieldObject = null;
-        fieldName = null;
-        fieldInfo = null;
-        propertyObject = null;
-        propertyName = null;
-        propertyInfo = null;
-        transformObject = null;
-        transformName = null;
-        componentObject = null;
-        componentName = null;
-        bridgeObjectID = null;
-    }
-
-
-    public void InitConstant(object constantObject0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.Constant;
-        constantObject = constantObject0;
-        conditional = conditional0;
-    }
-    
-
-    public void InitArray(object[] arrayObject0, int arrayIndex0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.Array;
-        arrayObject = arrayObject0;
-        arrayIndex = arrayIndex0;
-        conditional = conditional0;
-    }
-
-
-    public void InitList(List<object> listObject0, int listIndex0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.List;
-        listObject = listObject0;
-        listIndex = listIndex0;
-        conditional = conditional0;
-    }
-
-
-    public void InitDictionary(Dictionary<string, object> dictionaryObject0, string dictionaryKey0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.Dictionary;
-        dictionaryObject = dictionaryObject0;
-        dictionaryKey = dictionaryKey0;
-        conditional = conditional0;
-    }
-
-
-    public void InitField(object fieldObject0, string fieldName0, FieldInfo fieldInfo0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.Field;
-        fieldObject = fieldObject0;
-        fieldName = fieldName0;
-        fieldInfo = fieldInfo0;
-        conditional = conditional0;
-    }
-    
-
-    public void InitProperty(object propertyObject0, string propertyName0, PropertyInfo propertyInfo0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.Property;
-        propertyObject = propertyObject0;
-        propertyName = propertyName0;
-        propertyInfo = propertyInfo0;
-        conditional = conditional0;
-    }
-
-
-    public void InitTransform(object transformObject0, string transformName0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.Transform;
-        transformObject = transformObject0;
-        transformName = transformName0;
-        conditional = conditional0;
-    }
-
-
-    public void InitComponent(object componentObject0, string componentName0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.Component;
-        componentObject = componentObject0;
-        componentName = componentName0;
-        conditional = conditional0;
-    }
-
-
-    public void InitBridgeObject(string bridgeObjectID0, bool conditional0 = false)
-    {
-        Clear();
-        type = AccessorType.BridgeObject;
-        bridgeObjectID = bridgeObjectID0;
-        conditional = conditional0;
-    }
-
-
-    public bool CanGet()
-    {
-        switch (type) {
-
-            case AccessorType.Undefined:
-                return false;
-
-            case AccessorType.Constant:
-                return true;
-
-            case AccessorType.Array:
-                return (arrayIndex > 0) && (arrayIndex < arrayObject.Length);
-
-            case AccessorType.List:
-                return (listIndex > 0) && (listIndex < listObject.Count);
-
-            case AccessorType.Dictionary:
-                return dictionaryObject.ContainsKey(dictionaryKey);
-
-            case AccessorType.Field:
-                return true;
-
-            case AccessorType.Property:
-                return true;
-
-            case AccessorType.Transform:
-                return true;
-
-            case AccessorType.Component:
-                return true;
-
-            case AccessorType.BridgeObject:
-                return true;
-
-        }
-
-        return false;
-    }
-
-
-    public bool Get(ref object result)
-    {
-        result = null;
-
-        switch (type) {
-
-            case AccessorType.Undefined:
-                Debug.LogError("Accessor: Get: type: Unknown: error getting undefined accessor type");
-                return false;
-
-            case AccessorType.Constant: {
-                result = constantObject;
-                return true;
-            }
-
-            case AccessorType.Array: {
-                //Debug.Log("Accessor: Get: Array: arrayIndex: " + arrayIndex + " length: " + arrayObject.Length + " elementType: " + arrayObject.GetType().GetElementType());
-                if ((arrayIndex >= 0) && (arrayIndex < arrayObject.Length)) {
-                    result = arrayObject[arrayIndex];
-                    //Debug.Log("Accessor: Get: Array: result: " + result);
-                    return true;
-                } else {
-                    Debug.LogError("Accessor: Get: type: Array: invalid arrayIndex: " + arrayIndex);
-                    return false;
-                }
-            }
-
-            case AccessorType.List: {
-                if ((listIndex > 0) && (listIndex < listObject.Count)) {
-                    result = listObject[listIndex];
-                    return true;
-                } else {
-                    Debug.LogError("Accessor: Get: type: List: invalid listIndex: " + listIndex);
-                    return false;
-                }
-            }
-
-            case AccessorType.Dictionary: {
-                if (dictionaryObject.ContainsKey(dictionaryKey)) {
-                    result = dictionaryObject[dictionaryKey];
-                    return true;
-                } else {
-                    Debug.LogError("Accessor: Get: type: Dictionary: undefined dictionaryKey: " + dictionaryKey);
-                    return false;
-                }
-            }
-
-            case AccessorType.Field: {
-                try {
-                    result = fieldInfo.GetValue(fieldObject);
-                    return true;
-                } catch (Exception ex) {
-                    Debug.LogError("Accessor: Get: type: Field: error getting value via fieldInfo: " + fieldInfo + " from fieldObject: " + fieldObject + " ex: " + ex);
-                    return false;
-                }
-            }
-
-            case AccessorType.Property: {
-                try {
-#if UNITY_IOS
-                    // iOS AOT compiler requires this slower invocation.
-                    result = propertyInfo.GetGetMethod().Invoke(propertyObject, null);
-#else
-                    result = propertyInfo.GetValue(propertyObject, null);
-#endif
-                    return true;
-                } catch (Exception ex) {
-                    Debug.LogError("Accessor: Get: type: Property: error getting value via propetyInfo: " + propertyInfo + " from propertyObject: " + propertyObject + " ex: " + ex);
-                    return false;
-                }
-            }
-
-            case AccessorType.Transform: {
-                Component componentObject = transformObject as Component;
-                GameObject gameObject = transformObject as GameObject;
-
-                if ((componentObject == null) &&
-                    (gameObject == null)) {
-                    Debug.LogError("Accessor: Get: type: Transform: not a component or gameObject! transformObject: " + transformObject);
-                    return false;
-                }
-
-                if (componentObject != null) {
-                    gameObject = componentObject.gameObject;
-                }
-
-                Transform gameObjectTransform = gameObject.transform;
-
-                switch (transformName) {
-
-                    case ".":
-                        result = gameObjectTransform;
-                        return true;
-
-                    case "..":
-                        result = gameObjectTransform.parent;
-                        return true;
-
-                    default:
-                        int index = 0;
-                        bool isInteger = int.TryParse(transformName, out index);
-
-                        if (isInteger) {
-
-                            result =
-                                ((index >= 0) &&
-                                 (index < gameObjectTransform.childCount))
-                                    ? gameObjectTransform.GetChild(index)
-                                    : null;
-                            //Debug.Log("Accessor: Get: type: Transform gameObjectTransform: " + gameObjectTransform + " index: " + index + " result: " + result);
-                            return true;
-
-
-                        } else {
-
-                            result = 
-                                gameObjectTransform.Find(transformName);
-                            //Debug.Log("Accessor: Get: type: Transform gameObjectTransform: " + gameObjectTransform + " transformName: " + transformName + " result: " + result);
-                            return true;
-
-                        }
-
-                }
-            }
-
-            case AccessorType.Component: {
-                Component thisComponent = (Component)componentObject;
-
-#if false
-                Component[] components = thisComponent.gameObject.GetComponents(typeof(Component));
-                Debug.Log("Accessor: Get: component: FOUND " + components.Length + " components...");
-                foreach (Component c in components) {
-                    Debug.Log("Accessor: Get: component: COMPONENT: " + c + " " + c.GetType());
-                }
-#endif
-
-                if (thisComponent == null) {
-
-                    Debug.Log("Accessor: Get: type: Component Not Component subclass! componentObject: " + componentObject + " componentName: " + componentName);
-                    return false;
-
-                }
-
-                //Debug.Log("Accessor: Get: type: Component componentObject: " + componentObject + " thisComponent: " + thisComponent);
-
-                System.Type componentType = FindTypeInLoadedAssemblies(componentName);
-
-                //Debug.Log("Accessor: Get: type: Component FindTypeInLoadedAssemblies componentName: " + componentName + " componentType: " + componentType);
-
-                if (componentType == null) {
-                    componentType = FindTypeInLoadedAssemblies("UnityEngine." + componentName);
-                    //Debug.Log("Accessor: Get: type: Component FindTypeInLoadedAssemblies componentName: UnityEngine." + componentName + " componentType: " + componentType);
-                }
-
-                if (componentType == null) {
-                    Debug.LogError("Accessor: Get: type: Component: can't get componentType! componentObject: " + componentObject + " componentName: " + componentName);
-                    return false;
-                }
-
-                Component component = thisComponent.gameObject.GetComponent(componentType);
-
-                //Debug.Log("Accessor: Get: XXXX: type: Component component: " + component + " Type: " + ((component == null) ? "null" : ("" + component.GetType())));
-
-                if ((component == null) || component.Equals(null)) {
-                    return false;
-                }
-
-                result = component;
-                return true;
-            }
-
-            case AccessorType.BridgeObject: {
-                BridgeObject bridgeObject = 
-                    Bridge.bridge.GetBridgeObject(bridgeObjectID);
-
-                if (bridgeObject != null) {
-                    result = bridgeObject;
-                    //Debug.Log("Accessor: Get: type: BridgeObject: found bridgeObjectID: " + bridgeObjectID + " result: " + result);
-
-                    return true;
-                } else {
-                    Debug.LogError("Accessor: Get: type: BridgeObject: undefined bridgeObjectID: " + bridgeObjectID);
-
-                    return false;
-                }
-            }
-
-        }
-
-        return false;
-    }
-
-
-    public bool CanSet()
-    {
-        switch (type) {
-
-            case AccessorType.Undefined:
-                return false;
-
-            case AccessorType.Constant:
-                return false;
-
-            case AccessorType.Array:
-                return (arrayIndex > 0) && (arrayIndex < arrayObject.Length);
-
-            case AccessorType.List:
-                return (listIndex > 0) && (listIndex < listObject.Count);
-
-            case AccessorType.Dictionary:
-                return true;
-
-            case AccessorType.Field:
-                return true;
-
-            case AccessorType.Property:
-                return true;
-
-            case AccessorType.Transform:
-                return false;
-
-            case AccessorType.Component:
-                return false;
-
-            case AccessorType.BridgeObject:
-                return false;
-
-        }
-
-        return false;
-    }
-
-
-    public bool Set(object value)
-    {
-        switch (type) {
-
-            case AccessorType.Undefined:
-                Debug.LogError("Accessor: Get: type: Unknown: error setting undefined type");
-                return false;
-
-            case AccessorType.Constant:
-                Debug.LogError("Accessor: Get: type: Unknown: error setting constant type");
-                return false;
-
-            case AccessorType.Array:
-                if ((arrayIndex > 0) && (arrayIndex < arrayObject.Length)) {
-                    arrayObject[arrayIndex] = value;
-                    return true;
-                } else {
-                    Debug.LogError("Accessor: Set: type: Array: out of range arrayIndex: " + arrayIndex + " Length: " + arrayObject.Length);
-                    return false;
-                }
-
-            case AccessorType.List:
-                if ((listIndex > 0) && (listIndex < listObject.Count)) {
-                    listObject[listIndex] = value;
-                    return true;
-                } else {
-                    Debug.LogError("Accessor: Set: type: Array: out of range arrayIndex: " + arrayIndex + " Length: " + arrayObject.Length);
-                    return false;
-                }
-
-            case AccessorType.Dictionary:
-                dictionaryObject[dictionaryKey] = value;
-                return true;
-
-            case AccessorType.Field:
-                try {
-                    fieldInfo.SetValue(fieldObject, value);
-                    return true;
-                } catch (Exception ex) {
-                    Debug.LogError("Accessor: Set: type: Field: error setting value! ex: " + ex);
-                    return false;
-                }
-
-            case AccessorType.Property:
-                try {
-                    propertyInfo.SetValue(propertyObject, value, null);
-                    return true;
-                } catch (Exception ex) {
-                    Debug.LogError("Accessor: Set: type: Property: error setting value! ex: " + ex);
-                    return false;
-                }
-
-            case AccessorType.Transform:
-                Debug.LogError("Accessor: Set: can't set type: Transform transformObject: " + transformObject);
-                return false;
-
-            case AccessorType.Component:
-                Debug.LogError("Accessor: Set: can't set type: Component componentObject: " + componentObject);
-                return false;
-
-            case AccessorType.BridgeObject:
-                Debug.LogError("Accessor: Set: can't set type: BridgeObject bridgeObjectID: " + bridgeObjectID);
-                return false;
-
-        }
-
-        return false;
-    }
-
-
-    public Type GetTargetType()
-    {
-        switch (type) {
-
-            case AccessorType.Undefined:
-                Debug.LogError("Accessor: Get: type: Unknown: error getting type of undefined accessor");
-                return null;
-
-            case AccessorType.Constant:
-                if ((constantObject == null) || constantObject.Equals(null)) {
-                    return null;
-                }
-                return constantObject.GetType();
-
-            case AccessorType.Array:
-                return arrayObject.GetType().GetElementType();
-
-            case AccessorType.List:
-                return arrayObject.GetType().GetGenericArguments()[0];
-
-            case AccessorType.Dictionary:
-                return arrayObject.GetType().GetGenericArguments()[1];
-
-            case AccessorType.Field:
-                return fieldInfo.FieldType;
-
-            case AccessorType.Property:
-                return propertyInfo.PropertyType;
-
-            case AccessorType.Transform:
-                return typeof(Transform);
-
-            case AccessorType.Component:
-                return typeof(Component);
-
-            case AccessorType.BridgeObject:
-                return typeof(BridgeObject);
-
-        }
-
-        return null;
-    }
-    
-
     public static System.Type FindTypeInLoadedAssemblies(string typeName)
     {
         System.Type foundType = null;
@@ -967,6 +624,846 @@ public class Accessor {
         return foundType;
     }
 
+
+    ////////////////////////////////////////////////////////////////////////
+    // Instance Methods
+
+
+    public void Clear()
+    {
+        type = AccessorType.Undefined;
+        conditional = false;
+        excited = false;
+        index = 0;
+        str = null;
+        obj = null;
+        objArray = null;
+        objList = null;
+        objDict = null;
+        fieldInfo = null;
+        propertyInfo = null;
+    }
+
+
+    public void Init_Constant(object obj0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Constant;
+        obj = obj0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_JArray(JArray jarray0, int index0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.JArray;
+        obj = jarray0;
+        index = index0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_Array(object[] objArray0, int index0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Array;
+        objArray = objArray0;
+        index = index0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_List(List<object> objList0, int index0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.List;
+        objList = objList0;
+        index = index0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_JObject(JObject jobject0, string key0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Dictionary;
+        obj = jobject0;
+        str = key0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_Dictionary(Dictionary<string, object> objDict0, string key0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Dictionary;
+        objDict = objDict0;
+        str = key0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_Field(object obj0, string name0, FieldInfo fieldInfo0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Field;
+        obj = obj0;
+        str = name0;
+        fieldInfo = fieldInfo0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+    
+
+    public void Init_Property(object obj0, string name0, PropertyInfo propertyInfo0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Property;
+        obj = obj0;
+        str = name0;
+        propertyInfo = propertyInfo0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_Transform(object xform0, string str0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Transform;
+        obj = xform0;
+        str = str0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_Component(object component0, string className0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Component;
+        obj = component0;
+        str = className0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_Resource(string resourcePath0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Resource;
+        str = resourcePath0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_BridgeObject(string bridgeObjectID0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.BridgeObject;
+        str = bridgeObjectID0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public void Init_Method(object obj0, string methodName0, bool conditional0, bool excited0)
+    {
+        Clear();
+        type = AccessorType.Method;
+        obj = obj0;
+        str = methodName0;
+        conditional = conditional0;
+        excited = excited0;
+    }
+
+
+    public bool CanGet()
+    {
+        switch (type) {
+
+            case AccessorType.Undefined:
+                return false;
+
+            case AccessorType.Constant:
+                return true;
+
+            case AccessorType.JArray:
+                return (index > 0) && (index < ((JArray)obj).Count);
+
+            case AccessorType.Array:
+                return (index > 0) && (index < objArray.Length);
+
+            case AccessorType.List:
+                return (index > 0) && (index < objList.Count);
+
+            case AccessorType.JObject:
+                return ((JObject)obj)[str] != null;
+
+            case AccessorType.Dictionary:
+                return objDict.ContainsKey(str);
+
+            case AccessorType.Field:
+                return true;
+
+            case AccessorType.Property:
+                return true;
+
+            case AccessorType.Transform:
+                return true;
+
+            case AccessorType.Component:
+                return true;
+
+            case AccessorType.Resource:
+                return true;
+
+            case AccessorType.BridgeObject:
+                return true;
+
+            case AccessorType.Method:
+                return false;
+
+        }
+
+        return false;
+    }
+
+
+    public bool Get(ref object result)
+    {
+        result = null;
+
+        switch (type) {
+
+            case AccessorType.Undefined:
+                Debug.LogError("Accessor: Get: type: Unknown: error getting undefined accessor type");
+                return false;
+
+            case AccessorType.Constant:
+                return Get_Constant(ref result);
+
+            case AccessorType.JArray:
+                return Get_JArray(ref result);
+
+            case AccessorType.Array:
+                return Get_Array(ref result);
+
+            case AccessorType.List:
+                return Get_List(ref result);
+
+            case AccessorType.JObject:
+                return Get_JObject(ref result);
+
+            case AccessorType.Dictionary:
+                return Get_Dictionary(ref result);
+
+            case AccessorType.Field:
+                return Get_Field(ref result);
+
+            case AccessorType.Property:
+                return Get_Property(ref result);
+
+            case AccessorType.Transform:
+                return Get_Transform(ref result);
+
+            case AccessorType.Component:
+                return Get_Component(ref result);
+
+            case AccessorType.Resource:
+                return Get_Resource(ref result);
+
+            case AccessorType.BridgeObject:
+                return Get_BridgeObject(ref result);
+
+            case AccessorType.Method:
+                Debug.LogError("Accessor: Get: type: Method: tried to read from a method: path! Try setting. methodName: " + str);
+                return false;
+
+        }
+
+        return false;
+    }
+
+
+    public bool Get_Constant(ref object result)
+    {
+        result = obj;
+        return true;
+    }
+
+
+    public bool Get_JArray(ref object result)
+    {
+        JArray jarray = (JArray)obj;
+        //Debug.Log("Accessor: Get_JArray: index: " + index + " length: " + jarray.Count);
+        if ((index >= 0) && 
+            (index < jarray.Count)) {
+            result = jarray[index];
+            //Debug.Log("Accessor: Get_JArray: result: " + result);
+            return true;
+        } else {
+            Debug.LogError("Accessor: Get_JArray: invalid index: " + index + " jarray: " + jarray);
+            return false;
+        }
+    }
+
+
+    public bool Get_Array(ref object result)
+    {
+        //Debug.Log("Accessor: Get_Array: index: " + index + " length: " + objArray.Length + " elementType: " + objArray.GetType().GetElementType());
+        if ((index >= 0) && 
+            (index < objArray.Length)) {
+            result = objArray[index];
+            //Debug.Log("Accessor: Get_Array: result: " + result);
+            return true;
+        } else {
+            Debug.LogError("Accessor: Get_Array: invalid index: " + index + " objArray: " + objArray);
+            return false;
+        }
+    }
+
+
+    public bool Get_List(ref object result)
+    {
+        if ((index > 0) &&
+            (index < objList.Count)) {
+            result = objList[index];
+            //Debug.Log("Accessor: Get_List: result: " + result);
+            return true;
+        } else {
+            Debug.LogError("Accessor: Get_List: invalid index: " + index + " objList: " + objList);
+            return false;
+        }
+    }
+
+
+    public bool Get_JObject(ref object result)
+    {
+        JObject jobject = (JObject)obj;
+        JToken token = jobject[str];
+        if (token != null) {
+            result = token;
+            return true;
+        } else {
+            Debug.LogError("Accessor: Get_JObject: undefined str: " + str + " jobject: " + jobject);
+            return false;
+        }
+    }
+
+
+    public bool Get_Dictionary(ref object result)
+    {
+        if (objDict.ContainsKey(str)) {
+            result = objDict[str];
+            return true;
+        } else {
+            Debug.LogError("Accessor: Get_Dictionary: undefined str: " + str + " objDict: " + objDict);
+            return false;
+        }
+    }
+
+
+    public bool Get_Field(ref object result)
+    {
+        try {
+            result = fieldInfo.GetValue(obj);
+            return true;
+        } catch (Exception ex) {
+            Debug.LogError("Accessor: Get_Field: error getting value via fieldInfo: " + fieldInfo + " from obj: " + obj + " ex: " + ex);
+            return false;
+        }
+    }
+
+
+    public bool Get_Property(ref object result)
+    {
+        try {
+#if UNITY_IOS
+            // iOS AOT compiler requires this slower invocation.
+            result = propertyInfo.GetGetMethod().Invoke(obj, null);
+#else
+            result = propertyInfo.GetValue(obj, null);
+#endif
+            return true;
+        } catch (Exception ex) {
+            Debug.LogError("Accessor: Get_Property: error getting value via propetyInfo: " + propertyInfo + " from obj: " + obj + " ex: " + ex);
+            return false;
+        }
+    }
+
+
+    public bool Get_Transform(ref object result)
+    {
+        Component component = obj as Component;
+        GameObject gameObject = obj as GameObject;
+
+        if ((component == null) &&
+            (gameObject == null)) {
+            Debug.LogError("Accessor: Get_Transform: not a Component or GameObject! obj: " + obj);
+            return false;
+        }
+
+        if (component != null) {
+            gameObject = component.gameObject;
+        }
+
+        Transform gameObjectTransform = gameObject.transform;
+
+        switch (str) {
+
+            case ".":
+                result = gameObjectTransform;
+                return true;
+
+            case "..":
+                result = gameObjectTransform.parent;
+                return true;
+
+            default:
+                int index = 0;
+                bool isInteger = int.TryParse(str, out index);
+
+                if (isInteger) {
+
+                    result =
+                        ((index >= 0) &&
+                         (index < gameObjectTransform.childCount))
+                            ? gameObjectTransform.GetChild(index)
+                            : null;
+                    //Debug.Log("Accessor: Get_Transform gameObjectTransform: " + gameObjectTransform + " index: " + index + " result: " + result);
+                    return true;
+
+
+                } else {
+
+                    result = 
+                        gameObjectTransform.Find(str);
+                    //Debug.Log("Accessor: Get_Transform gameObjectTransform: " + gameObjectTransform + " str: " + str + " result: " + result);
+                    return true;
+
+                }
+
+        }
+    }
+
+
+    public bool Get_Component(ref object result)
+    {
+        Component component = (Component)obj;
+
+#if false
+        Component[] components = component.gameObject.GetComponents(typeof(Component));
+        Debug.Log("Accessor: Get_Component: found " + components.Length + " components...");
+        foreach (Component c in components) {
+            Debug.Log("Accessor: Get_Component: c: " + c + " " + c.GetType());
+        }
+#endif
+
+        if (component == null) {
+            Debug.LogError("Accessor: Get_Component: Not Component subclass! obj: " + obj + " str: " + str);
+            return false;
+        }
+
+        //Debug.Log("Accessor: Get_Component obj: " + obj + " component: " + component);
+
+        System.Type componentType = FindTypeInLoadedAssemblies(str);
+
+        //Debug.Log("Accessor: Get_Component FindTypeInLoadedAssemblies str: " + str + " componentType: " + componentType);
+
+        if (componentType == null) {
+            componentType = FindTypeInLoadedAssemblies("UnityEngine." + str);
+            //Debug.Log("Accessor: Get_Component FindTypeInLoadedAssemblies str: UnityEngine." + str + " componentType: " + componentType);
+        }
+
+        if (componentType == null) {
+            Debug.LogError("Accessor: Get_Component: can't get componentType! obj: " + obj + " str: " + str);
+            return false;
+        }
+
+        Component otherComponent = component.gameObject.GetComponent(componentType);
+
+        //Debug.Log("Accessor: Get_Component: component: " + component + " Type: " + ((otherComponent == null) ? "null" : ("" + otherComponent.GetType())));
+
+        if ((otherComponent == null) || otherComponent.Equals(null)) {
+            return false;
+        }
+
+        result = otherComponent;
+        return true;
+    }
+
+
+    public bool Get_Resource(ref object result)
+    {
+        UnityEngine.Object resource = 
+            Resources.Load(str);
+
+        if (resource != null) {
+            result = resource;
+            //Debug.Log("Accessor: Get_Resource: found str: " + str + " result: " + result);
+            return true;
+        } else {
+            Debug.LogError("Accessor: Get_Resource: undefined str: " + str);
+            return false;
+        }
+    }
+
+
+    public bool Get_BridgeObject(ref object result)
+    {
+        BridgeObject bridgeObject = 
+            Bridge.bridge.GetBridgeObject(str);
+
+        if (bridgeObject != null) {
+            result = bridgeObject;
+            //Debug.Log("Accessor: Get_BridgeObject: found str: " + str + " result: " + result);
+
+            return true;
+        } else {
+            Debug.LogError("Accessor: Get_BridgeObject: undefined str: " + str);
+
+            return false;
+        }
+    }
+
+
+    public bool CanSet()
+    {
+        switch (type) {
+
+            case AccessorType.Undefined:
+                return false;
+
+            case AccessorType.Constant:
+                return false;
+
+            case AccessorType.JArray:
+                return (index > 0) && (index < ((JArray)obj).Count);
+
+            case AccessorType.Array:
+                return (index > 0) && (index < objArray.Length);
+
+            case AccessorType.List:
+                return (index > 0) && (index < objList.Count);
+
+            case AccessorType.JObject:
+                return true;
+
+            case AccessorType.Dictionary:
+                return true;
+
+            case AccessorType.Field:
+                return true;
+
+            case AccessorType.Property:
+                return true;
+
+            case AccessorType.Transform:
+                return false;
+
+            case AccessorType.Component:
+                return false;
+
+            case AccessorType.Resource:
+                return false;
+
+            case AccessorType.BridgeObject:
+                return false;
+
+            case AccessorType.Method:
+                return true;
+
+        }
+
+        return false;
+    }
+
+
+    public bool Set(object value)
+    {
+        switch (type) {
+
+            case AccessorType.Undefined:
+                Debug.LogError("Accessor: Get: type: Unknown: error setting undefined type");
+                return false;
+
+            case AccessorType.Constant:
+                Debug.LogError("Accessor: Get: type: Unknown: error setting constant type");
+                return false;
+
+            case AccessorType.JArray:
+                return Set_JArray(obj, value);
+
+            case AccessorType.Array:
+                return Set_Array(obj, value);
+
+            case AccessorType.List:
+                return Set_List(obj, value);
+
+            case AccessorType.JObject:
+                return Set_JObject(obj, value);
+
+            case AccessorType.Dictionary:
+                return Set_Dictionary(obj, value);
+
+            case AccessorType.Field:
+                return Set_Field(obj, value);
+
+            case AccessorType.Property:
+                return Set_Property(obj, value);
+
+            case AccessorType.Transform:
+                Debug.LogError("Accessor: Set: can't set type: Transform obj: " + obj);
+                return false;
+
+            case AccessorType.Component:
+                Debug.LogError("Accessor: Set: can't set type: Component obj: " + obj);
+                return false;
+
+            case AccessorType.Resource:
+                Debug.LogError("Accessor: Set: can't set type: Resource str: " + str);
+                return false;
+
+            case AccessorType.BridgeObject:
+                Debug.LogError("Accessor: Set: can't set type: BridgeObject str: " + str);
+                return false;
+
+            case AccessorType.Method:
+                //Debug.Log("Accessor: Set: Method: obj: " + obj + " str: " + str + " value: " + value.GetType().Name + " " + value);
+                return Set_Method(obj, value);
+
+        }
+
+        return false;
+    }
+
+
+    public bool Set_JArray(object obj, object value)
+    {
+        // TODO: Automatically convert various types to JSON.
+        if ((value != null) &&
+            (!(value is JToken))) {
+            Debug.LogError("Accessor: Set_JArray: value not JToken or null.");
+            return false;
+        }
+
+        JArray jarray = (JArray)obj;
+
+        if ((index > 0) && 
+            (index < jarray.Count)) {
+            // TODO: Automatically convert various types to JSON.
+            JToken token = (JToken)obj;
+            jarray[index] = token;
+            return true;
+        } else {
+            Debug.LogError("Accessor: Set_Array: out of range array index: " + index + " Count: " + jarray.Count + " jarray: " + jarray);
+            return false;
+        }
+    }
+
+
+    public bool Set_Array(object obj, object value)
+    {
+        if ((index > 0) && 
+            (index < objArray.Length)) {
+            objArray[index] = value;
+            return true;
+        } else {
+            Debug.LogError("Accessor: Set_Array: out of range array index: " + index + " Length: " + objArray.Length + " objArray: " + objArray);
+            return false;
+        }
+    }
+
+
+    public bool Set_List(object obj, object value)
+    {
+        if ((index > 0) && (index < objList.Count)) {
+            objList[index] = value;
+            return true;
+        } else {
+            Debug.LogError("Accessor: Set_List: out of range list index: " + index + " Count: " + objList.Count + " objList: " + objList);
+            return false;
+        }
+    }
+
+
+    public bool Set_JObject(object obj, object value)
+    {
+        // TODO: Automatically convert various types to JSON.
+        if ((value != null) &&
+            (!(value is JToken))) {
+            Debug.LogError("Accessor: Set_JObject: value not JToken or null.");
+            return false;
+        }
+
+        JObject jobject = (JObject)obj;
+        JToken token = (JToken)value;
+
+        jobject[str] = token;
+
+        return true;
+    }
+
+
+    public bool Set_Dictionary(object obj, object value)
+    {
+        objDict[str] = value;
+        return true;
+    }
+
+
+    public bool Set_Field(object obj, object value)
+    {
+        try {
+            fieldInfo.SetValue(obj, value);
+            return true;
+        } catch (Exception ex) {
+            Debug.LogError("Accessor: Set_Field: error setting value! obj: " + obj + " fieldInfo: " + fieldInfo + " ex: " + ex);
+            return false;
+        }
+    }
+
+
+    public bool Set_Property(object obj, object value)
+    {
+        try {
+            propertyInfo.SetValue(obj, value, null);
+            return true;
+        } catch (Exception ex) {
+            Debug.LogError("Accessor: Set_Property: error setting value! obj: " + obj + " propertyInfo: " + propertyInfo + " ex: " + ex);
+            return false;
+        }
+    }
+
+
+    public bool Set_Method(object obj, object value)
+    {
+        var type = 
+            obj.GetType();
+        //Debug.Log("Accessor: Set_Method: type: " + type);
+
+        MethodInfo methodInfo = 
+            type.GetMethod(str, BindingFlags.Public | BindingFlags.Static);
+
+        if (methodInfo == null) {
+            methodInfo =
+                type.GetExtensionMethod(str);
+            //Debug.Log("Accessor: Set_Method: methodInfo: " + ((methodInfo == null) ? "NULL" : ("" + methodInfo)));
+        }
+
+        if (methodInfo == null) {
+            Debug.LogError("Accessor: Set_Method: can't find str: " + str + " on type: " + type);
+            return false;
+        }
+
+        ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+        //foreach (ParameterInfo parameterInfo in parameterInfos) {
+            //Debug.Log("Accessor: Set_Method: parameterInfo: " + parameterInfo);
+        //}
+
+        List<object> parameters = new List<object>();
+        parameters.Add(obj);
+
+        JArray paramArray = value as JArray;
+        if (paramArray == null) {
+            Debug.LogError("Accessor: Set_Method: parameters should be an array: " + value);
+            return false;
+        }
+
+        if (paramArray.Count != parameterInfos.Length - 1) {
+            Debug.LogError("Accessor: Set_Method: parameters should be an array of length " + (parameterInfos.Length - 1) + ": " + value);
+            return false;
+        }
+
+        for (int i = 1, n = parameterInfos.Length; i < n; i++) {
+            ParameterInfo parameterInfo = parameterInfos[i];
+            Type parameterType = parameterInfo.ParameterType;
+            JToken jsParameter = paramArray[i - 1];
+            object val = null;
+            //Debug.Log("Accessor: Set_Method: about to convert to type jsParameter: " + jsParameter + " parameterType: " + parameterType);
+            bool success = Bridge.bridge.ConvertToType(jsParameter, parameterType, ref val);
+            if (!success) {
+                Debug.LogError("Accessor: Set_Method: can't convert parameter to type: " + parameterType + " jsParameters: " + jsParameter + " parameterInfo: " + parameterInfo);
+                return false;
+            }
+            //Debug.Log("Accessor: Set_Method: converted to val: " + val);
+            parameters.Add(val);
+        }
+
+        object result = 
+            methodInfo.Invoke(obj, parameters.ToArray());
+
+        //Debug.Log("Accessor: Set_Method: Invoked str: " + str + " on obj: " + obj + " result: " + result);
+
+        return true;
+    }
+    
+
+    public Type GetTargetType()
+    {
+        switch (type) {
+
+            case AccessorType.Undefined:
+                Debug.LogError("Accessor: Get: type: Unknown: error getting type of undefined accessor");
+                return null;
+
+            case AccessorType.Constant:
+                if ((obj == null) || obj.Equals(null)) {
+                    return null;
+                }
+                return obj.GetType();
+
+            case AccessorType.JArray:
+                return typeof(JToken);
+
+            case AccessorType.Array:
+                return objArray.GetType().GetElementType();
+
+            case AccessorType.List:
+                return objArray.GetType().GetGenericArguments()[0];
+
+            case AccessorType.JObject:
+                return typeof(JToken);
+
+            case AccessorType.Dictionary:
+                return objArray.GetType().GetGenericArguments()[1];
+
+            case AccessorType.Field:
+                return fieldInfo.FieldType;
+
+            case AccessorType.Property:
+                return propertyInfo.PropertyType;
+
+            case AccessorType.Transform:
+                return typeof(Transform);
+
+            case AccessorType.Component:
+                return typeof(Component);
+
+            case AccessorType.Resource:
+                return typeof(UnityEngine.Object);
+
+            case AccessorType.BridgeObject:
+                return typeof(BridgeObject);
+
+            case AccessorType.Method:
+                return typeof(object);
+
+        }
+
+        return null;
+    }
+    
 
 }
 

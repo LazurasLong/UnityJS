@@ -22,19 +22,21 @@ public class BridgeTransport : MonoBehaviour
     public List<string> jsToUnityEventQueue = new List<string>();
     public List<string> unityToJSEventQueue = new List<string>();
     public bool startedJS = false;
+    public int jsToUnityEventMaxCount = 100;
+    public int unityToJSEventMaxCount = 100;
     
 
     public void Init(Bridge bridge0)
     {
         bridge = bridge0;
-        Debug.Log("BridgeTransport: Init: bridge: " + bridge);
+        //Debug.Log("BridgeTransport: Init: bridge: " + bridge);
         HandleInit();
     }
     
 
     public virtual void HandleInit()
     {
-        Debug.Log("BridgeTransport: HandleInit: this: " + this + " bridge: " + bridge);
+        //Debug.Log("BridgeTransport: HandleInit: this: " + this + " bridge: " + bridge);
     }
 
 
@@ -46,7 +48,7 @@ public class BridgeTransport : MonoBehaviour
 
     public virtual void HandleAwake()
     {
-        Debug.Log("BridgeTransport: HandleAwake: this: " + this + " bridge: " + bridge);
+        //Debug.Log("BridgeTransport: HandleAwake: this: " + this + " bridge: " + bridge);
     }
 
 
@@ -58,7 +60,7 @@ public class BridgeTransport : MonoBehaviour
 
     public virtual void HandleStart()
     {
-        Debug.Log("BridgeTransport: HandleStart: this: " + this + " bridge: " + bridge);
+        //Debug.Log("BridgeTransport: HandleStart: this: " + this + " bridge: " + bridge);
     }
 
 
@@ -70,7 +72,7 @@ public class BridgeTransport : MonoBehaviour
 
     public virtual void HandleDestroy()
     {
-        Debug.Log("BridgeTransport: HandleDestroy: this: " + this + " bridge: " + bridge);
+        //Debug.Log("BridgeTransport: HandleDestroy: this: " + this + " bridge: " + bridge);
     }
     
 
@@ -84,16 +86,30 @@ public class BridgeTransport : MonoBehaviour
 
     public virtual string ReceiveJSToUnityEvents()
     {
-        if (jsToUnityEventQueue.Count == 0) {
+        int eventCount = jsToUnityEventQueue.Count;
+
+        if (eventCount == 0) {
             return null;
         }
 
-        string evListString =
-            string.Join(",", jsToUnityEventQueue.ToArray());
+        string evListString;
 
-        jsToUnityEventQueue.Clear();
+        if (eventCount <= jsToUnityEventMaxCount) {
 
-        Debug.Log("BridgeTransport: ReceiveJSToUnityEvents: evListString: " + evListString);
+            evListString =
+                string.Join(",", jsToUnityEventQueue.ToArray());
+            jsToUnityEventQueue.Clear();
+
+        } else {
+
+            List<string> firstEvents = 
+                jsToUnityEventQueue.GetRange(0, jsToUnityEventMaxCount);
+            jsToUnityEventQueue.RemoveRange(0, jsToUnityEventMaxCount);
+            evListString =
+                string.Join(",", firstEvents.ToArray());
+        }
+
+        //Debug.Log("BridgeTransport: ReceiveJSToUnityEvents: evListString: " + evListString);
 
         return evListString;
     }
@@ -101,7 +117,7 @@ public class BridgeTransport : MonoBehaviour
 
     public virtual void SendUnityToJSEvents(string evListString)
     {
-        Debug.Log("BridgeTransport: SendUnityToJSEvents: evListString: " + evListString);
+        //Debug.Log("BridgeTransport: SendUnityToJSEvents: evListString: " + evListString);
 
         unityToJSEventQueue.Add(evListString);
     }
@@ -109,16 +125,30 @@ public class BridgeTransport : MonoBehaviour
 
     public virtual string ReceiveUnityToJSEvents()
     {
-        if (unityToJSEventQueue.Count == 0) {
+        int eventCount = unityToJSEventQueue.Count;
+
+        if (eventCount == 0) {
             return null;
         }
 
-        string evListString =
-            string.Join(",", unityToJSEventQueue.ToArray());
+        string evListString;
 
-        unityToJSEventQueue.Clear();
+        if (eventCount <= unityToJSEventMaxCount) {
 
-        Debug.Log("BridgeTransport: ReceiveUnityToJSEvents: evListString: " + evListString);
+            evListString =
+                string.Join(",", unityToJSEventQueue.ToArray());
+            unityToJSEventQueue.Clear();
+
+        } else {
+
+            List<string> firstEvents = 
+                unityToJSEventQueue.GetRange(0, unityToJSEventMaxCount);
+            unityToJSEventQueue.RemoveRange(0, unityToJSEventMaxCount);
+            evListString =
+                string.Join(",", firstEvents.ToArray());
+        }
+
+        //Debug.Log("BridgeTransport: ReceiveUnityToJSEvents: evListString: " + evListString);
 
         return evListString;
     }

@@ -56,10 +56,10 @@ public class BridgeObject : MonoBehaviour {
 
     public virtual void HandleEvent(JObject ev)
     {
-        //Debug.Log("BridgeObject: HandleEvent: this: " + this + " ev: " + ev, this);
+        Debug.Log("BridgeObject: HandleEvent: this: " + this + " ev: " + ev, this);
 
         string eventName = (string)ev["event"];
-        //Debug.Log("BridgeObject: HandleEvent: eventName: " + eventName, this);
+        Debug.Log("BridgeObject: HandleEvent: eventName: " + eventName, this);
         if (string.IsNullOrEmpty(eventName)) {
             Debug.LogError("BridgeObject: HandleEvent: missing event name in ev: " + ev);
             return;
@@ -213,6 +213,10 @@ public class BridgeObject : MonoBehaviour {
     {
         //Debug.Log("BridgeObject: UpdateInterests: newInterests: " + newInterests, this);
 
+        if (interests == null) {
+            return;
+        }
+
         foreach (var item in newInterests) {
             string eventName = item.Key;
             JToken interestUpdate = (JToken)item.Value;
@@ -267,40 +271,19 @@ public class BridgeObject : MonoBehaviour {
 
     public void SendEventName(string eventName, JObject data = null)
     {
-        //Debug.Log("BridgeObject: SendEventName: eventName: " + eventName + " data: " + data);
-
-        JObject ev = new JObject();
-
-        ev.Add("event", eventName);
-        ev.Add("id", id);
-
-        if (data != null) {
-            ev.Add("data", data);
-        }
-
-        SendEventWithData(ev);
-    }
-
-
-    public void SendEventWithData(JObject ev)
-    {
-        //Debug.Log("BridgeObject: SendEventWithData: ev: " + ev, this);
+        //Debug.Log("BridgeObject: SendEventName: eventName: " + eventName + " data: " + data + " interests: " + interests);
 
         if (bridge == null) {
-            Debug.LogError("BridgeObject: SendEventWithData: bridge is null!");
+            Debug.LogError("BridgeObject: SendEventName: bridge is null!");
             return;
         }
-
-        string eventName = (string)ev["event"];
-        //string id = (string)ev["id"];
-        JObject data = (JObject)ev["data"];
 
         bool foundInterest = false;
 
         if (interests != null) {
 
             JObject interest = (JObject)interests[eventName];
-            //Debug.Log("BridgeObject: SendEventWithData: eventName: " + eventName + " interest: " + interest, this);
+            //Debug.Log("BridgeObject: SendEventName: eventName: " + eventName + " interest: " + interest, this);
             if (interest != null) {
 
                 JToken disabledToken = interest["disabled"];
@@ -311,20 +294,19 @@ public class BridgeObject : MonoBehaviour {
                 if (!disabled) {
 
                     foundInterest = true;
-                    //Debug.Log("BridgeObject: SendEventWithData: foundInterest: eventName: " + eventName + " interest: " + interest, this);
+                    //Debug.Log("BridgeObject: SendEventName: foundInterest: eventName: " + eventName + " interest: " + interest, this);
 
                     JObject query = (JObject)interest["query"];
                     if (query != null) {
 
-                        //Debug.Log("BridgeObject: SendEventWithData: event interest query: " + query);
+                        //Debug.Log("BridgeObject: SendEventName: event interest query: " + query);
 
                         if (data == null) {
                             data = new JObject();
-                            ev["data"] = data;
                         }
 
                         bridge.AddQueryData(this, query, data);
-                        //Debug.Log("BridgeObject: SendEventWithData: event interest query data: " + dagta);
+                        //Debug.Log("BridgeObject: SendEventName: event interest query data: " + dagta);
 
                     }
 
@@ -338,6 +320,18 @@ public class BridgeObject : MonoBehaviour {
         if (foundInterest ||
             (eventName == "Created") ||
             (eventName == "Destroyed")) {
+
+            JObject ev = new JObject();
+
+            ev.Add("event", eventName);
+            ev.Add("id", id);
+
+            if (data != null) {
+                ev.Add("data", data);
+            }
+
+            //Debug.Log("BridgeObject: SendEventName: ev: " + ev, this);
+
             bridge.SendEvent(ev);
         }
 
@@ -644,7 +638,7 @@ public class BridgeObject : MonoBehaviour {
                                     break;
                                 case "ShakePosition":
                                     iTween.ShakePosition(gameObject, vector3, time);
-                                    break;
+                                    bstring id0 = null, reak;
                                 case "ShakeRotation":
                                     iTween.ShakeRotation(gameObject, vector3, time);
                                     break;

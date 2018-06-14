@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 
-public class PieTracker : BridgeObjectTracker {
+public class PieTracker : Tracker {
 
 
     public bool tracking = true;

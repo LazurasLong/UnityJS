@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-// BridgeObjectTrackerProxy.cs
+// TrackerProxy.cs
 // Copyright (C) 2018 by Don Hopkins, Ground Up Software.
 
 
@@ -10,56 +10,56 @@ using System.Reflection;
 using UnityEngine;
 
 
-public class BridgeObjectTrackerProxy : MonoBehaviour {
+public class TrackerProxy : MonoBehaviour {
 
 
-    public BridgeObjectTracker target;
+    public Tracker target;
 
 
     public virtual void OnMouseEnter()
     {
-        Debug.Log("BridgeObjectTrackerProxy: OnMouseEnter: target: " + target);
+        Debug.Log("TrackerProxy: OnMouseEnter: target: " + target);
         target.OnMouseEnter();
     }
 
 
     public virtual void OnMouseExit()
     {
-        Debug.Log("BridgeObjectTrackerProxy: OnMouseExit: target: " + target);
+        Debug.Log("TrackerProxy: OnMouseExit: target: " + target);
         target.OnMouseExit();
     }
 
     public virtual void OnMouseDown()
     {
-        Debug.Log("BridgeObjectTrackerProxy: OnMouseDown: target: " + target);
+        Debug.Log("TrackerProxy: OnMouseDown: target: " + target);
         target.OnMouseDown();
     }
 
 
     public virtual void OnMouseUp()
     {
-        Debug.Log("BridgeObjectTrackerProxy: OnMouseUp: target: " + target);
+        Debug.Log("TrackerProxy: OnMouseUp: target: " + target);
         target.OnMouseUp();
     }
 
 
     public virtual void OnMouseUpAsButton()
     {
-        Debug.Log("BridgeObjectTrackerProxy: OnMouseUpAsButton: target: " + target);
+        Debug.Log("TrackerProxy: OnMouseUpAsButton: target: " + target);
         target.OnMouseUpAsButton();
     }
 
 
     public virtual void OnMouseDrag()
     {
-        Debug.Log("BridgeObjectTrackerProxy: OnMouseDrag: target: " + target);
+        Debug.Log("TrackerProxy: OnMouseDrag: target: " + target);
         target.OnMouseDrag();
     }
 
 
     public virtual void OnMouseOver()
     {
-        Debug.Log("BridgeObjectTrackerProxy: OnMouseOver: target: " + target);
+        Debug.Log("TrackerProxy: OnMouseOver: target: " + target);
         target.OnMouseOver();
     }
 

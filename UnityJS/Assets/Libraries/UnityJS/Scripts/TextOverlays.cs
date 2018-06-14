@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-// OverlayBridge.cs
+// TextOverlays.cs
 // Copyright (C) 2018 by Don Hopkins, Ground Up Software.
 
 
@@ -10,7 +10,7 @@ using UnityEngine;
 using TMPro;
 
 
-public class OverlayBridge: BridgeObjectTracker {
+public class TextOverlays: Tracker {
 
 
     ////////////////////////////////////////////////////////////////////////

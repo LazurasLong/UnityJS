@@ -17,18 +17,26 @@ using Newtonsoft.Json.Linq;
 public class BridgeJsonConverter : JsonConverter {
 
 
-    public delegate bool ConvertToDelegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer);
-    public delegate bool ConvertFromDelegate(JsonWriter writer, System.Type objectType, object value, JsonSerializer serializer);
+    public delegate bool ConvertToDelegate(
+        JsonReader reader, 
+        System.Type objectType, 
+        ref object result, 
+        JsonSerializer serializer);
+
+
+    public delegate bool ConvertFromDelegate(
+        JsonWriter writer, 
+        System.Type objectType, 
+        object value, 
+        JsonSerializer serializer);
 
 
     public override bool CanConvert(Type objectType)
     {
-        bool canConvertFrom =
+        bool canConvertFrom = 
             convertFromObjectMap.ContainsKey(objectType);
-
-        bool canConvertTo =
+        bool canConvertTo = 
             convertToObjectMap.ContainsKey(objectType);
-
         bool canConvert = 
             canConvertFrom || canConvertTo;
 
@@ -52,10 +60,18 @@ public class BridgeJsonConverter : JsonConverter {
             return;
         }
         
-        ConvertFromDelegate converter = convertFromObjectMap[objectType];
+        ConvertFromDelegate converter = 
+            convertFromObjectMap[objectType];
+
         //Debug.Log("BridgeJsonConverter: WriteJson: converter: " + converter);
 
-        bool success = converter(writer, objectType, value, serializer);
+        bool success = 
+            converter(
+                writer, 
+                objectType, 
+                value, 
+                serializer);
+
         //Debug.Log("BridgeJsonConverter: WriteJson: success: " + success);
 
         if (!success) {
@@ -77,13 +93,19 @@ public class BridgeJsonConverter : JsonConverter {
 
         object result = null;
 
-        bool success = converter(reader, objectType, ref result, serializer);
+        bool success = 
+            converter(
+                reader, 
+                objectType, 
+                ref result, 
+                serializer);
+
+        //Debug.Log("BridgeJsonConverter: ReadJson: success: " + success + " result: " + result);
+
         if (!success) {
             Debug.LogError("BridgeJsonConverter: ReadJson: error converting JSON reader: " + reader + " to objectType: " + objectType);
             return null;
         }
-
-        //Debug.Log("BridgeJsonConverter: ReadJson: result: " + result);
 
         return result;
     }
@@ -114,8 +136,8 @@ public class BridgeJsonConverter : JsonConverter {
                     Vector2 vector2 = Vector2.zero;
 
                     JObject obj = JObject.Load(reader);
-                    float x = (float)obj["x"];
-                    float y = (float)obj["y"];
+                    float x = obj.GetFloat("x");
+                    float y = obj.GetFloat("y");
 
                     result = new Vector2(x, y);
                     return true;
@@ -132,9 +154,9 @@ public class BridgeJsonConverter : JsonConverter {
                     Vector3 vector3 = Vector3.zero;
 
                     JObject obj = JObject.Load(reader);
-                    float x = (float)obj["x"];
-                    float y = (float)obj["y"];
-                    float z = (float)obj["z"];
+                    float x = obj.GetFloat("x");
+                    float y = obj.GetFloat("y");
+                    float z = obj.GetFloat("z");
 
                     result = new Vector3(x, y, z);
                     return true;
@@ -151,10 +173,10 @@ public class BridgeJsonConverter : JsonConverter {
                     Vector4 vector4 = Vector4.zero;
 
                     JObject obj = JObject.Load(reader);
-                    float x = (float)obj["x"];
-                    float y = (float)obj["y"];
-                    float z = (float)obj["z"];
-                    float w = (float)obj["w"];
+                    float x = obj.GetFloat("x");
+                    float y = obj.GetFloat("y");
+                    float z = obj.GetFloat("z");
+                    float w = obj.GetFloat("w");
 
                     result = new Vector4(x, y, z, w);
                     return true;
@@ -174,6 +196,7 @@ public class BridgeJsonConverter : JsonConverter {
                     JToken rollToken = obj["roll"];
                     JToken pitchToken = obj["pitch"];
                     JToken yawToken = obj["yaw"];
+
                     if ((rollToken != null) ||
                         (pitchToken != null) ||
                         (yawToken != null)) {
@@ -186,10 +209,10 @@ public class BridgeJsonConverter : JsonConverter {
 
                     } else {
 
-                        float x = (float)obj["x"];
-                        float y = (float)obj["y"];
-                        float z = (float)obj["z"];
-                        float w = (float)obj["w"];
+                        float x = obj.GetFloat("x");
+                        float y = obj.GetFloat("y");
+                        float z = obj.GetFloat("z");
+                        float w = obj.GetFloat("w");
 
                         result = new Quaternion(x, y, z, w);
 
@@ -223,11 +246,10 @@ public class BridgeJsonConverter : JsonConverter {
 
                     JObject obj = JObject.Load(reader);
 
-                    float r = (float)obj["r"];
-                    float g = (float)obj["g"];
-                    float b = (float)obj["b"];
-                    JToken aToken = obj["a"];
-                    float a = (aToken == null) ? 1.0f : (float)aToken;
+                    float r = obj.GetFloat("r");
+                    float g = obj.GetFloat("g");
+                    float b = obj.GetFloat("b");
+                    float a = obj.GetFloat("a", 1.0f);
 
                     result = new Color(r, g, b, a);
                     return true;
@@ -245,7 +267,7 @@ public class BridgeJsonConverter : JsonConverter {
                     }
 
                     if (reader.TokenType != JsonToken.StartArray) {
-                        Debug.LogError("BridgeManager: Matrix4x4: expected array");
+                        Debug.LogError("BridgeJsonConverter: Matrix4x4: expected array");
                         result = mat;
                         return false;
                     }
@@ -253,10 +275,12 @@ public class BridgeJsonConverter : JsonConverter {
                     JArray a = JArray.Load(reader);
 
                     if (a.Count != 16) {
-                        Debug.LogError("BridgeManager: Matrix4x4: expected array of length 16");
+                        Debug.LogError("BridgeJsonConverter: Matrix4x4: expected array of length 16");
                         result = mat;
                         return false;
                     }
+
+                    // TODO: make sure all elements of the array are numbers.
 
                     mat.SetColumn(0, new Vector4((float)a[0], (float)a[1], (float)a[2], (float)a[3]));
                     mat.SetColumn(1, new Vector4((float)a[4], (float)a[5], (float)a[6], (float)a[7]));
@@ -290,27 +314,25 @@ public class BridgeJsonConverter : JsonConverter {
                         return true;
                     }
 
-
                     JObject obj = (JObject)token;
 
-                    string minMaxCurveType = (string)obj["minMaxCurveType"];
+                    string minMaxCurveType = obj.GetString("minMaxCurveType");
 
                     switch (minMaxCurveType) {
 
                         case "Constant": {
 
-                            float constant = (float)obj["constant"];
+                            float constant = obj.GetFloat("constant");
 
                             result = new ParticleSystem.MinMaxCurve(constant);
-                            //Debug.Log("BridgeManager: MinMaxCurve: minMaxCurveType: Constant: constant:" + constant + " result: " + result);
+                            //Debug.Log("BridgeJsonConverter: MinMaxCurve: minMaxCurveType: Constant: constant:" + constant + " result: " + result);
 
                             return true;
                         }
 
                         case "Curve": {
 
-                            JToken multiplierToken = obj["multiplier"];
-                            float multiplier = (multiplierToken == null) ? 1.0f : (float)multiplierToken;
+                            float multiplier = obj.GetFloat("multiplier", 1.0f);
 
                             JToken curveToken = obj["curve"];
                             AnimationCurve curve = null;
@@ -322,15 +344,14 @@ public class BridgeJsonConverter : JsonConverter {
                             minMaxCurve = new ParticleSystem.MinMaxCurve(multiplier, curve);
                             result = minMaxCurve;
 
-                            //Debug.Log("BridgeManager: MinMaxCurve: minMaxCurveType: Curve: multiplier: " + multiplier + " curve: " + curve + " result: " + result);
+                            //Debug.Log("BridgeJsonConverter: MinMaxCurve: minMaxCurveType: Curve: multiplier: " + multiplier + " curve: " + curve + " result: " + result);
 
                             return true;
                         }
 
                         case "RandomCurves": {
 
-                            JToken multiplierToken = obj["multiplier"];
-                            float multiplier = (multiplierToken == null) ? 1.0f : (float)multiplierToken;
+                            float multiplier = obj.GetFloat("multiplier", 1.0f);
 
                             JToken minCurveToken = obj["min"];
                             AnimationCurve minCurve = null;
@@ -347,25 +368,25 @@ public class BridgeJsonConverter : JsonConverter {
                             minMaxCurve = new ParticleSystem.MinMaxCurve(multiplier, minCurve, maxCurve);
                             result = minMaxCurve;
 
-                            //Debug.Log("BridgeManager: convertToObjectMap: MinMaxCurve: minMaxCurveType: RandomCurves: multiplier: " + multiplier + " minCurve: " + minCurve + " maxCurve: " + maxCurve + " result: " + result);
+                            //Debug.Log("BridgeJsonConverter: convertToObjectMap: MinMaxCurve: minMaxCurveType: RandomCurves: multiplier: " + multiplier + " minCurve: " + minCurve + " maxCurve: " + maxCurve + " result: " + result);
 
                             return true;
                         }
 
                         case "RandomConstants": {
 
-                            float minConstant = (float)obj["min"];
-                            float maxConstant = (float)obj["max"];
+                            float minConstant = obj.GetFloat("min");
+                            float maxConstant = obj.GetFloat("max", 1.0f);
 
                             minMaxCurve = new ParticleSystem.MinMaxCurve(minConstant, maxConstant);
                             result = minMaxCurve;
 
-                            //Debug.Log("BridgeManager: convertToObjectMap: MinMaxCurve: minMaxCurveType: RandomConstants min: " + minConstant + " max: " + maxConstant + " result: " + result);
+                            //Debug.Log("BridgeJsonConverter: convertToObjectMap: MinMaxCurve: minMaxCurveType: RandomConstants min: " + minConstant + " max: " + maxConstant + " result: " + result);
                             return true;
                         }
 
                         default: {
-                            Debug.LogError("BridgeManager: convertToObjectMap: MinMaxCurve: unexpected minMaxCurveType: " + minMaxCurveType);
+                            Debug.LogError("BridgeJsonConverter: convertToObjectMap: MinMaxCurve: unexpected minMaxCurveType: " + minMaxCurveType);
                             return false;
                         }
 
@@ -387,15 +408,14 @@ public class BridgeJsonConverter : JsonConverter {
                     JToken token = JToken.Load(reader);
                     JObject obj = (JObject)token;
 
-                    string minMaxGradientType = (string)obj["minMaxGradientType"];
+                    string minMaxGradientType = obj.GetString("minMaxGradientType");
 
                     if (string.IsNullOrEmpty(minMaxGradientType)) {
                         Color color = (Color)obj.ToObject(typeof(Color), serializer);
-
                         minMaxGradient = new ParticleSystem.MinMaxGradient(color);
                         minMaxGradient.mode = ParticleSystemGradientMode.Color;
                         result = minMaxGradient;
-                        //Debug.Log("BridgeManager: convertToObjectMap: MinMaxGradient: color:" + color + " result: " + result);
+                        //Debug.Log("BridgeJsonConverter: convertToObjectMap: MinMaxGradient: color:" + color + " result: " + result);
                         return true;
                     }
 
@@ -403,7 +423,10 @@ public class BridgeJsonConverter : JsonConverter {
 
                         case "Color": {
                             JToken colorToken = obj["color"];
-                            Color color = (colorToken != null) ? (Color)colorToken.ToObject(typeof(Color), serializer) : Color.white;
+                            Color color =
+                                (colorToken != null)
+                                    ? (Color)colorToken.ToObject(typeof(Color), serializer) 
+                                    : Color.white;
                             minMaxGradient = new ParticleSystem.MinMaxGradient(color);
                             minMaxGradient.mode = ParticleSystemGradientMode.Color;
                             result = minMaxGradient;
@@ -412,7 +435,10 @@ public class BridgeJsonConverter : JsonConverter {
 
                         case "Gradient": {
                             JToken gradientToken = obj["gradient"];
-                            Gradient gradient = (gradientToken != null) ? (Gradient)gradientToken.ToObject(typeof(Gradient), serializer) : null;
+                            Gradient gradient =
+                                (gradientToken != null)
+                                    ? (Gradient)gradientToken.ToObject(typeof(Gradient), serializer) 
+                                    : null;
                             minMaxGradient = new ParticleSystem.MinMaxGradient();
                             minMaxGradient.mode = ParticleSystemGradientMode.Gradient;
                             minMaxGradient.gradient = gradient;
@@ -422,9 +448,15 @@ public class BridgeJsonConverter : JsonConverter {
 
                         case "TwoColors": {
                             JToken minToken = obj["min"];
-                            Color min = (minToken != null) ? (Color)minToken.ToObject(typeof(Color), serializer) : Color.white;
+                            Color min = 
+                                (minToken != null) 
+                                    ? (Color)minToken.ToObject(typeof(Color), serializer)
+                                    : Color.white;
                             JToken maxToken = obj["max"];
-                            Color max = (maxToken != null) ? (Color)maxToken.ToObject(typeof(Color), serializer) : Color.white;
+                            Color max =
+                                (maxToken != null)
+                                    ? (Color)maxToken.ToObject(typeof(Color), serializer)
+                                    : Color.white;
                             minMaxGradient = new ParticleSystem.MinMaxGradient();
                             minMaxGradient.mode = ParticleSystemGradientMode.TwoColors;
                             minMaxGradient.colorMin = min;
@@ -435,9 +467,15 @@ public class BridgeJsonConverter : JsonConverter {
 
                         case "TwoGradients": {
                             JToken minToken = obj["min"];
-                            Gradient gradientMin = (minToken != null) ? (Gradient)minToken.ToObject(typeof(Gradient), serializer) : null;
+                            Gradient gradientMin =
+                                (minToken != null) 
+                                    ? (Gradient)minToken.ToObject(typeof(Gradient), serializer) 
+                                    : null;
                             JToken maxToken = obj["max"];
-                            Gradient gradientMax = (maxToken != null) ? (Gradient)maxToken.ToObject(typeof(Gradient), serializer) : null;
+                            Gradient gradientMax =
+                                (maxToken != null) 
+                                    ? (Gradient)maxToken.ToObject(typeof(Gradient), serializer) 
+                                    : null;
                             minMaxGradient = new ParticleSystem.MinMaxGradient();
                             minMaxGradient.mode = ParticleSystemGradientMode.TwoGradients;
                             minMaxGradient.gradientMin = gradientMin;
@@ -448,7 +486,10 @@ public class BridgeJsonConverter : JsonConverter {
 
                         case "RandomColor": {
                             JToken gradientToken = obj["gradient"];
-                            Gradient gradient = (gradientToken != null) ? (Gradient)gradientToken.ToObject(typeof(Gradient), serializer) : null;
+                            Gradient gradient =
+                                (gradientToken != null) 
+                                    ? (Gradient)gradientToken.ToObject(typeof(Gradient), serializer) 
+                                    : null;
                             minMaxGradient = new ParticleSystem.MinMaxGradient();
                             minMaxGradient.mode = ParticleSystemGradientMode.RandomColor;
                             minMaxGradient.gradient = gradient;
@@ -457,7 +498,7 @@ public class BridgeJsonConverter : JsonConverter {
                         }
 
                         default: {
-                            Debug.LogError("BridgeManager: convertToObjectMap: MinMaxGradient: unexpected minMaxGradientType: " + minMaxGradientType);
+                            Debug.LogError("BridgeJsonConverter: convertToObjectMap: MinMaxGradient: unexpected minMaxGradientType: " + minMaxGradientType);
                             result = null;
                             return false;
                         }
@@ -467,11 +508,70 @@ public class BridgeJsonConverter : JsonConverter {
                 }
             },
 
-#if false
+            { typeof(Gradient), // class
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    JToken token = JToken.Load(reader);
+                    JObject obj = (JObject)token;
+
+                    List<GradientAlphaKey> gradientAlphaKeysList = new List<GradientAlphaKey>();
+                    List<GradientColorKey> gradientColorKeysList = new List<GradientColorKey>();
+
+                    JArray alphaKeys = obj.GetArray("alphaKeys");
+                    JArray colorKeys = obj.GetArray("colorKeys");
+
+                    if (alphaKeys != null) {
+                        foreach (JToken keyToken in alphaKeys) {
+                            //Debug.Log("BridgeJsonConverter: convertToObjectMap: Gradient: alphaKeys: keyToken: " + keyToken);
+
+                            GradientAlphaKey gradientAlphaKey = 
+                                (GradientAlphaKey)keyToken.ToObject(typeof(GradientAlphaKey), serializer);
+
+                            gradientAlphaKeysList.Add(gradientAlphaKey);
+                        }
+
+                    }
+
+                    if (colorKeys != null) {
+                        foreach (JToken keyToken in colorKeys) {
+                            //Debug.Log("BridgeJsonConverter: convertToObjectMap: Gradient: colorKeys: keyToken: " + keyToken);
+
+                            GradientColorKey gradientColorKey =
+                                (GradientColorKey)keyToken.ToObject(typeof(GradientColorKey), serializer);
+
+                            gradientColorKeysList.Add(gradientColorKey);
+                        }
+
+                    }
+
+                    Gradient gradient = new Gradient();
+                    gradient.alphaKeys = gradientAlphaKeysList.ToArray();
+                    gradient.colorKeys = gradientColorKeysList.ToArray();
+
+                    string mode = obj.GetString("mode");
+                    if (!string.IsNullOrEmpty(mode)) {
+                        GradientMode gradientMode = gradient.mode;
+                        if (!Bridge.ConvertToEnum<GradientMode>(mode, ref gradientMode)) {
+                            Debug.LogError("BridgeJsonConverter: convertToObjectMap: Gradient: invalid gradientMode: " + mode);
+                        } else {
+                            gradient.mode = gradientMode;
+                        }
+                    }
+
+                    result = gradient;
+                    return true;
+                }
+            },
+
             { typeof(AnimationCurve), // class
                 delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
 
-                    AnimationCurve animationCurve = new AnimationCurve();
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: AnimationCurve reader: " + reader);
 
                     if (reader.TokenType == JsonToken.Null) {
                         result = null;
@@ -480,91 +580,187 @@ public class BridgeJsonConverter : JsonConverter {
 
                     JObject obj = JObject.Load(reader);
 
-                    string animationCurveType = (string)obj["animationCurveType"];
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: AnimationCurve obj: " + obj);
+
+                    string animationCurveType = obj.GetString("animationCurveType");
+                    AnimationCurve animationCurve = null;
 
                     switch (animationCurveType) {
 
+                        case "Constant": {
+                            animationCurve = AnimationCurve.Constant(
+                                obj.GetFloat("timeStart"),
+                                obj.GetFloat("timeEnd"),
+                                obj.GetFloat("value"));
+                            break;
+                        }
+
                         case "EaseInOut": {
-                            result = AnimationCurve.EaseInOut(
-                                GetFloat(dict, "timeStart"),
-                                GetFloat(dict, "timeEnd"),
-                                GetFloat(dict, "valueStart"),
-                                GetFloat(dict, "valueEnd"));
-                            return true;
+                            animationCurve = AnimationCurve.EaseInOut(
+                                obj.GetFloat("timeStart"),
+                                obj.GetFloat("timeEnd"),
+                                obj.GetFloat("valueStart"),
+                                obj.GetFloat("valueEnd"));
+                            break;
                         }
 
                         case "Linear": {
-                            result = AnimationCurve.Linear(
-                                GetFloat(dict, "timeStart"),
-                                GetFloat(dict, "timeEnd"),
-                                GetFloat(dict, "valueStart"),
-                                GetFloat(dict, "valueEnd"));
-                            return true;
+                            animationCurve = AnimationCurve.Linear(
+                                obj.GetFloat("timeStart"),
+                                obj.GetFloat("timeEnd"),
+                                obj.GetFloat("valueStart"),
+                                obj.GetFloat("valueEnd"));
+                            break;
                         }
 
                         case "Keys": {
-                            fsData keys = dict.ContainsKey("keys") ? dict["keys"] : null;
-                            Keyframe[] curveKeys = null;
+                            JArray keys = obj.GetArray("keys");
 
-                            //Debug.Log("BridgeManager: ConvertToAnimationCurve: keys: " + keys + " isList: " + keys.IsList);
-                            if ((keys != null) &&
-                                !keys.IsList) {
-                                Debug.LogError("BridgeManager: ConvertToAnimationCurve: keys should be list!");
+                            //Debug.Log("BridgeJsonConverter: convertToObjectMap: AnimationCurve obj: " + obj + " keys: " + keys);
+                            if (keys == null) {
+                                Debug.LogError("BridgeJsonConverter: convertToObjectMap: AnimationCurve: keys should be an array!");
                                 return false;
                             }
 
                             var keyframeList = new List<Keyframe>();
-                            foreach (fsData key in keys.AsList) {
+                            foreach (JToken key in keys) {
 
-                                //Debug.Log("BridgeManager: ConvertToAnimationCurve: key: " + key + " isDictionary: " + key.IsDictionary);
+                                //Debug.Log("BridgeJsonConverter: convertToObjectMap: AnimationCurve key: " + key + " type: " + key.Type);
 
-                                Keyframe keyframe = new Keyframe();
-                                if (!ConvertToKeyframe(key, ref keyframe)) {
-                                    //Debug.Log("BridgeManager: ConvertToAnimationCurve: Can't convert to Keyframe key: " + key);
-                                    return false;
-                                }
+                                Keyframe keyframe =
+                                    (Keyframe)key.ToObject(typeof(Keyframe), serializer);
 
                                 keyframeList.Add(keyframe);
                             }
 
-                            curveKeys = keyframeList.ToArray();
-                            //Debug.Log("BridgeManager: ConvertToAnimationCurve: total keys: " + curveKeys.Length + " curveKeys: " + curveKeys);
+                            Keyframe[] curveKeys = keyframeList.ToArray();
+                            //Debug.Log("BridgeJsonConverter: convertToObjectMap: total keys: " + curveKeys.Length + " curveKeys: " + curveKeys);
 
-                            result = new AnimationCurve(curveKeys);
+                            animationCurve = new AnimationCurve(curveKeys);
 
-                            fsData preWrapMode = dict.ContainsKey("preWrapMode") ? dict["preWrapMode"] : null;
-                            if (preWrapMode != null) {
-                                WrapMode wrapMode = result.preWrapMode;
-                                if (!ConvertToEnum<WrapMode>(preWrapMode, ref wrapMode)) {
-                                    Debug.LogError("BridgeManager: ConvertToAnimationCurve: invalid preWrapMode: " + preWrapMode);
-                                } else {
-                                    result.preWrapMode = wrapMode;
-                                }
-                            }
-
-                            fsData postWrapMode = dict.ContainsKey("postWrapMode") ? dict["postWrapMode"] : null;
-                            if (postWrapMode != null) {
-                                WrapMode wrapMode = result.postWrapMode;
-                                if (!ConvertToEnum<WrapMode>(postWrapMode, ref wrapMode)) {
-                                    Debug.LogError("BridgeManager: ConvertToAnimationCurve: invalid postWrapMode: " + postWrapMode);
-                                } else {
-                                    result.postWrapMode = wrapMode;
-                                }
-                            }
-
-                            return true;
+                            break;
                         }
 
                         default: {
-                            Debug.LogError("BridgeManager: convertToObjectMap: AnimationCurve: unexpected animationCurveType: " + animationCurveType);
+                            Debug.LogError("BridgeJsonConverter: convertToObjectMap: AnimationCurve: unexpected animationCurveType: " + animationCurveType);
                             result = null;
                             return false;
                         }
                     }
 
+                    string preWrapMode = obj.GetString("preWrapMode");
+                    if (!string.IsNullOrEmpty(preWrapMode)) {
+                        WrapMode wrapMode = animationCurve.preWrapMode;
+                        if (!Bridge.ConvertToEnum<WrapMode>(preWrapMode, ref wrapMode)) {
+                            Debug.LogError("BridgeJsonConverter: convertToObjectMap: AnimationCurve: invalid preWrapMode: " + preWrapMode);
+                        } else {
+                            animationCurve.preWrapMode = wrapMode;
+                        }
+                    }
+
+                    string postWrapMode = obj.GetString("postWrapMode");
+                    if (!string.IsNullOrEmpty(postWrapMode)) {
+                        WrapMode wrapMode = animationCurve.postWrapMode;
+                        if (!Bridge.ConvertToEnum<WrapMode>(postWrapMode, ref wrapMode)) {
+                            Debug.LogError("BridgeJsonConverter: convertToObjectMap: AnimationCurve: invalid postWrapMode: " + postWrapMode);
+                        } else {
+                            animationCurve.postWrapMode = wrapMode;
+                        }
+                    }
+
+                    result = animationCurve;
+                    return true;
                 }
             },
-#endif
+
+            { typeof(Keyframe), // struct
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    JObject obj = JObject.Load(reader);
+
+                    float time = obj.GetFloat("time");
+                    float value = obj.GetFloat("value");
+                    float inTangent = obj.GetFloat("inTangent");
+                    float outTangent = obj.GetFloat("outTangent");
+
+                    Keyframe keyframe = 
+                        new Keyframe(time, value, inTangent, outTangent);
+
+                    result = keyframe;
+                    return true;
+                }
+            },
+
+            { typeof(GradientColorKey), // struct
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    JObject obj = JObject.Load(reader);
+
+                    JToken colorToken = obj["color"];
+                    Color color =
+                        (colorToken == null)
+                            ? Color.white
+                            : (Color)colorToken.ToObject(typeof(Color), serializer);
+                    float time = obj.GetFloat("time");
+
+                    GradientColorKey gradientColorKey = 
+                        new GradientColorKey(color, time);
+
+                    result = gradientColorKey;
+                    return true;
+                }
+            },
+
+            { typeof(GradientAlphaKey), // struct
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    JObject obj = JObject.Load(reader);
+
+                    float alpha = obj.GetFloat("alpha", 1.0f);
+                    float time = obj.GetFloat("time");
+
+                    GradientAlphaKey gradientAlphaKey = 
+                        new GradientAlphaKey(alpha, time);
+
+                    result = gradientAlphaKey;
+                    return true;
+                }
+            },
+
+            { typeof(Texture), // class
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.String) {
+                        return false;
+                    }
+
+                    string resourcePath = (string)JValue.Load(reader);
+                    Texture resource = (Texture)Resources.Load(resourcePath);
+
+                    result = resource;
+                    return true;
+                }
+            },
 
         };
 
@@ -683,6 +879,12 @@ public class BridgeJsonConverter : JsonConverter {
                 }
             },
 
+            { typeof(Texture), // class
+                delegate(JsonWriter writer, System.Type objectType, object value, JsonSerializer serializer) {
+                    return false;
+                }
+            },
+
 #if false
             { typeof(AnimationCurve), // class
                 delegate(JsonWriter writer, System.Type objectType, object value, JsonSerializer serializer) {
@@ -756,7 +958,7 @@ public class BridgeJsonConverter : JsonConverter {
         object proxied = ProxyGroup.FindProxied(handle);
 
         if (proxied == null) {
-            Debug.LogError("BridgeManager: ConvertToProxied: undefined handle: " + handle);
+            Debug.LogError("BridgeJsonConverter: ConvertToProxied: undefined handle: " + handle);
             return false;
         }
 
@@ -776,7 +978,7 @@ public class BridgeJsonConverter : JsonConverter {
         string handle = ProxyGroup.FindHandle(obj);
 
         if (handle == null) {
-            Debug.LogError("BridgeManager: ConvertFromProxied: can't make handle for obj: " + obj);
+            Debug.LogError("BridgeJsonConverter: ConvertFromProxied: can't make handle for obj: " + obj);
             return false;
         }
 
@@ -793,356 +995,6 @@ public class BridgeJsonConverter : JsonConverter {
 
 
 #if false
-
-
-    ////////////////////////////////////////////////////////////////////////
-    // AnimationCurve type.
-
-
-    public static bool ConvertToAnimationCurve(JToken data, ref AnimationCurve result)
-    {
-        if (data.Type != JTokenType.Object) {
-            return false;
-        }
-
-        JObject dict = (JObject)dict;
-        string animationCurveType = GetString(dict, "animationCurveType");
-
-        switch (animationCurveType) {
-
-            case "EaseInOut":
-                result = AnimationCurve.EaseInOut(
-                    GetFloat(dict, "timeStart"),
-                    GetFloat(dict, "timeEnd"),
-                    GetFloat(dict, "valueStart"),
-                    GetFloat(dict, "valueEnd"));
-                return true;
-
-            case "Linear":
-                result = AnimationCurve.Linear(
-                    GetFloat(dict, "timeStart"),
-                    GetFloat(dict, "timeEnd"),
-                    GetFloat(dict, "valueStart"),
-                    GetFloat(dict, "valueEnd"));
-                return true;
-
-            case "Keys":
-                JToken keys = dict.ContainsKey("keys") ? dict["keys"] : null;
-                Keyframe[] curveKeys = null;
-
-                //Debug.Log("BridgeManager: ConvertToAnimationCurve: keys: " + keys + " isList: " + keys.IsList);
-                if ((keys != null) &&
-                    !keys.IsList) {
-                    Debug.LogError("BridgeManager: ConvertToAnimationCurve: keys should be list!");
-                    return false;
-                }
-
-                var keyframeList = new List<Keyframe>();
-                foreach (JToken key in keys.AsList) {
-
-                    //Debug.Log("BridgeManager: ConvertToAnimationCurve: key: " + key + " isDictionary: " + key.IsDictionary);
-
-                    Keyframe keyframe = new Keyframe();
-                    if (!ConvertToKeyframe(key, ref keyframe)) {
-                        //Debug.Log("BridgeManager: ConvertToAnimationCurve: Can't convert to Keyframe key: " + key);
-                        return false;
-                    }
-
-                    keyframeList.Add(keyframe);
-                }
-
-                curveKeys = keyframeList.ToArray();
-                //Debug.Log("BridgeManager: ConvertToAnimationCurve: total keys: " + curveKeys.Length + " curveKeys: " + curveKeys);
-
-                result = new AnimationCurve(curveKeys);
-
-                JToken preWrapMode = dict.ContainsKey("preWrapMode") ? dict["preWrapMode"] : null;
-                if (preWrapMode != null) {
-                    WrapMode wrapMode = result.preWrapMode;
-                    if (!ConvertToEnum<WrapMode>(preWrapMode, ref wrapMode)) {
-                        Debug.LogError("BridgeManager: ConvertToAnimationCurve: invalid preWrapMode: " + preWrapMode);
-                    } else {
-                        result.preWrapMode = wrapMode;
-                    }
-                }
-
-                JToken postWrapMode = dict.ContainsKey("postWrapMode") ? dict["postWrapMode"] : null;
-                if (postWrapMode != null) {
-                    WrapMode wrapMode = result.postWrapMode;
-                    if (!ConvertToEnum<WrapMode>(postWrapMode, ref wrapMode)) {
-                        Debug.LogError("BridgeManager: ConvertToAnimationCurve: invalid postWrapMode: " + postWrapMode);
-                    } else {
-                        result.postWrapMode = wrapMode;
-                    }
-                }
-
-                return true;
-
-            default:
-                Debug.LogError("BridgeManager: ConvertToAnimationCurve: invalid animationCurveType: " + animationCurveType);
-                return false;
-
-        }
-
-    }
-
-
-    public static JToken ConvertFromAnimationCurve(AnimationCurve animationCurve)
-    {
-        JToken result = CreateDictionary();
-        var dict = result.AsDictionary;
-
-        // TODO
-
-        return result;
-    }
-
-
-    public static AnimationCurve GetAnimationCurve(Dictionary<string, JToken> dict, string key)
-    {
-        AnimationCurve result = new AnimationCurve();
-
-        if (dict.ContainsKey(key)) {
-            ConvertToAnimationCurve(dict[key], ref result);
-        }
-
-        return result;
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////
-    // Keyframe type.
-
-
-    public static bool ConvertToKeyframe(JToken data, ref Keyframe result)
-    {
-        if (!data.IsDictionary) {
-            return false;
-        }
-
-        var dict = data.AsDictionary;
-        float time = GetFloat(dict, "time");
-        float value = GetFloat(dict, "value");
-        float inTangent = GetFloat(dict, "inTangent");
-        float outTangent = GetFloat(dict, "outTangent");
-
-        result = new Keyframe(time, value, inTangent, outTangent);
-        return true;
-    }
-
-
-    public static JToken ConvertFromKeyframe(Keyframe keyframe)
-    {
-        JToken result = CreateDictionary();
-        var dict = result.AsDictionary;
-        dict["time"] = ConvertFromFloat(keyframe.time);
-        dict["value"] = ConvertFromFloat(keyframe.value);
-        dict["inTangent"] = ConvertFromFloat(keyframe.inTangent);
-        dict["outTangent"] = ConvertFromFloat(keyframe.outTangent);
-
-        return result;
-    }
-
-
-    public static Keyframe GetKeyframe(Dictionary<string, JToken> dict, string key)
-    {
-        Keyframe result = new Keyframe();
-
-        if (dict.ContainsKey(key)) {
-            ConvertToKeyframe(dict[key], ref result);
-        }
-
-        return result;
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////
-    // Gradient type.
-
-
-    public static bool ConvertToGradient(JToken data, ref Gradient result)
-    {
-        if (!data.IsDictionary) {
-            return false;
-        }
-
-        var dict = data.AsDictionary;
-        List<GradientAlphaKey> gradientAlphaKeysList = new List<GradientAlphaKey>();
-        List<GradientColorKey> gradientColorKeysList = new List<GradientColorKey>();
-
-        if (dict.ContainsKey("alphaKeys")) {
-            JToken alphaKeysData = dict["alphaKeys"];
-
-            if (!alphaKeysData.IsList) {
-                Debug.LogError("BridgeManager: ConvertToGradient: invalid alphaKeysData: " + alphaKeysData);
-            } else {
-
-                foreach (JToken key in alphaKeysData.AsList) {
-                    //Debug.Log("BridgeManager: ConvertToGradient: alphaKeys: key: " + key + " isDictionary: " + key.IsDictionary);
-
-                    if (!key.IsDictionary) {
-                        Debug.LogError("BridgeManager: ConvertToGradient: key should be dictionary!");
-                        return false;
-                    }
-
-                    GradientAlphaKey gradientAlphaKey = new GradientAlphaKey();
-                    if (!ConvertToGradientAlphaKey(key, ref gradientAlphaKey)) {
-                        //Debug.Log("BridgeManager: ConvertToGradient: Can't convert to GradientAlphaKey key: " + key);
-                        return false;
-                    }
-
-                    gradientAlphaKeysList.Add(gradientAlphaKey);
-                }
-
-            }
-
-        }
-
-        if (dict.ContainsKey("colorKeys")) {
-            JToken colorKeysData = dict["colorKeys"];
-
-            if (!colorKeysData.IsList) {
-                Debug.LogError("BridgeManager: ConvertToGradient: invalid colorKeysData: " + colorKeysData);
-            } else {
-
-                foreach (JToken key in colorKeysData.AsList) {
-                    //Debug.Log("BridgeManager: ConvertToGradient: colorKeys: key: " + key + " isDictionary: " + key.IsDictionary);
-
-                    GradientColorKey gradientColorKey = new GradientColorKey();
-                    if (!ConvertToGradientColorKey(key, ref gradientColorKey)) {
-                        //Debug.Log("BridgeManager: ConvertToGradient: Can't convert to GradientColorKey key: " + key);
-                        return false;
-                    }
-
-                    gradientColorKeysList.Add(gradientColorKey);
-                }
-
-            }
-
-        }
-
-        result = new Gradient();
-
-        result.alphaKeys = gradientAlphaKeysList.ToArray();
-        result.colorKeys = gradientColorKeysList.ToArray();
-        if (dict.ContainsKey("mode")) {
-            GradientMode gradientMode = result.mode;
-            if (!ConvertToEnum<GradientMode>(dict["mode"], ref gradientMode)) {
-                Debug.LogError("BridgeManager: ConvertToAnimationCurve: invalid gradientMode: " + dict["mode"]);
-            } else {
-                result.mode = gradientMode;
-            }
-        }
-
-        return true;
-    }
-
-
-    public static JToken ConvertFromGradient(Gradient gradient)
-    {
-        JToken result = CreateDictionary();
-        var dict = result.AsDictionary;
-
-        // TODO
-
-        return result;
-    }
-
-
-    public static Gradient GetGradient(Dictionary<string, JToken> dict, string key)
-    {
-        Gradient result = new Gradient();
-
-        if (dict.ContainsKey(key)) {
-            ConvertToGradient(dict[key], ref result);
-        }
-
-        return result;
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////
-    // GradientColorKey type.
-
-
-    public static bool ConvertToGradientColorKey(JToken data, ref GradientColorKey result)
-    {
-        if (!data.IsDictionary) {
-            return false;
-        }
-
-        var dict = data.AsDictionary;
-        Color color = GetColor(dict, "color", Color.white);
-        float time = GetFloat(dict, "time");
-
-        result = new GradientColorKey(color, time);
-        return true;
-    }
-
-
-    public static JToken ConvertFromGradientColorKey(GradientColorKey gradientColorKey)
-    {
-        JToken result = CreateDictionary();
-        var dict = result.AsDictionary;
-        dict["color"] = ConvertFromColor(gradientColorKey.color);
-        dict["time"] = ConvertFromFloat(gradientColorKey.time);
-
-        return result;
-    }
-
-
-    public static GradientColorKey GetGradientColorKey(Dictionary<string, JToken> dict, string key)
-    {
-        GradientColorKey result = new GradientColorKey();
-
-        if (dict.ContainsKey(key)) {
-            ConvertToGradientColorKey(dict[key], ref result);
-        }
-
-        return result;
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////
-    // GradientAlphaKey type.
-
-
-    public static bool ConvertToGradientAlphaKey(JToken data, ref GradientAlphaKey result)
-    {
-        if (!data.IsDictionary) {
-            return false;
-        }
-
-        var dict = data.AsDictionary;
-        float alpha = GetFloat(dict, "alpha", 1.0f);
-        float time = GetFloat(dict, "time");
-
-        result = new GradientAlphaKey(alpha, time);
-        return true;
-    }
-
-
-    public static JToken ConvertFromGradientAlphaKey(GradientAlphaKey gradientAlphaKey)
-    {
-        JToken result = CreateDictionary();
-        var dict = result.AsDictionary;
-        dict["alpha"] = ConvertFromFloat(gradientAlphaKey.alpha);
-        dict["time"] = ConvertFromFloat(gradientAlphaKey.time);
-
-        return result;
-    }
-
-
-    public static GradientAlphaKey GetGradientAlphaKey(Dictionary<string, JToken> dict, string key)
-    {
-        GradientAlphaKey result = new GradientAlphaKey();
-
-        if (dict.ContainsKey(key)) {
-            ConvertToGradientAlphaKey(dict[key], ref result);
-        }
-
-        return result;
-    }
 
 
     ////////////////////////////////////////////////////////////////////////

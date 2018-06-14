@@ -41,7 +41,7 @@ public class BridgeTransportWebView : BridgeTransport
         driver = "WebView";
         url = CleanURL(url);
 
-        Debug.Log("BridgeTransportWebView: HandleInit: url: " + url);
+        //Debug.Log("BridgeTransportWebView: HandleInit: url: " + url);
 
         IEnumerator coroutine = StartWebView();
         StartCoroutine(coroutine);
@@ -50,7 +50,7 @@ public class BridgeTransportWebView : BridgeTransport
 
     public IEnumerator StartWebView()
     {
-        Debug.Log("BridgeTransportWebView: StartWebView: url: " + url);
+        //Debug.Log("BridgeTransportWebView: StartWebView: url: " + url);
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         //Debug.Log("BridgeTransportWebView: StartWebView: Android");
@@ -139,7 +139,7 @@ public class BridgeTransportWebView : BridgeTransport
 
     public override void HandleDestroy()
     {
-        Debug.Log("BridgeTransportWebView: HandleDestroy");
+        //Debug.Log("BridgeTransportWebView: HandleDestroy");
 
         base.HandleDestroy();
 
@@ -177,7 +177,7 @@ public class BridgeTransportWebView : BridgeTransport
 
         cleanURL = cleanURL.Replace(" ", "%20");
 
-        Debug.Log("BridgeTransportWebView: CleanURL: url: " + url + " cleanURL: " + cleanURL);
+        //Debug.Log("BridgeTransportWebView: CleanURL: url: " + url + " cleanURL: " + cleanURL);
 
         return cleanURL;
     }
@@ -248,7 +248,7 @@ public class BridgeTransportWebView : BridgeTransport
 
     public void HandleResult(string result)
     {
-        Debug.Log("BridgeTransportWebView: HandleResult: result: " + result, this);
+        //Debug.Log("BridgeTransportWebView: HandleResult: result: " + result, this);
 
         if (bridge == null) {
             return;
@@ -262,13 +262,13 @@ public class BridgeTransportWebView : BridgeTransport
 
     public void HandleError(string message)
     {
-        Debug.Log("BridgeTransportWebView: HandleError: message: " + message, this);
+        //Debug.Log("BridgeTransportWebView: HandleError: message: " + message, this);
     }
 
 
     public void HandleLoaded(string url)
     {
-        Debug.Log("BridgeTransportWebView: HandleLoaded: url: " + url, this);
+        //Debug.Log("BridgeTransportWebView: HandleLoaded: url: " + url, this);
 
         startedJS = true;
 

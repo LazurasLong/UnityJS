@@ -20,7 +20,7 @@ public enum CuboidFace {
 };
 
 
-public class Cuboid : BridgeObjectTracker {
+public class Cuboid : Tracker {
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -59,23 +59,32 @@ public class Cuboid : BridgeObjectTracker {
         updateTiles = false;
 
 
+        float cx = cuboidSize.x;
+        float cy = cuboidSize.y;
+        float cz = cuboidSize.z;
+
         if (tiles[(int)CuboidFace.Top   ] != null) {
-            UpdateTile(tiles[(int)CuboidFace.Top   ], cuboidSize.x, cuboidSize.z, new Vector3( 0.0f,                 0.5f * cuboidSize.y,  0.0f));
+            UpdateTile(tiles[(int)CuboidFace.Top   ], cx, cz, new Vector3( 0.0f,       0.5f * cy,  0.0f)      );
         }
+
         if (tiles[(int)CuboidFace.Bottom] != null) {
-            UpdateTile(tiles[(int)CuboidFace.Bottom], cuboidSize.x, cuboidSize.z, new Vector3( 0.0f,                -0.5f * cuboidSize.y,  0.0f));
+            UpdateTile(tiles[(int)CuboidFace.Bottom], cx, cz, new Vector3( 0.0f,      -0.5f * cy,  0.0f)      );
         }
+
         if (tiles[(int)CuboidFace.Front ] != null) {
-            UpdateTile(tiles[(int)CuboidFace.Front ], cuboidSize.x, cuboidSize.y, new Vector3( 0.0f,                 0.0f,                 0.5f * cuboidSize.z));
+            UpdateTile(tiles[(int)CuboidFace.Front ], cx, cy, new Vector3( 0.0f,       0.0f,       0.5f * cz) );
         }
+
         if (tiles[(int)CuboidFace.Back  ] != null) {
-            UpdateTile(tiles[(int)CuboidFace.Back  ], cuboidSize.x, cuboidSize.y, new Vector3( 0.0f,                 0.0f,                -0.5f * cuboidSize.z));
+            UpdateTile(tiles[(int)CuboidFace.Back  ], cx, cy, new Vector3( 0.0f,       0.0f,      -0.5f * cz) );
         }
+
         if (tiles[(int)CuboidFace.Right ] != null) {
-            UpdateTile(tiles[(int)CuboidFace.Right ], cuboidSize.z, cuboidSize.y, new Vector3( 0.5f * cuboidSize.x,  0.0f,                 0.0f));
+            UpdateTile(tiles[(int)CuboidFace.Right ], cz, cy, new Vector3( 0.5f * cx,  0.0f,       0.0f)      );
         }
+
         if (tiles[(int)CuboidFace.Left  ] != null) {
-            UpdateTile(tiles[(int)CuboidFace.Left  ], cuboidSize.z, cuboidSize.y, new Vector3(-0.5f * cuboidSize.x,  0.0f,                 0.0f));
+            UpdateTile(tiles[(int)CuboidFace.Left  ], cz, cy, new Vector3(-0.5f * cx,  0.0f,       0.0f)      );
         }
 
         boxCollider.size = cuboidSize;
@@ -92,5 +101,6 @@ public class Cuboid : BridgeObjectTracker {
                 y,
                 1.0f);
     }
+
 
 }

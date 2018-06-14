@@ -26,6 +26,7 @@ var globals = {
     unityToJSEventBytes: 0,
     unityToJSEventLog: "",
     content: null,
+    updateContent: false,
     mousePosition: null,
     cameraPosition: null,
     cameraRotation: null
@@ -66,7 +67,7 @@ function StartBridge(driver)
 function MakeID(kind)
 {
     // We don't want slashes in the object ids.
-    kind = kind.replace('/', '_');
+    kind = kind.replace(/\//g, '_');
     return kind + "_" + globals.nextID++;
 }
 
@@ -86,47 +87,44 @@ function Dump(obj)
 }
 
 
-function CreatePrefab(prefab, obj, config, interests, preEvents, postEvents)
+function CreatePrefab(d)
 {
-    //console.log("bridge.js: CreatePrefab:", prefab, obj, config, interests, preEvents, postEvents);
+    //console.log("bridge.js: CreatePrefab: d:", Dump(d));
 
-    if (!obj) {
-        obj = {};
-    }
+    // prefab, component, obj, config, interests, preEvents, postEvents
 
-    if (!config) {
-        config = {};
-    }
+    var obj = d.obj || {};
+    var prefab = d.prefab || null;
+    var component = d.component || null;
+    var config = d.config || null;
+    var interests = d.interests || null;
+    var preEvents = d.preEvents || null;
+    var postEvents = d.postEvents || null;
 
-    if (!interests) {
-        interests = {};
-    }
-
-    if (!preEvents) {
-        preEvents = [];
-    }
-
-    if (!postEvents) {
-        postEvents = [];
-    }
+    //console.log("CreatePrefab", "obj", obj, "prefab", prefab, "component", component, "config", config, "interests", JSON.stringify(interests), "length", interests.length, "preEvent", preEvents, "postEvents", postEvents);
 
     var remoteInterests = {};
-    for (var eventName in interests) {
-        var interest = interests[eventName];
-        var remoteInterest = {};
-        remoteInterests[eventName] = remoteInterest;
-        for (var key in interest) {
-            if (key == 'handler') {
-                continue;
+    if (interests) {
+        for (var eventName in interests) {
+            var interest = interests[eventName];
+            var remoteInterest = {};
+            remoteInterests[eventName] = remoteInterest;
+            for (var key in interest) {
+                if (key == 'handler') {
+                    continue;
+                }
+                remoteInterest[key] = interest[key];
             }
-            remoteInterest[key] = interest[key];
         }
     }
 
-    var id = MakeID(prefab);
+    //console.log("CreatePrefab", "remoteInterests", JSON.stringify(remoteInterests));
+
+    var id = MakeID(prefab || 'GameObject');
 
     obj.id = id;
     obj.prefab = prefab;
+    obj.component = component;
     obj.config = config;
     obj.interests = interests;
     obj.preEvents = preEvents;
@@ -135,8 +133,9 @@ function CreatePrefab(prefab, obj, config, interests, preEvents, postEvents)
     globals.objects[id] = obj;
 
     var data = {
-        prefab: prefab,
         id: id,
+        prefab: prefab,
+        component: component,
         config: config,
         interests: remoteInterests,
         preEvents: preEvents,
@@ -245,7 +244,7 @@ function SendEvent(ev)
 {
     var evString = JSON.stringify(ev);
 
-    console.log("======== SendEvent", evString);
+    //console.log("======== SendEvent", evString);
 
     globals.jsToUnityEventCount++;
     globals.jsToUnityEventBytes += evString.length;
@@ -302,6 +301,9 @@ function DistributeEvents(evList, evListStringLength)
 
 function UpdateContent()
 {
+    if (!globals.updateContent) {
+    }
+
     if (globals.content == null) {
         globals.content = document.getElementById('content');
     }
@@ -514,13 +516,13 @@ function SetText(text)
 
 
 ////////////////////////////////////////////////////////////////////////
-// Overlay Utilities
+// TextOverlays Utilities
 
 
 function SetGridText(topLeft, top, topRight, left, center, right, bottomLeft, bottom, bottomRight)
 {
     //console.log("SetGridText", topLeft, top, topRight, left, center, right, bottomLeft, bottom, bottomRight);
-    UpdateObject(globals.overlay, {
+    UpdateObject(globals.textOverlays, {
         "topLeftText/text": topLeft || '',
         "topText/text": top || '',
         "topRightText/text": topRight || '',
@@ -569,10 +571,35 @@ function CreateObjects()
 
 function CreateInterface()
 {
-    globals.light = CreatePrefab('Light');
-    globals.camera = CreatePrefab('Camera');
-    globals.eventSystem = CreatePrefab('EventSystem');
-    globals.overlay = CreatePrefab('Overlay');
+
+    globals.light = CreatePrefab({
+        prefab: 'Prefabs/Light',
+        obj: {
+            doNotDelete: true
+        }
+    });
+
+    globals.camera = CreatePrefab({
+        prefab: 'Prefabs/Camera',
+        obj: {
+            doNotDelete: true
+        }
+    });
+
+    globals.eventSystem = CreatePrefab({
+        prefab: 'Prefabs/EventSystem',
+        obj: {
+            doNotDelete: true
+        }
+    });
+
+    globals.textOverlays = CreatePrefab({
+        prefab: 'Prefabs/TextOverlays',
+        obj: {
+            doNotDelete: true
+        }
+    });
+
 }
 
 
@@ -834,9 +861,10 @@ function CreatePieTracker()
 
     }
 
-    globals.pieTracker = CreatePrefab(
-        'PieTracker', 
-        { // obj
+    globals.pieTracker = CreatePrefab({
+        prefab: 'Prefabs/PieTracker', 
+        obj: { // obj
+            doNotDelete: true,
             pie: null,
             tracking: false,
             data: null,
@@ -930,14 +958,14 @@ function CreatePieTracker()
                 }
             }
         }, // obj
-        { // params:
+        params: { // params:
             tracking: true,
             trackingMouseButton: true,
             trackingMousePosition: false,
             trackingCameraPosition: false,
             trackingCameraRotation: false
         },
-        { // interests:
+        interests: { // interests:
             MouseButtonDown: {
                 query: {
                     mousePosition: "mousePosition",
@@ -1079,7 +1107,8 @@ function CreatePieTracker()
                     globals.pieTracker.cameraRotationEulerAngles = results.cameraRotationEulerAngles;
                 }
             }
-        });
+        }
+    });
 
     globals.pieTracker.doNotDestroy = true;
 
@@ -1088,17 +1117,24 @@ function CreatePieTracker()
 
 function CreateCanvas()
 {
-    globals.canvas = CreatePrefab('Canvas');
+    globals.canvas = CreatePrefab({
+        prefab: 'Prefabs/TestCanvas',
+        obj: {
+            doNotDelete: true
+        }
+    });
 
-    var canvasRef = 'bridgeobject:' + globals.canvas.id;
+    var canvasRef = 'object:' + globals.canvas.id;
 
-    globals.buttonEval = CreatePrefab(
-        'ToolbarButton',
-        null, // obj
-        { // config:
+    globals.buttonEval = CreatePrefab({
+        perfab: 'Prefabs/ToolbarButton',
+        obj: {
+            doNotDelete: true
+        },
+        config: { // config:
             'label/text': 'Eval'
         },
-        { // interests:
+        interests: { // interests:
             Click: {
                 query: {
                     js: canvasRef + '/transform:Panel/transform:JSField/component:TMPro.TMP_InputField/text'
@@ -1110,26 +1146,28 @@ function CreateCanvas()
                 }
             }
         },
-        null, // preEvents
-        [ // postEvents:
+        postEvents: [ // postEvents:
             {
                 event: 'SetParent',
                 data: {
                     'path': canvasRef + '/transform:Panel/transform:ButtonPanel'
                 }
             }
-        ]);
+        ]
+    });
 
-    globals.buttonFoo = CreatePrefab(
-        'ToolbarButton',
-        null, // obj
-        { // config:
+    globals.buttonFoo = CreatePrefab({
+        prefab: 'Prefabs/ToolbarButton',
+        obj: {
+            doNotDelete: true
+        },
+        config: { // config:
             'label/text': 'Foo'
         },
-        { // interests:
+        interests: { // interests:
             Click: {
                 query: {
-                    text: 'bridgeobject:' + globals.canvas.id + '/transform:Panel/transform:TextField/component:TMPro.TMP_InputField/text'
+                    text: 'object:' + globals.canvas.id + '/transform:Panel/transform:TextField/component:TMPro.TMP_InputField/text'
                 },
                 handler: function(obj, result) {
                     console.log("Canvas: button: Foo: text: " + result.text);
@@ -1137,26 +1175,28 @@ function CreateCanvas()
                 }
             }
         },
-        null, // preEvents
-        [ // postEvents:
+        postEvents: [ // postEvents:
             {
                 event: 'SetParent',
                 data: {
                     'path': canvasRef + '/transform:Panel/transform:ButtonPanel'
                 }
             }
-        ]);
+        ]
+    });
 
-    globals.buttonBar = CreatePrefab(
-        'ToolbarButton',
-        null, // obj
-        { // config:
+    globals.buttonBar = CreatePrefab({
+        prefab: 'Prefabs/ToolbarButton',
+        obj: {
+            doNotDelete: true
+        },
+        config: { // config:
             'label/text': 'Bar'
         },
-        { // interests:
+        interests: { // interests:
             Click: {
                 query: {
-                    text: 'bridgeobject:' + globals.canvas.id + '/transform:Panel/transform:TextField/component:TMPro.TMP_InputField/text'
+                    text: 'object:' + globals.canvas.id + '/transform:Panel/transform:TextField/component:TMPro.TMP_InputField/text'
                 },
                 handler: function(obj, result) {
                     console.log("Canvas: button: Bar: text: " + result.text);
@@ -1164,15 +1204,15 @@ function CreateCanvas()
                 }
             }
         },
-        null, // preEvents
-        [ // postEvents:
+        postEvents: [ // postEvents:
             {
                 event: 'SetParent',
                 data: {
                     'path': canvasRef + '/transform:Panel/transform:ButtonPanel'
                 }
             }
-        ]);
+        ]
+    });
 
 }
 
@@ -1180,23 +1220,29 @@ function CreateCanvas()
 function CreateJunk()
 {
 
-    globals.ball = CreatePrefab(
-        'Ball',
-        null, // obj
-        { // config:
+    globals.ball = CreatePrefab({
+        prefab: 'Prefabs/Ball',
+        obj: {
+            doNotDelete: true
+        },
+        config: { // config:
             "transform/localPosition": {x: 500, y: -200, z: -50},
             "transform/localScale": {x: 300, y: 300, z: 300},
             "transform/localRotation": {roll: 30, pitch: 45, yaw: 0}
-        });
+        }
+    });
 
-    globals.cuboid = CreatePrefab(
-        'Cuboid',
-        null, // obj
-        { // config:
+    globals.cuboid = CreatePrefab({
+        prefab: 'Prefabs/Cuboid',
+        obj: {
+            doNotDelete: true
+        },
+        config: { // config:
             "transform/localPosition": {x: -600, y: -200, z: -50},
             "transform/localScale": {x: 200, y: 200, z: 200},
             "transform/localRotation": {roll: 0, pitch: 45, yaw: 45}
-        });
+        }
+    });
 
 }
 
@@ -1204,10 +1250,12 @@ function CreateJunk()
 function CreateParticleSystem()
 {
 
-    globals.particleSystem = CreatePrefab(
-        'ParticleSystems/TileParticles',
-        null, // obj
-        { // config:
+    globals.particleSystem = CreatePrefab({
+        prefab: 'Prefabs/ParticleSystems/TileParticles',
+        obj: {
+            doNotDelete: true
+        },
+        config: { // config:
             "transform/localPosition": {x: 0, y: 0, z: -0},
             "transform/localScale": {x: 1, y: 1, z: 1},
             "transform/localRotation": {roll: 0, pitch: 0, yaw: 0},
@@ -1237,9 +1285,11 @@ function CreateParticleSystem()
                     }
                 }
             ]
-        });
+        }
+    });
 
-    QueryObject(globals.particleSystem, {
+    QueryObject(
+        globals.particleSystem, {
             activeVertexStreams:'activeVertexStreams'
         }, function (result) {
             console.log('QueryObject: globals.particleSystem', globals.particleSystem, 'activeVertexStreams', result.activeVertexStreams);
@@ -1352,7 +1402,12 @@ function CreateBridgeTest()
         });
     }
 
-    globals.bridgeTest = CreatePrefab('BridgeTest');
+    globals.bridgeTest = CreatePrefab({
+        prefab: 'Prefabs/BridgeTest',
+        obj: {
+            doNotDelete: true
+        }
+    });
 
 }
 

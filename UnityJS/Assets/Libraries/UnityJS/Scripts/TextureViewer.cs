@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 
-public class TextureViewer : BridgeObjectTracker {
+public class TextureViewer : Tracker {
 
 
     ////////////////////////////////////////////////////////////////////////

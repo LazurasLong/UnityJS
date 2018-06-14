@@ -1,0 +1,305 @@
+UnityJS Architecture
+
+Classes
+
+    - Means subclass of parent in outline.
+    * Means root- or sub-object (superclass).
+
+    * Accessor (none)
+
+    * Bridge (MonoBehaviour)
+
+    * BridgeObject (MonoBehaviour)
+        - Tracker
+            * TrackerProxy (MonoBehaviour)
+            - PieTracker
+            - Cuboid
+                * Tile (MonoBehaviour)
+            - ParticleSystemHelper
+        - TextOverlays
+        - ToolbarButton
+        - TextureViewer
+        - HexTile
+        - Rainbow
+          * Bow (BridgeObject)
+        - BridgeTest
+
+    * BridgeTransport (MonoBehaviour)
+        - BridgeTransportCEF
+            * UnityJSWindow (EditorWindow)
+            * WebProvider (none)
+        - BridgeTransportSocketIO
+        - BridgeTransportWebGL
+        - BridgeTransportWebView
+            UnityJSPlugin (MonoBehaviour)
+
+    * BridgeExtensions (none)
+    * BridgeJsonConverter (JsonConverter)
+
+    * ProxyGroup (MonoBehaviour)
+
+    * MonoPInvokeCallbackAttribute (System.Attribute)
+
+    * Loader (MonoBehavior)
+
+    * NamedAssetManager (MonoBehavior)
+        * NamedAsset (ScriptableObject)
+
+JSON Converters
+
+    Vector2
+
+        { // 2d vector
+            x: 0,
+            y: 0
+        }
+
+    Vector3
+
+        { // 3d vector
+            x: 0,
+            y: 0,
+            z: 0
+        }
+
+    Vector4
+
+        { // 4d vector
+            x: 0,
+            y: 0,
+            z: 0,
+            w: 0
+        }
+
+    Quaternion
+
+        { // 4d quaternion
+            x: 0,
+            y: 0,
+            z: 0,
+            w: 0
+        }
+
+        { // 3d euler angles
+            roll: 0,
+            pitch: 0,
+            yaw: 0
+        }
+
+    Color
+
+        "#00000000" // html color string
+
+        { // rgb color
+            r: 0,
+            g: 0,
+            b: 0
+        }
+        
+        { /// rgba color
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 1
+        }
+        
+    Matrix4x4
+
+        [ // 16 element matrix array
+            1, 0, 0, 0, 
+            0, 1, 0, 0, 
+            0, 0, 1, 0, 
+            0, 0, 0, 1
+        ]
+
+    ParticleSystem.MinMaxCurve
+
+        null // null value
+
+        0 // constant
+
+        { // constant
+            minMaxCurveType: "Constant",
+            constant: 0
+        }
+
+        { // curve
+            minMaxCurveType: "Curve",
+            multiplier: 1,
+            curve: AnimationCurve
+        }
+
+        { // random curves
+            minMaxCurveType: "RandomCurves",
+            multiplier: 1,
+            min: AnimationCurve,
+            max: AnimationCurve
+        }
+
+        { // random constants
+            minMaxCurveType: "RandomConstants",
+            min: 0,
+            max: 1
+        }
+
+    ParticleSystem.MinMaxGradient
+
+        null // null value
+
+        { // constant color
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 1
+        }
+
+        { // constant color
+            minMaxGradientType: "Color",
+            color: Color
+        }
+
+        { // gradient
+            minMaxGradientType: "Gradient",
+            gradient: Gradient
+        }
+
+        { // two colors
+            minMaxGradientType: "TwoColors",
+            min: Color,
+            max: Color
+        }
+
+        { // two gradients
+            minMaxGradientType: "TwoGradients",
+            min: Gradient,
+            max: Gradient
+        }
+
+        { // random color
+            minMaxGradientType: "RandomColor",
+            gradient: Gradient
+        }
+
+    Gradient
+
+        null // null value
+
+        { // gradient
+            alphaKeys: [GradientAlphaKey, ...],
+            colorKeys: [GradientColorKey, ...],
+            mode: "GradientMode" // Blend, Fixed
+        }
+
+    AnimationCurve
+
+        null // null value
+
+        { // constant
+            animationCurveType: "Constant",
+            timeStart: 0,
+            timeEnd: 0,
+            value: 0,
+            preWrapMode: "WrapMode", // Once, Loop, Default, PingPong, Default, ClampForever
+            postWrapMode: "WrapMode" // Once, Loop, Default, PingPong, Default, ClampForever
+        }
+
+        { // ease in out
+            animationCurveType: "Constant",
+            timeStart: 0,
+            timeEnd: 0,
+            valueStart: 0,
+            valueEnd: 0,
+            preWrapMode: "WrapMode", // Once, Loop, Default, PingPong, Default, ClampForever
+            postWrapMode: "WrapMode" // Once, Loop, Default, PingPong, Default, ClampForever
+        }
+
+        { // linear
+            animationCurveType: "Linear",
+            timeStart: 0,
+            timeEnd: 0,
+            valueStart: 0,
+            valueEnd: 0,
+            preWrapMode: "PreWrapMode",
+            postWrapMode: "PostWrapMode"
+        }
+
+        { // keys
+            animationCurveType: "Keys",
+            keys: [Keyframe, ...],
+            preWrapMode: "PreWrapMode",
+            postWrapMode: "PostWrapMode"
+        }
+
+    Keyframe
+
+        null // null value
+
+        {
+            time: 0,
+            value: 0,
+            inTangent: 1,
+            outTangent: 1
+        }
+
+    GradientColorKey
+
+        null // null value
+
+        {
+            color: Color,
+            time: 0
+        }
+
+    GradientAlphaKey
+
+        null // null value
+
+        {
+            alpha: 1,
+            time: 0
+        }
+
+    Texture
+
+        null
+
+        "ResourcePath"
+
+Accessor Path Expressions
+
+    Path
+
+        A Path consists of a series of steps separated by slashes, like "foo/bar/baz".
+
+    Step
+
+        A Step consists of an optional type (defaulting to "object")
+        followed by a colon, then a type specific string.
+
+        A Step may not contain slashes, question marks or exclamation
+        marks, but they be represented with URL percent encoding.
+
+        A Step may include ? or ! modifiers.
+
+            ? makes a step conditional, so it returns null instead of
+            raising an error.
+
+            ! makes a step excited, so it evaluates the value when setting
+            instead of treating it as a literal.
+
+    Step Types:
+
+        string
+        float
+        integer, int
+        boolean, bool
+        null
+        json
+        index, jarray, array, list
+        map, dict, dictionary, jobject
+        transform
+        component
+        resource
+        member, field, propery
+        object, bridgeobject
+        method
