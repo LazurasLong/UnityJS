@@ -600,12 +600,6 @@ function LoadJSONFromSheet(scope)
                     return tokenInfo;
                 }
 
-                function PopValue()
-                {
-                    value = valueStack.pop();
-                    return value;
-                }
-
                 function ParseTop()
                 {
                     var tokenInfo = NextTokenInfo();
