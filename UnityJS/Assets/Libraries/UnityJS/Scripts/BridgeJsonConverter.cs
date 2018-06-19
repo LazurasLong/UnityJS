@@ -745,6 +745,8 @@ public class BridgeJsonConverter : JsonConverter {
             { typeof(Texture), // class
                 delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
 
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Texture: reader: " + reader + " objectType: " + objectType);
+
                     if (reader.TokenType == JsonToken.Null) {
                         result = null;
                         return true;
@@ -755,9 +757,54 @@ public class BridgeJsonConverter : JsonConverter {
                     }
 
                     string resourcePath = (string)JValue.Load(reader);
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Texture: resourcePath: " + resourcePath);
+
                     Texture resource = (Texture)Resources.Load(resourcePath);
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Texture: resource: " + resource, resource);
 
                     result = resource;
+                    return true;
+                }
+            },
+
+            { typeof(Shader), // name
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.String) {
+                        return false;
+                    }
+
+                    string shaderName = (string)JValue.Load(reader);
+                    Shader shader = Shader.Find(shaderName);
+
+                    result = shader;
+                    return true;
+                }
+            },
+
+            { typeof(ComputeBuffer), // name
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.String) {
+                        return false;
+                    }
+
+                    string computeBufferName = (string)JValue.Load(reader);
+                    ComputeBuffer computeBuffer = null; // TODO: Look up computeBufferName
+
+                    Debug.LogError("BridgeJsonConverter: convertToObjectMap: ComputeBuffer: computeBufferName: " + computeBufferName + " TODO!!!");
+
+                    result = computeBuffer;
                     return true;
                 }
             },

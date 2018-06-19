@@ -89,7 +89,7 @@ function Dump(obj)
 
 function CreatePrefab(d)
 {
-    //console.log("bridge.js: CreatePrefab: d:", Dump(d));
+    console.log("bridge.js: CreatePrefab: d:", JSON.stringify(d, null, 4));
 
     // prefab, component, obj, config, interests, preEvents, postEvents
 

@@ -323,9 +323,302 @@ public static class BridgeExtensions {
     }
 
 
+    // Material.UpdateMaterial takes a JSON object that is interpreted
+    // as a magic dictionary containing both fixed key names (like
+    // "shader"), and dynamic key names (like "texture_MainTex")
+    // starting with a prefix ("texture") and finishing with a dynamic
+    // name parameter ("_MainTex").
+
+    // This delegate is called to set a key that begins with prefix
+    // and ends with name, by converting the JSON token value to the
+    // appropriate type, and calling the appropriate setter or method.
+
+    public delegate bool SetMaterialPrefixDelegate(
+        Material material,
+        string name,
+        JToken token);
+
+
+    // This record keeps tracks of all the key prefixes of the JSON
+    // object used to configure a material. The prefix specifies the
+    // key prefix or the entire key, depending on isPrefix. The phase
+    // controls the order in which the keys are handled. The setter is
+    // called to set the key, passing the material, the name of the
+    // key, and a JSON token.
+
+    public class SetMaterialPrefixRecord {
+
+        public string prefix;
+        public bool isPrefix;
+        public int phase;
+        public SetMaterialPrefixDelegate setter;
+
+        public SetMaterialPrefixRecord(string prefix0, int phase0, bool isPrefix0, SetMaterialPrefixDelegate setter0)
+        {
+            prefix = prefix0;
+            phase = phase0;
+            isPrefix = isPrefix0;
+            setter = setter0;
+        }
+        
+    };
+
+
+    // The order of the SetMaterialPrefixRecords is important. Make
+    // sure the more specific (longer, like textureOffset) prefixes
+    // are listed before the root prefixes (shorter, like texture).
+
+    public static List<SetMaterialPrefixRecord> materialKeyPrefixes =
+        new List<SetMaterialPrefixRecord>() {
+
+            new SetMaterialPrefixRecord("copyPropertiesFromMaterial", false, 0, delegate(Material material, string name, JToken token) {
+                Material otherMaterial = null;
+                if (!Bridge.bridge.ConvertToType<Material>(token, ref otherMaterial)) {
+                    return false;
+                }
+                material.CopyPropertiesFromMaterial(otherMaterial);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("doubleSidedGI", false, 1, delegate(Material material, string name, JToken token) {
+                bool doubleSidedGI = false;
+                if (!Bridge.bridge.ConvertToType<bool>(token, ref doubleSidedGI)) {
+                    return false;
+                }
+                material.doubleSidedGI = doubleSidedGI;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("enableInstancing", false, 1, delegate(Material material, string name, JToken token) {
+                bool enableInstancing = false;
+                if (!Bridge.bridge.ConvertToType<bool>(token, ref enableInstancing)) {
+                    return false;
+                }
+                material.enableInstancing = enableInstancing;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("globalIlluminationFlags", false, 1, delegate(Material material, string name, JToken token) {
+                MaterialGlobalIlluminationFlags flags = 0;
+                if (!Bridge.bridge.ConvertToType<MaterialGlobalIlluminationFlags>(token, ref flags)) {
+                    return false;
+                }
+                material.globalIlluminationFlags = flags;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("mainTextureOffset", false, 1, delegate(Material material, string name, JToken token) {
+                Vector2 offset = Vector2.zero;
+                if (!Bridge.bridge.ConvertToType<Vector2>(token, ref offset)) {
+                    return false;
+                }
+                material.mainTextureOffset = offset;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("mainTextureScale", false, 1, delegate(Material material, string name, JToken token) {
+                Vector2 scale = Vector2.one;
+                if (!Bridge.bridge.ConvertToType<Vector2>(token, ref scale)) {
+                    return false;
+                }
+                material.mainTextureScale = scale;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("mainTexture", false, 1, delegate(Material material, string name, JToken token) {
+                Texture texture = null;
+                if (!Bridge.bridge.ConvertToType<Texture>(token, ref texture)) {
+                    return false;
+                }
+                material.mainTexture = texture;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("renderQueue", false, 1, delegate(Material material, string name, JToken token) {
+                int renderQueue = 0;
+                if (!Bridge.bridge.ConvertToType<int>(token, ref renderQueue)) {
+                    return false;
+                }
+                material.renderQueue = renderQueue;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("shader", false, 1, delegate(Material material, string name, JToken token) {
+                Shader shader = null;
+                if (!Bridge.bridge.ConvertToType<Shader>(token, ref shader)) {
+                    return false;
+                }
+                material.shader = shader;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("shaderKeywords", false, 1, delegate(Material material, string name, JToken token) {
+                string[] keywords = null;
+                if (!Bridge.bridge.ConvertToType<string[]>(token, ref keywords)) {
+                    return false;
+                }
+                material.shaderKeywords = keywords;
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("textureOffset", true, 1, delegate(Material material, string name, JToken token) {
+                Vector2 offset = Vector2.zero;
+                if (!Bridge.bridge.ConvertToType<Vector2>(token, ref offset)) {
+                    return false;
+                }
+                material.SetTextureOffset(name, offset);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("textureScale", true, 1, delegate(Material material, string name, JToken token) {
+                Vector2 scale = Vector2.one;
+                if (!Bridge.bridge.ConvertToType<Vector2>(token, ref scale)) {
+                    return false;
+                }
+                material.SetTextureScale(name, scale);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("texture", true, 1, delegate(Material material, string name, JToken token) {
+                Texture texture = null;
+                if (!Bridge.bridge.ConvertToType<Texture>(token, ref texture)) {
+                    return false;
+                }
+                material.SetTexture(name, texture);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("keyword", true, 1, delegate(Material material, string name, JToken token) {
+                bool enabled = false;
+                if (!Bridge.bridge.ConvertToType<bool>(token, ref enabled)) {
+                    return false;
+                }
+                if (enabled) {
+                    material.EnableKeyword(name);
+                } else {
+                    material.DisableKeyword(name);
+                }
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("overrideTag", true, 1, delegate(Material material, string name, JToken token) {
+                string val = "";
+                if (!Bridge.bridge.ConvertToType<string>(token, ref val)) {
+                    return false;
+                }
+                material.SetOverrideTag(name, val);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("shaderPass", true, 1, delegate(Material material, string name, JToken token) {
+                bool enabled = false;
+                if (!Bridge.bridge.ConvertToType<bool>(token, ref enabled)) {
+                    return false;
+                }
+                material.SetShaderPassEnabled(name, enabled);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("buffer", true, 1, delegate(Material material, string name, JToken token) {
+                ComputeBuffer computeBuffer = null;
+                if (!Bridge.bridge.ConvertToType<ComputeBuffer>(token, ref computeBuffer)) {
+                    return false;
+                }
+                material.SetBuffer(name, computeBuffer);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("colorArray", true, 1, delegate(Material material, string name, JToken token) {
+                Color[] colorArray = null;
+                if (!Bridge.bridge.ConvertToType<Color[]>(token, ref colorArray)) {
+                    return false;
+                }
+                material.SetColorArray(name, colorArray);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("color", true, 1, delegate(Material material, string name, JToken token) {
+                Color color = Color.black;
+                if (!Bridge.bridge.ConvertToType<Color>(token, ref color)) {
+                    return false;
+                }
+                if (name.Length == 0) {
+                    material.color = color;
+                } else {
+                    material.SetColor(name, color);
+                }
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("floatArray", true, 1, delegate(Material material, string name, JToken token) {
+                float[] floatArray = null;
+                if (!Bridge.bridge.ConvertToType<float[]>(token, ref floatArray)) {
+                    return false;
+                }
+                material.SetFloatArray(name, floatArray);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("float", true, 1, delegate(Material material, string name, JToken token) {
+                float f = 0.0f;
+                if (!Bridge.bridge.ConvertToType<float>(token, ref f)) {
+                    return false;
+                }
+                material.SetFloat(name, f);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("int", true, 1, delegate(Material material, string name, JToken token) {
+                int i = 0;
+                if (!Bridge.bridge.ConvertToType<int>(token, ref i)) {
+                    return false;
+                }
+                material.SetInt(name, i);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("matrixArray", true, 1, delegate(Material material, string name, JToken token) {
+                Matrix4x4[] matrixArray = null;
+                if (!Bridge.bridge.ConvertToType<Matrix4x4[]>(token, ref matrixArray)) {
+                    return false;
+                }
+                material.SetMatrixArray(name, matrixArray);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("matrix", true, 1, delegate(Material material, string name, JToken token) {
+                Matrix4x4 matrix = Matrix4x4.identity;
+                if (!Bridge.bridge.ConvertToType<Matrix4x4>(token, ref matrix)) {
+                    return false;
+                }
+                material.SetMatrix(name, matrix);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("vectorArray", true, 1, delegate(Material material, string name, JToken token) {
+                Vector4[] vectorArray = null;
+                if (!Bridge.bridge.ConvertToType<Vector4[]>(token, ref vectorArray)) {
+                    return false;
+                }
+                material.SetVectorArray(name, vectorArray);
+                return true;
+            }),
+
+            new SetMaterialPrefixRecord("vector", true, 1, delegate(Material material, string name, JToken token) {
+                Vector4 vector = Vector4.zero;
+                if (!Bridge.bridge.ConvertToType<Vector4>(token, ref vector)) {
+                    return false;
+                }
+                material.SetVector(name, vector);
+                return true;
+            }),
+
+        };
+
+
     public static void UpdateMaterial(this Material material, JToken materialData)
     {
-        //Debug.Log("BridgeExtensions: Material: UpdateMaterial: material: " + material + " materialData: " + materialData.GetType() + " " + materialData);
+        Debug.Log("BridgeExtensions: Material: UpdateMaterial: material: " + material + " materialData: " + materialData.GetType() + " " + materialData);
 
         JObject obj = materialData as JObject;
         if (obj == null) {
@@ -333,103 +626,46 @@ public static class BridgeExtensions {
             return;
         }
 
-        // color
-        // doubleSidedGI
-        // enableInstancing
-        // globalIlluminationFlags
-        // mainTexture
-        // mainTextureOffset
-        // mainTextureScale
-        // passCount
-        // renderQueue
-        // shader => Shader.Find
-        // shaderKeywords
+        // Phase 0 keys must be handled first before phase 1 keys.
+        int phases = 2;
+        for (int phase = 0; phase < phases; phase++) {
 
-        // pass => FindPass, SetPass
+            foreach (JProperty property in obj.Properties()) {
+                string key = property.Name;
+                JToken valueToken = (JToken)property.Value;
+                //Debug.Log("BridgeExtensions: Material: phase: " + phase + " Key: " + key);
 
-        // color* => SetColor
-        // color_Color
-        // color_SpecColor
+                for (int i = 0, n = materialKeyPrefixes.Count; i < n; i++) {
 
-        // texture* => SetTexure
-        // texture_MainTex
-        // texture_BumpMap
-        // texture_MetallicGlossMap
+                    if (materialKeyPrefixes[i].phase != phase) {
+                        continue;
+                    }
 
-        // keyword* => EnableKeyword / DisableKeyword
-        // keyword_NORMALMAP
-        // keyword_METALLICGLOSSMAP
+                    string keyPrefix = materialKeyPrefixes[i].prefix;
 
-        // overrideTag* => SetOverrideTag
-        // overrideTagRenderType
+                    if (key.StartsWith(keyPrefix)) {
 
-        // shaderPass* => SetShaderPassEnabled
+                        string name = key.Substring(keyPrefix.Length);
+                        if (!materialKeyPrefixes[i].isPrefix &&
+                            (name.Length > 0)) {
+                            Debug.LogError("BridgeExtensions: UpdateMaterial: key: " + key + " should not have suffix name: " + name);
+                        } else {
 
-        // buffer* => SetBuffer
-        // color* => SetColor
-        // colorArray* => SetColorArray
-        // float* => SetFloat
-        // floatArray* => SetFloatArray
-        // int* => SetInt
-        // matrix* => SetMatrix
-        // matrixArray* => SetMatrixArray
-        // overrideTag* => SetOverrideTag
-        // textureOffset* => SetTextureOffset
-        // textureScale* => SetTextureScale
-        // texture* => SetTexture
-        // vector* => SetVector
-        // vectorArray* => SetVectorArray
+                            SetMaterialPrefixDelegate setter = materialKeyPrefixes[i].setter;
+                            setter(material, name, valueToken);
 
-        // copyPropertiesFromMaterial => CopyPropertiesFromMaterial
+                        }
 
-        // lerp => Lerp(start, end, t)
+                        break;
+                    }
 
-        // https://docs.unity3d.com/Manual/MaterialsAccessingViaScript.html
-        
-        // The specific Keywords required to enable the Standard Shader features are as follows:
-        // 
-        // Keyword	Feature
-        // _NORMALMAP				Normal Mapping
-        // _ALPHATEST_ON			“Cut out” Transparency Rendering Mode
-        // _ALPHABLEND_ON			“Fade” Transparency Rendering Mode
-        // _ALPHAPREMULTIPLY_ON		“Transparent” Transparency Rendering Mode
-        // _EMISSION				Emission Colour or Emission Mapping
-        // _PARALLAXMAP				Height Mapping
-        // _DETAIL_MULX2			Secondary “Detail” Maps (Albedo & Normal Map)
-        // _METALLICGLOSSMAP		Metallic/Smoothness Mapping in Metallic Workflow
-        // _SPECGLOSSMAP			Specular/Smoothness Mapping in Specular Workflow
+                }
 
-        foreach (JProperty property in obj.Properties()) {
-            string key = property.Name;
-            //Debug.Log("BridgeExtensions: Material: Key: " + key);
-
-            if (key.StartsWith("textureOffset")) {
-                //Vector2 offset;
-                //ConvertToType
-            } else if (key.StartsWith("textureScale")) {
-            } else if (key.StartsWith("texture")) {
-            } else if (key.StartsWith("keyword")) {
-            } else if (key.StartsWith("overrideTag")) {
-            } else if (key.StartsWith("shaderPass")) {
-            } else if (key.StartsWith("buffer")) {
-            } else if (key.StartsWith("colorArray")) {
-            } else if (key.StartsWith("color")) {
-            } else if (key.StartsWith("floatArray")) {
-            } else if (key.StartsWith("float")) {
-            } else if (key.StartsWith("int")) {
-            } else if (key.StartsWith("matrixArray")) {
-            } else if (key.StartsWith("matrix")) {
-            } else if (key.StartsWith("vectorArray")) {
-            } else if (key.StartsWith("vector")) {
-            } else if (key.StartsWith("copyPropertiesFromMaterial")) {
-            } else if (key.StartsWith("lerp")) {
-            } else {
-                
             }
+
         }
 
     }
 
 
 }
-

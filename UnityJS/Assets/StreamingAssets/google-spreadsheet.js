@@ -30,7 +30,7 @@ function handleClientLoad()
  */
 function initClient()
 {
-    console.log("bridge.html: initClient");
+    console.log("google-spreadsheet.js: initClient");
     gapi.client.init({
         apiKey: API_KEY,
         clientId: CLIENT_ID,

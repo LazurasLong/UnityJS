@@ -288,7 +288,7 @@ public class Bridge : MonoBehaviour {
         JArray evList = JArray.Parse(json);
         //Debug.Log("Bridge: DistributeUnityEvents: evList: " + evList);
 
-        Debug.Log("Bridge: DistributeUnityEvents: evList.Count: " + evList.Count + " json.Length: " + json.Length);
+        //Debug.Log("Bridge: DistributeUnityEvents: evList.Count: " + evList.Count + " json.Length: " + json.Length);
 
         foreach (JObject ev in evList) {
             DistributeUnityEvent(ev);
@@ -334,7 +334,7 @@ public class Bridge : MonoBehaviour {
                 JArray preEvents = GetJArrayDefault(data, "preEvents");
                 JArray postEvents = GetJArrayDefault(data, "postEvents");
 
-                Debug.Log("Bridge: DistributeUnityEvent: Create: prefab: " + prefab + " id: " + id + " config: " + config + " interests: " + interests + " preEvents: " + preEvents + " postEvents: " + postEvents);
+                //Debug.Log("Bridge: DistributeUnityEvent: Create: prefab: " + prefab + " id: " + id + " config: " + config + " interests: " + interests + " preEvents: " + preEvents + " postEvents: " + postEvents);
 
                 GameObject instance = null;
                 if (string.IsNullOrEmpty(prefab)) {
@@ -390,7 +390,7 @@ public class Bridge : MonoBehaviour {
                 bridgeObjectToID[bridgeObject] = id;
                 idToBridgeObject[id] = bridgeObject;
 
-                //Debug.Log("Bridge: DistributeUnityEvent: Create: created, position: " + bridgeObject.transform.position.x + " " + bridgeObject.transform.position.y + " " + bridgeObject.transform.position.z + " bridgeObject: " + bridgeObject);
+                //Debug.Log("Bridge: DistributeUnityEvent: Create: created, position: " + bridgeObject.transform.position.x + " " + bridgeObject.transform.position.y + " " + bridgeObject.transform.position.z + " bridgeObject: " + bridgeObject, bridgeObject);
 
                 if (preEvents != null) {
                     bridgeObject.HandleEvents(preEvents);
@@ -595,6 +595,18 @@ public class Bridge : MonoBehaviour {
 
     ////////////////////////////////////////////////////////////////////////
     // Type conversion.
+
+
+    public bool ConvertToType<T>(JToken data, ref T result)
+    {
+        //Debug.Log("Bridge: ConvertToType: T: " + typeof(T) + " data: " + data);
+
+        result = (T)data.ToObject(typeof(T), jsonSerializer);
+
+        //Debug.Log("Bridge: ConvertToType: result: " + result);
+
+        return true;
+    }
 
 
     public bool ConvertToType(JToken data, System.Type objectType, ref object result)

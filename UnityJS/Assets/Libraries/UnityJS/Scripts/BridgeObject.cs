@@ -56,10 +56,11 @@ public class BridgeObject : MonoBehaviour {
 
     public virtual void HandleEvent(JObject ev)
     {
-        Debug.Log("BridgeObject: HandleEvent: this: " + this + " ev: " + ev, this);
+        //Debug.Log("BridgeObject: HandleEvent: this: " + this + " ev: " + ev, this);
 
         string eventName = (string)ev["event"];
-        Debug.Log("BridgeObject: HandleEvent: eventName: " + eventName, this);
+        //Debug.Log("BridgeObject: HandleEvent: eventName: " + eventName, this);
+
         if (string.IsNullOrEmpty(eventName)) {
             Debug.LogError("BridgeObject: HandleEvent: missing event name in ev: " + ev);
             return;

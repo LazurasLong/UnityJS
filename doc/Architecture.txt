@@ -303,3 +303,95 @@ Accessor Path Expressions
         member, field, propery
         object, bridgeobject
         method
+
+----
+
+Extension Methods
+
+    Material.UpdateMaterial(this Material material, JToken materialData)
+
+        This method modifies the material based on the keys of a JSON object. 
+        The materialData is an object with keys describing how to update the material.
+        Some of the keys are prefixes that can be followed by name of a property,
+        so setting "texture_MainTex" calls material.SetTexture("_MainTex", texture).
+
+            copyPropertiesFromMaterial: "MaterialResourceName"
+                Material value;
+                material.CopyPropertiesFromMaterial(value);
+            doubleSidedGI: true
+                bool value;
+                material.doubleSidedGI = value;
+            enableInstancing: true
+                bool value;
+                material.enableInstancing = value;
+            globalIlluminationFlags: "None"
+                MaterialGlobalIlluminationFlags value; // string or number
+                globalIlluminationFlags = value;
+            mainTextureOffset: {x: 0, y: 0}
+                Vector2 value;
+                material.mainTextureOffset = value;
+            mainTextureScale: {x: 1, y: 1}
+                Vector2 value;
+                material.mainTextureScale = value;
+            mainTexture: "TextureResourceName"
+                Texture value; // texture resource name
+                material.mainTexture = value;
+            renderQueue: 1
+                int value;
+                material.renderQueue = value;
+            shader: "ShaderName"
+                Shader value; // shader name
+                material.shader = value;
+            shaderKeywords: ["key", ...]
+                string[] value;
+            texture<name>: "TextureResourceName"
+                Texture value; // texture resource name
+                material.SetTexture(name, value);
+            textureOffset: {x:0, y:0}
+                Vector2 value;
+                material.SetTextureOffset(name, value);
+            textureScale<name>: {x:1, y:1}
+                Vector2 value;
+                material.SetTextureScale(name, value);
+            keyword<name>: true
+                bool value;
+                material.(value ? Enable : Disable)Keyword(<name>);
+            overrideTag<name>: true
+                bool value;
+                material.SetOverrideTag(name, value);
+            shaderPass<name>: true
+                bool value;
+                material.SetShaderPassEnabled(name, value);
+            buffer<name>: "BufferName"
+                ComputeBuffer value;
+                material.SetComputeBuffer(name, value);
+            color: {r:1, b:1, g:1, a: 1}
+                Color value;
+                material.color = value;
+            color<name>: {r:1, b:1, g:1, a: 1}
+                Color value;
+                material.SetColor(name, value);
+            colorArray<name>: [{r:1, b:1, g:1, a: 1}, ...]
+                Color[] value;
+                material.SetColorArray(name, value);
+            float<name>: 0.1
+                float value;
+                material.SetFloat(name, value);
+            floatArray<name>: [0.1, ...]
+                float[] value;
+                material.SetFloatArray(name, value);
+            int<name>: 0
+                int value;
+                material.SetInt(name, value);
+            matrix<name>: [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+                Matrix4x4 value;
+                material.SetMatrix(name, value);
+            matrixArray<name> [[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1], ...]
+                Matrix4x4[] value;
+                material.SetMatrixArray(name, value);
+            vector<name>: {x:0, y:0, z:0, w:0}
+                Vector4 value;
+                material.SetVector(name, value);
+            vectorArray<name>: [{x:0, y:0, z:0, w:0}, ...]
+                Vector4[] value;
+                material.SetVectorArray(name, value);

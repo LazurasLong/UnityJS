@@ -66,7 +66,7 @@ public class Tile: MonoBehaviour {
 
                 texture = (Texture2D)Resources.Load(textureName);
 
-                //Debug.Log("Tile: Update: updateTexture: textureName: " + textureName + " texture: " + texture + " meshRenderer: " + meshRenderer + " material: " + meshRenderer.material.mainTexture + " mainTexture: " + meshRenderer.material.mainTexture + " shader: " + meshRenderer.material.shader);
+                Debug.Log("Tile: Update: updateTexture: textureName: " + textureName + " texture: " + texture + " meshRenderer: " + meshRenderer + " material: " + meshRenderer.material.mainTexture + " mainTexture: " + meshRenderer.material.mainTexture + " shader: " + meshRenderer.material.shader);
 
                 //meshRenderer.material.mainTexture = texture;
 
