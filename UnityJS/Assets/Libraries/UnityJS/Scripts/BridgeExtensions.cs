@@ -618,7 +618,7 @@ public static class BridgeExtensions {
 
     public static void UpdateMaterial(this Material material, JToken materialData)
     {
-        Debug.Log("BridgeExtensions: Material: UpdateMaterial: material: " + material + " materialData: " + materialData.GetType() + " " + materialData);
+        //Debug.Log("BridgeExtensions: Material: UpdateMaterial: material: " + material + " materialData: " + materialData.GetType() + " " + materialData);
 
         JObject obj = materialData as JObject;
         if (obj == null) {
@@ -666,6 +666,22 @@ public static class BridgeExtensions {
 
         }
 
+    }
+
+
+    public static void SetMaterials(this Renderer renderer, JToken materialsToken)
+    {
+        Debug.Log("BridgeExtensions: Material: SetMaterials: renderer: " + renderer + " materialsToken: " + materialsToken);
+
+        Material[] materials = null;
+        if (!Bridge.bridge.ConvertToType<Material[]>(materialsToken, ref materials)) {
+            Debug.LogError("BridgeExtensions: SetMaterials: renderer: " + renderer + " expected array of Materials!");
+            return;
+        }
+
+        Debug.LogError("BridgeExtensions: SetMaterials: renderer: " + renderer + " BEFORE SET");
+        renderer.materials = materials;
+        Debug.LogError("BridgeExtensions: SetMaterials: renderer: " + renderer + " AFTER SET");
     }
 
 

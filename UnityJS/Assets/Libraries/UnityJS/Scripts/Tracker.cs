@@ -31,7 +31,7 @@ public class Tracker : BridgeObject {
     public Vector2 screenSize = Vector2.zero;
     public Vector3 mousePosition = Vector3.zero;
     public Vector3 mousePositionToCameraOffset;
-    public bool mouseTrackingRay = true;
+    public bool mouseTrackingRaycast = true;
     public float mouseRayMaxDistance = Mathf.Infinity;
     public int mouseRayLayerMask = Physics.DefaultRaycastLayers;
     public QueryTriggerInteraction mouseRayQueryTriggerInteraction = QueryTriggerInteraction.UseGlobal;
@@ -41,6 +41,17 @@ public class Tracker : BridgeObject {
     public Quaternion mouseRaycastHitPointFaceCameraRotation;
     public BridgeObject mouseRaycastHitBridgeObject;
     public string mouseRaycastHitBridgeObjectID;
+    public bool dragTracking = false;
+    public bool dragging = false;
+    public Plane dragPlane = new Plane(Vector3.up, Vector3.zero);
+    public Vector3 dragStartPosition;
+    public Vector3 dragStartPlanePosition;
+    public Vector3 dragPlanePosition;
+    public Vector3 dragPlaneDistance;
+    public Quaternion dragStartRotation;
+    public Vector3 dragStartScreenPosition;
+    public Vector3 dragScreenDistance;
+    public Vector3 dragDistance;
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -49,62 +60,98 @@ public class Tracker : BridgeObject {
 
     public virtual void TrackMousePosition()
     {
-       mouseRaycastHitBridgeObject = null;
-       mouseRaycastHitBridgeObjectID = null;
+        mouseRaycastHitBridgeObject = null;
+        mouseRaycastHitBridgeObjectID = null;
 
-       if (!mouseTrackingPosition) {
-           return;
+        if (!mouseTrackingPosition) {
+            return;
+        }
+
+        mousePosition = Input.mousePosition;
+        screenSize = new Vector2(Screen.width, Screen.height);
+
+        if (Camera.main == null) {
+            return;
+        }
+
+        mouseRay =
+            Camera.main.ScreenPointToRay(
+                mousePosition);
+
+        if (!mouseTrackingRaycast) {
+
+            mouseRaycastResult = false;
+
+        } else {
+
+            mouseRaycastResult =
+                Physics.Raycast(
+                    mouseRay, 
+                    out mouseRaycastHit, 
+                    mouseRayMaxDistance, 
+                    mouseRayLayerMask, 
+                    mouseRayQueryTriggerInteraction);
+
+            //Debug.Log("Tracker: TrackMousePosition: mouseRaycastResult: " + mouseRaycastResult + " mouseRaycastHitPoint: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z);
+
+            if (!mouseRaycastResult) {
+
+            } else {
+
+                Vector3 cameraPosition = Camera.main.transform.position;
+                Vector3 offset = cameraPosition - mouseRaycastHit.point;
+                offset.y = 0.0f;
+                float direction = 
+                    (offset == Vector3.zero)
+                        ? 0.0f
+                        : (180.0f + (Mathf.Atan2(offset.x, offset.z) * Mathf.Rad2Deg));
+                mouseRaycastHitPointFaceCameraRotation =
+                    Quaternion.Euler(0.0f, direction, 0.0f);
+
+                mouseRaycastHitBridgeObject = null;
+                Transform xform = mouseRaycastHit.transform;
+                while (xform != null) {
+                    mouseRaycastHitBridgeObject = xform.gameObject.GetComponent<BridgeObject>();
+                    if (mouseRaycastHitBridgeObject != null) {
+                        break;
+                    }
+
+                    xform = xform.parent;
+                }
+
+                mouseRaycastHitBridgeObjectID =
+                    (mouseRaycastHitBridgeObject == null)
+                        ? null
+                        : mouseRaycastHitBridgeObject.id;
+            }
+
+            //Debug.Log("Tracker: TrackMousePosition: cameraPosition: " + cameraPosition.x + " " + cameraPosition.y + " " + cameraPosition.z + " point: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z + " offset: " + offset.x + " " + offset.y + " " + offset.z + " direction: " + direction);
+
+        }
+
+        if (dragging) {
+
+            dragScreenDistance = 
+                mousePosition - dragStartScreenPosition;
+
+            float enter = 0.0f;
+            if (dragPlane.Raycast(mouseRay, out enter)) {
+                dragPlanePosition = mouseRay.GetPoint(enter);
+                dragPlaneDistance = dragPlanePosition - dragStartPlanePosition;
+            }
+
+            if (dragDistance != dragPlaneDistance) {
+
+                dragDistance = dragPlaneDistance;
+
+                transform.position =
+                    dragStartPosition + dragDistance;
+
+                SendEventName("DragMove");
+
+          }
+
        }
-
-       mousePosition = Input.mousePosition;
-       screenSize = new Vector2(Screen.width, Screen.height);
-
-       if (!mouseTrackingRay) {
-           mouseRaycastResult = false;
-           return;
-       }
-
-       if (Camera.main == null) {
-           return;
-       }
-
-       mouseRay = Camera.main.ScreenPointToRay(mousePosition);
-       mouseRaycastResult = Physics.Raycast(mouseRay, out mouseRaycastHit, mouseRayMaxDistance, mouseRayLayerMask, mouseRayQueryTriggerInteraction);
-
-       //Debug.Log("Tracker: TrackMousePosition: mouseRaycastResult: " + mouseRaycastResult + " mouseRaycastHitPoint: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z);
-
-       if (!mouseRaycastResult) {
-
-       } else {
-
-           Vector3 cameraPosition = Camera.main.transform.position;
-           Vector3 offset = cameraPosition - mouseRaycastHit.point;
-           offset.y = 0.0f;
-           float direction = 
-               (offset == Vector3.zero)
-                   ? 0.0f
-                   : (180.0f + (Mathf.Atan2(offset.x, offset.z) * Mathf.Rad2Deg));
-           mouseRaycastHitPointFaceCameraRotation =
-               Quaternion.Euler(0.0f, direction, 0.0f);
-
-           mouseRaycastHitBridgeObject = null;
-           Transform xform = mouseRaycastHit.transform;
-           while (xform != null) {
-               mouseRaycastHitBridgeObject = xform.gameObject.GetComponent<BridgeObject>();
-               if (mouseRaycastHitBridgeObject != null) {
-                   break;
-               }
-
-               xform = xform.parent;
-           }
-
-           mouseRaycastHitBridgeObjectID =
-               (mouseRaycastHitBridgeObject == null)
-                   ? null
-                   : mouseRaycastHitBridgeObject.id;
-       }
-
-       //Debug.Log("Tracker: TrackMousePosition: cameraPosition: " + cameraPosition.x + " " + cameraPosition.y + " " + cameraPosition.z + " point: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z + " offset: " + offset.x + " " + offset.y + " " + offset.z + " direction: " + direction);
 
     }
 
@@ -168,6 +215,30 @@ public class Tracker : BridgeObject {
     {
         //Debug.Log("Tracker: SetMouseDown: mouseDown0: " + mouseDown0, this);
         mouseDown = mouseDown0;
+
+        if (dragTracking) {
+            if (mouseDown) {
+                dragging = true;
+                dragPlane.SetNormalAndPosition(
+                    Vector3.up,
+                    transform.position);
+
+                float enter = 0.0f;
+                if (!dragPlane.Raycast(mouseRay, out enter)) {
+                    dragging = false;
+                    return;
+                }
+                dragStartPlanePosition = mouseRay.GetPoint(enter);
+
+                dragStartPosition = transform.position;
+                dragStartRotation = transform.rotation;
+                dragStartScreenPosition = mousePosition;
+                SendEventName("DragStart");
+            } else {
+                dragging = false;
+                SendEventName("DragStop");
+            }
+        }
     }
 
 

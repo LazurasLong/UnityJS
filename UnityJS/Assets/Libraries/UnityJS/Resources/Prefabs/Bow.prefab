@@ -65,7 +65,7 @@ MonoBehaviour:
   toTransformAttached: 1
   toTransform: {fileID: 0}
   toPosition: {x: 0, y: 0, z: 0}
-  toOffset: {x: 0, y: 0.5, z: 0}
+  toOffset: {x: 0, y: 0, z: 0}
   toLocalOffset: {x: 0, y: 0, z: 0}
   toLocalOffsetRotated: {x: 0, y: 0, z: 0}
   lineRenderer: {fileID: 120906442093127462}

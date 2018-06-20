@@ -51,6 +51,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42a2dd422a52140718e7f1f4dbdc67aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 
+  bridge: {fileID: 0}
+  destroyed: 0
   fromTransformAttached: 1
   fromTransform: {fileID: 0}
   fromOffset: {x: 0, y: 0, z: 0}
@@ -61,7 +64,7 @@ MonoBehaviour:
   fromRotation: 0
   toTransformAttached: 1
   toTransform: {fileID: 0}
-  toOffset: {x: 0, y: 0.5, z: 0}
+  toOffset: {x: 0, y: 0, z: 0}
   toLocalOffset: {x: 0, y: 0, z: 0}
   toLocalOffsetRotated: {x: 0, y: 0, z: 0}
   toPosition: {x: 0, y: 0, z: 0}

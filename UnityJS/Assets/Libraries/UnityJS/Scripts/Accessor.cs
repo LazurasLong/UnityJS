@@ -336,13 +336,13 @@ public class Accessor {
                         Debug.Log ("========================================================================");
 
                         FieldInfo[] fields = searchType.GetFields(BindingFlags.Public | BindingFlags.Static);
-                        Debug.Log ("Accessor: FindAccessor: DUMPING searchType: " + searchType + " fields: " + fields.Length);
+                        Debug.Log ("Accessor: FindAccessor: DUMPING rest: " + rest + " searchType: " + searchType + " fields: " + fields.Length);
                         foreach (FieldInfo fieldInfo1 in fields) {
                             Debug.Log ("Accessor: FindAccessor: fieldInfo1: " + fieldInfo1);
                         }
 
                         PropertyInfo[] properties = searchType.GetProperties(BindingFlags.Public | BindingFlags.Static);
-                        Debug.Log ("Accessor: FindAccessor: DUMPING searchType: " + searchType + " properties: " + properties.Length);
+                        Debug.Log ("Accessor: FindAccessor: DUMPING rest: " + rest + " searchType: " + searchType + " properties: " + properties.Length);
                         foreach (PropertyInfo propertyInfo1 in properties) {
                             Debug.Log ("Accessor: FindAccessor: propertyInfo1: " + propertyInfo1);
                         }
@@ -371,10 +371,10 @@ public class Accessor {
                     }
 
                     if (fieldInfo != null) {
-                        //Debug.Log("Accessor: FindAccessor: found fieldInfo: " + fieldInfo);
+                        //Debug.Log("Accessor: FindAccessor: found fieldInfo: " + fieldInfo + " rest: " + rest);
                         accessor.Init_Field(nextObj, rest, fieldInfo, conditional, excited);
                     } else if (propertyInfo != null) {
-                        //Debug.Log("Accessor: FindAccessor: found propertyInfo: " + propertyInfo);
+                        //Debug.Log("Accessor: FindAccessor: found propertyInfo: " + propertyInfo + " rest: " + rest);
                         accessor.Init_Property(nextObj, rest, propertyInfo, conditional, excited);
                     } else {
                         Debug.LogError("Accessor: FindAccessor: undefined field or property rest: " + rest + " firstObj: " + firstObj + " nextObj: " + nextObj);
@@ -829,7 +829,7 @@ public class Accessor {
                 return true;
 
             case AccessorType.Method:
-                return false;
+                return true;
 
         }
 
@@ -884,8 +884,7 @@ public class Accessor {
                 return Get_Object(ref result);
 
             case AccessorType.Method:
-                Debug.LogError("Accessor: Get: type: Method: tried to read from a method: path! Try setting. methodName: " + str);
-                return false;
+                return Get_Method(ref result);
 
         }
 
@@ -1135,6 +1134,47 @@ public class Accessor {
     }
 
 
+    public bool Get_Method(ref object result)
+    {
+        var type = 
+            obj.GetType();
+        //Debug.Log("Accessor: Get_Method: type: " + type);
+
+        MethodInfo methodInfo = 
+            type.GetMethod(str, Type.EmptyTypes);
+
+        //Debug.Log("Accessor: Get_Method: 1 methodInfo: " + ((methodInfo == null) ? "NULL" : ("" + methodInfo)));
+
+        List<object> parameters = new List<object>();
+
+        // If we didn't find the method on the type, then look for an extension method.
+        if (methodInfo == null) {
+
+            methodInfo =
+                type.GetExtensionMethod(str);
+
+            // Extension methods take an additional obj parameter.
+            if (methodInfo != null) {
+                parameters.Add(obj);
+            }
+
+            //Debug.Log("Accessor: Get_Method: 2 methodInfo: " + ((methodInfo == null) ? "NULL" : ("" + methodInfo)));
+        }
+
+        if (methodInfo == null) {
+            Debug.LogError("Accessor: Get_Method: can't find str: " + str + " on type: " + type);
+            return false;
+        }
+
+        result = 
+            methodInfo.Invoke(obj, parameters.ToArray());
+
+        //Debug.Log("Accessor: Get_Method: Invoked str: " + str + " on obj: " + obj + "  type: " + ((result == null) ? "NULL" : result.GetType().Name) + " result: " + result);
+
+        return true;
+    }
+
+
     public bool CanSet()
     {
         switch (type) {
@@ -1237,7 +1277,6 @@ public class Accessor {
                 return false;
 
             case AccessorType.Method:
-                //Debug.Log("Accessor: Set: Method: obj: " + obj + " str: " + str + " value: " + value.GetType().Name + " " + value);
                 return Set_Method(obj, value);
 
         }
@@ -1335,7 +1374,18 @@ public class Accessor {
     public bool Set_Property(object obj, object value)
     {
         try {
+
+#if false
             propertyInfo.SetValue(obj, value, null);
+#else
+            MethodInfo setMethod = propertyInfo.GetSetMethod();
+            if (setMethod == null) {
+                Debug.LogError("Accessor: Set_Property: error setting value! Null setMethod for propertyInfo: " + propertyInfo + " obj: " + obj + " propertyInfo: " + propertyInfo);
+                 return false;
+            }
+            setMethod.Invoke(obj, new object[] { value });
+#endif
+
             return true;
         } catch (Exception ex) {
             Debug.LogError("Accessor: Set_Property: error setting value! obj: " + obj + " propertyInfo: " + propertyInfo + " ex: " + ex);

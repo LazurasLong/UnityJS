@@ -302,6 +302,7 @@ function DistributeEvents(evList, evListStringLength)
 function UpdateContent()
 {
     if (!globals.updateContent) {
+        return;
     }
 
     if (globals.content == null) {
@@ -561,6 +562,7 @@ function ShowObjectInfo(obj)
 function CreateObjects()
 {
     CreateInterface();
+    CreateKeyboardTracker();
     CreatePieTracker();
     CreateCanvas();
     CreateJunk();
@@ -1110,7 +1112,66 @@ function CreatePieTracker()
         }
     });
 
-    globals.pieTracker.doNotDestroy = true;
+}
+
+
+function TrackInputString(inputString)
+{
+    console.log("TrackInputString: inputString: " + inputString);
+}
+
+
+function TrackKeyEvent(results)
+{
+    console.log("TrackKeyEvent: keyEvent: " + JSON.stringify(results));
+}
+
+
+function CreateKeyboardTracker()
+{
+
+    globals.keyboardTracker = CreatePrefab({
+        prefab: 'Prefabs/KeyboardTracker', 
+        obj: { // obj
+            doNotDelete: true
+        }, // obj
+        params: { // params:
+            tracking: true,
+            inputStringTracking: true,
+            keyEventTracking: true
+        },
+        interests: { // interests:
+            InputString: {
+                query: {
+                    inputString: "inputString"
+                },
+                handler: function (obj, results) {
+                    //console.log("KeyboardTracker: InputString: inputString: " + results.inputString);
+                    TrackInputString(results.inputString);
+                }
+            },
+            KeyEvent: {
+                query: {
+                    character: "keyEvent/character",
+                    keyCode: "keyEvent/keyCode",
+                    type: "keyEvent/type/method:ToString",
+                    modifiers: "keyEvent/modifiers"
+                    //shift: "keyEvent/shift",
+                    //alt: "keyEvent/alt",
+                    //control: "keyEvent/control",
+                    //command: "keyEvent/command",
+                    //capsLock: "keyEvent/capsLock",
+                    //functionKey: "keyEvent/functionKey",
+                    //numeric: "keyEvent/numeric",
+                    //mousePosition: "keyEvent/mousePosition"
+                },
+                handler: function (obj, results) {
+                    //console.log("KeyboardTracker: KeyEvent: results: " + JSON.stringify(results));
+                    TrackKeyEvent(results);
+                }
+            }
+        }
+    });
 
 }
 

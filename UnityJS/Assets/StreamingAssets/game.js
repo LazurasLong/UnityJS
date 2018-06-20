@@ -40,8 +40,14 @@ globals.sheets = [];
 
 function CreateObjects()
 {
+    CreateKeyboardTracker();
     CreatePieTracker();
+    CreateSheetObjects();
+}
 
+
+function CreateSheetObjects()
+{
     LoadSheets(globals.sheets, globals.sheetURLs, function() {
 
         if (!globals.sheets['world']) {
@@ -59,7 +65,7 @@ function CreateObjects()
             } else {
                 globals.world = world;
                 console.log("game.js: CreateObjects: onload: Loaded world:", world, "scope:", scope);
-                StartWorld(world);
+                StartWorld();
             }
 
         }
@@ -70,7 +76,24 @@ function CreateObjects()
 }
 
 
-function StartWorld(world)
+function ClearWorld()
+{
+    var world = globals.world;
+
+    for (var objectID in globals.objects) {
+
+        var obj = globals.objects[objectID];
+
+        if (obj.doNotDelete) {
+            continue;
+        }
+
+        DestroyObject(obj);
+    }
+}
+
+
+function StartWorld()
 {
     CreateGlobalObjects();
     CreateGame();
@@ -162,10 +185,8 @@ function CreateGame()
                             config: { // config 
                                 "transform/localPosition": {x: tileX, y: tileZ, z: tileY},
                                 "transform/localRotation": {yaw: 90},
-                                "component:MeshRenderer/materials": [materialName, materialName, materialName]
-                                //"component:MeshRenderer/materials/index:0/method:UpdateMaterial": updateMaterialParams,
-                                //"component:MeshRenderer/materials/index:1/method:UpdateMaterial": updateMaterialParams,
-                                //"component:MeshRenderer/materials/index:2/method:UpdateMaterial": updateMaterialParams
+                                "component:MeshRenderer/materials": [materialName, materialName, materialName],
+                                "dragTracking": true
                             }, 
                             interests: { // interests
                                 MouseDown: {
@@ -173,7 +194,7 @@ function CreateGame()
                                         position: "transform/localPosition"
                                     },
                                     handler: function(obj, result) {
-                                        console.log("MouseDown on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
+                                        //console.log("MouseDown on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
                                         SendEvent({
                                             event: 'Tween',
                                             id: globals.leanTweenBridge.id,
@@ -183,6 +204,30 @@ function CreateGame()
                                                 sequence: [1, 2, 3]
                                             }
                                         });
+                                    }
+                                },
+                                DragStart: {
+                                    query: {
+                                        position: "transform/localPosition"
+                                    },
+                                    handler: function(obj, result) {
+                                        //console.log("DragStart on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
+                                    }
+                                },
+                                DragMove: {
+                                    query: {
+                                        position: "transform/localPosition"
+                                    },
+                                    handler: function(obj, result) {
+                                        //console.log("DragMove on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
+                                    }
+                                },
+                                DragEnd: {
+                                    query: {
+                                        position: "transform/localPosition"
+                                    },
+                                    handler: function(obj, result) {
+                                        //console.log("DragEnd on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
                                     }
                                 }
                             }
@@ -292,8 +337,20 @@ function CreateGame()
 }
 
 
-function CreatePlatform()
+function TrackInputString(inputString)
 {
+    //console.log("game.js: TrackInputString: inputString: " + inputString);
+
+    switch (inputString) {
+
+        case 'r':
+            console.log("game.js: TrackInputString: r: Reloading world...");
+            ClearWorld();
+            CreateSheetObjects();
+            break;
+
+    }
+
 }
 
 

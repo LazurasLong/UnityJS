@@ -423,12 +423,13 @@ public class Bridge : MonoBehaviour {
                     return;
                 }
 
-                object obj = idToObject[id];
-                //Debug.Log("Bridge: DistributeUnityEvent: obj: " + obj);
-                if (obj == null) {
-                    Debug.LogError("Bridge: DistributeUnityEvent: missing id: " + id + " ev: " + ev);
+                if (!idToObject.ContainsKey(id)) {
+                    Debug.Log("Bridge: DistributeUnityEvent: missing id: " + id + " ev: " + ev);
                     return;
                 }
+
+                object obj = idToObject[id];
+                //Debug.Log("Bridge: DistributeUnityEvent: obj: " + obj);
 
                 BridgeObject bridgeObject = obj as BridgeObject;
 
