@@ -21,9 +21,11 @@ globals.sheetURLs = {
     world: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=0',
     globalObjects: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=1535357011',
     texturePaths: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=580619937',
+    materialPaths: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=1288543752',
     prefabMap: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=1469835123',
     bowConfigs_outline: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=650116669',
     bowConfigs_table: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=233501381',
+    bowConfigs_rainbow: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=1544589805',
     twoDeeArray: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=1423929352',
     threeDeeArray: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=669397076',
     fourDeeArray: 'https://docs.google.com/spreadsheets/d/1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w/export?format=tsv&id=1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w&gid=894939244',
@@ -102,7 +104,7 @@ function CreateGame()
 
     world.rows = rows;
 
-    var dx = world.tileColumns * world.tileDX * -1.0;
+    var dx = world.tileColumns * world.tileDX * -0.5;
     var dy = world.tileRows * world.tileDY * -0.5;
 
     for (var y = 0; y < world.tileRows; y++) {
@@ -118,8 +120,8 @@ function CreateGame()
 
                 var tileX =
                     world.tileX + dx +
-                    ((y & 1) ? world.tileDX : 0) +
-                    (x * world.tileDX * 2);
+                    ((y & 1) ? (world.tileDX * 0.5) : 0) +
+                    (x * world.tileDX);
 
                 var tileZ =
                     world.tileHeight[y][x];
@@ -128,6 +130,10 @@ function CreateGame()
                     hexes.dir + 
                     world.tileName[y][x];
 
+                var materialName =
+                    world.tileMaterial[y][x];
+
+/*
                 var textureName = 
                     world.tileTexture[y][x];
 
@@ -137,6 +143,7 @@ function CreateGame()
                     texture_MainTex: textureName + "_COLOR",
                     texture_BumpMap: textureName + "_NORM"
                 }];
+*/
 
                 var prefabs = [];
 
@@ -154,9 +161,11 @@ function CreateGame()
                             }, 
                             config: { // config 
                                 "transform/localPosition": {x: tileX, y: tileZ, z: tileY},
-                                "component:MeshRenderer/materials/index:0/method:UpdateMaterial": updateMaterialParams,
-                                "component:MeshRenderer/materials/index:1/method:UpdateMaterial": updateMaterialParams,
-                                "component:MeshRenderer/materials/index:2/method:UpdateMaterial": updateMaterialParams
+                                "transform/localRotation": {yaw: 90},
+                                "component:MeshRenderer/materials": [materialName, materialName, materialName]
+                                //"component:MeshRenderer/materials/index:0/method:UpdateMaterial": updateMaterialParams,
+                                //"component:MeshRenderer/materials/index:1/method:UpdateMaterial": updateMaterialParams,
+                                //"component:MeshRenderer/materials/index:2/method:UpdateMaterial": updateMaterialParams
                             }, 
                             interests: { // interests
                                 MouseDown: {
@@ -247,8 +256,8 @@ function CreateGame()
             config: {
                 'fromTransform!': 'object:' + fromTile.id + '/transform',
                 'toTransform!': 'object:' + toTile.id + '/transform',
-                fromWidth: bowCount * 4.0,
-                toWidth: bowCount * 4.0
+                fromWidth: world.rainbowWidth,
+                toWidth: world.rainbowWidth
             }
         });
 

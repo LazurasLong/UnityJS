@@ -2,48 +2,51 @@ UnityJS Architecture
 
 Classes
 
-    - Means subclass of parent in outline.
-    * Means root- or sub-object (superclass).
+    - Means root object (with name of superclass in parens).
+    + Means subclass of parent in outline.
+    * Means sub-object of parent in outline (with name of superclass in parens).
 
-    * Accessor (none)
+    - Accessor (none)
 
-    * Bridge (MonoBehaviour)
+    - Bridge (MonoBehaviour)
 
-    * BridgeObject (MonoBehaviour)
-        - Tracker
-            * TrackerProxy (MonoBehaviour)
-            - PieTracker
-            - Cuboid
-                * Tile (MonoBehaviour)
-            - ParticleSystemHelper
-        - TextOverlays
-        - ToolbarButton
-        - TextureViewer
-        - HexTile
-        - Rainbow
-          * Bow (BridgeObject)
-        - BridgeTest
-
-    * BridgeTransport (MonoBehaviour)
-        - BridgeTransportCEF
+    - BridgeTransport (MonoBehaviour)
+        + BridgeTransportCEF
             * UnityJSWindow (EditorWindow)
             * WebProvider (none)
-        - BridgeTransportSocketIO
-        - BridgeTransportWebGL
-        - BridgeTransportWebView
-            UnityJSPlugin (MonoBehaviour)
+        + BridgeTransportSocketIO
+        + BridgeTransportWebGL
+        + BridgeTransportWebView
+            * UnityJSPlugin (MonoBehaviour)
 
-    * BridgeExtensions (none)
-    * BridgeJsonConverter (JsonConverter)
+    - BridgeExtensions (none)
+    - BridgeJsonConverter (JsonConverter)
 
-    * ProxyGroup (MonoBehaviour)
+    - BridgeObject (MonoBehaviour)
+        + Tracker
+            * TrackerProxy (MonoBehaviour)
+            + PieTracker
+            + Cuboid
+                * Tile (MonoBehaviour)
+            + ParticleSystemHelper
+        + LeanTweenBridge
+        + TextOverlays
+        + ToolbarButton
+        + TextureViewer
+        + HexTile
+        + KineticText
+        + Rainbow
+          * Bow (BridgeObject)
+        + BridgeTest
 
-    * MonoPInvokeCallbackAttribute (System.Attribute)
+    - ProxyGroup (MonoBehaviour)
 
-    * Loader (MonoBehavior)
-
-    * NamedAssetManager (MonoBehavior)
+    - NamedAssetManager (MonoBehavior)
         * NamedAsset (ScriptableObject)
+
+    - Loader (MonoBehavior)
+
+    - MonoPInvokeCallbackAttribute (System.Attribute)
 
 JSON Converters
 
@@ -90,7 +93,7 @@ JSON Converters
 
         "#00000000" // html color string
 
-        { // rgb color
+        { // rgb color (alpha defaults to 1)
             r: 0,
             g: 0,
             b: 0
@@ -219,15 +222,15 @@ JSON Converters
             timeEnd: 0,
             valueStart: 0,
             valueEnd: 0,
-            preWrapMode: "PreWrapMode",
-            postWrapMode: "PostWrapMode"
+            preWrapMode: "WrapMode", // Once, Loop, Default, PingPong, Default, ClampForever
+            postWrapMode: "WrapMode" // Once, Loop, Default, PingPong, Default, ClampForever
         }
 
         { // keys
             animationCurveType: "Keys",
             keys: [Keyframe, ...],
-            preWrapMode: "PreWrapMode",
-            postWrapMode: "PostWrapMode"
+            preWrapMode: "WrapMode", // Once, Loop, Default, PingPong, Default, ClampForever
+            postWrapMode: "WrapMode" // Once, Loop, Default, PingPong, Default, ClampForever
         }
 
     Keyframe
@@ -265,6 +268,24 @@ JSON Converters
 
         "ResourcePath"
 
+    Material
+
+        null
+
+        "ResourcePath"
+
+    Shader
+
+        null
+
+        "ShaderName"
+
+    ComputeBuffer
+
+        null
+
+        "ComputerBufferName" // TODO
+
 Accessor Path Expressions
 
     Path
@@ -273,7 +294,7 @@ Accessor Path Expressions
 
     Step
 
-        A Step consists of an optional type (defaulting to "object")
+        A Step consists of an optional type (defaulting to "member")
         followed by a colon, then a type specific string.
 
         A Step may not contain slashes, question marks or exclamation
@@ -301,7 +322,7 @@ Accessor Path Expressions
         component
         resource
         member, field, propery
-        object, bridgeobject
+        object
         method
 
 ----

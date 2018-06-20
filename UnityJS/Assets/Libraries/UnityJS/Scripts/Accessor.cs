@@ -29,7 +29,7 @@ public class Accessor {
         Transform,
         Component,
         Resource,
-        BridgeObject,
+        Object,
         Method,
     };
 
@@ -170,7 +170,6 @@ public class Accessor {
             // "array:" gets Array and "list:" gets List, "jarray:" get JArray, but "index:" is generic and figures out which to use at runtime.
             // "dict:" and "dictionary:" get Array, "jobject:" gets JObject, but "map:" is generic and figures out which to use at runtime.
             // "dictionary" and "dict" are synonyms for Dictionary.
-            // "bridgeobject" and "object" are synonyms for BridgeObject.
 
             switch (prefix) {
 
@@ -385,10 +384,9 @@ public class Accessor {
 
                     break;
 
-                case "object": // BridgeObject id
-                case "bridgeobject": // BridgeObject id
+                case "object": // Object id
 
-                    accessor.Init_BridgeObject(rest, conditional, excited);
+                    accessor.Init_Object(rest, conditional, excited);
 
                     break;
 
@@ -496,7 +494,7 @@ public class Accessor {
                     //Debug.Log("Accessor: SetProperty: excited: failed to get from pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
 
                     if (!pathAccessor.conditional) {
-                        Debug.LogError("BridgeObject: HandleEvent: SetParent: can't get pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
+                        Debug.LogError("Accessor: SetProperty: excited: can't get pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
                         return false;
                     }
 
@@ -766,11 +764,11 @@ public class Accessor {
     }
 
 
-    public void Init_BridgeObject(string bridgeObjectID0, bool conditional0, bool excited0)
+    public void Init_Object(string objectID0, bool conditional0, bool excited0)
     {
         Clear();
-        type = AccessorType.BridgeObject;
-        str = bridgeObjectID0;
+        type = AccessorType.Object;
+        str = objectID0;
         conditional = conditional0;
         excited = excited0;
     }
@@ -827,7 +825,7 @@ public class Accessor {
             case AccessorType.Resource:
                 return true;
 
-            case AccessorType.BridgeObject:
+            case AccessorType.Object:
                 return true;
 
             case AccessorType.Method:
@@ -882,8 +880,8 @@ public class Accessor {
             case AccessorType.Resource:
                 return Get_Resource(ref result);
 
-            case AccessorType.BridgeObject:
-                return Get_BridgeObject(ref result);
+            case AccessorType.Object:
+                return Get_Object(ref result);
 
             case AccessorType.Method:
                 Debug.LogError("Accessor: Get: type: Method: tried to read from a method: path! Try setting. methodName: " + str);
@@ -1119,18 +1117,18 @@ public class Accessor {
     }
 
 
-    public bool Get_BridgeObject(ref object result)
+    public bool Get_Object(ref object result)
     {
-        BridgeObject bridgeObject = 
-            Bridge.bridge.GetBridgeObject(str);
+        object obj = 
+            Bridge.bridge.GetObject(str);
 
-        if (bridgeObject != null) {
-            result = bridgeObject;
-            //Debug.Log("Accessor: Get_BridgeObject: found str: " + str + " result: " + result);
+        if (obj != null) {
+            result = obj;
+            //Debug.Log("Accessor: Get_Object: found str: " + str + " result: " + result);
 
             return true;
         } else {
-            Debug.LogError("Accessor: Get_BridgeObject: undefined str: " + str);
+            Debug.LogError("Accessor: Get_Object: undefined str: " + str);
 
             return false;
         }
@@ -1148,13 +1146,13 @@ public class Accessor {
                 return false;
 
             case AccessorType.JArray:
-                return (index > 0) && (index < ((JArray)obj).Count);
+                return (index >= 0) && (index < ((JArray)obj).Count);
 
             case AccessorType.Array:
-                return (index > 0) && (index < objArray.Length);
+                return (index >= 0) && (index < objArray.Length);
 
             case AccessorType.List:
-                return (index > 0) && (index < objList.Count);
+                return (index >= 0) && (index < objList.Count);
 
             case AccessorType.JObject:
                 return true;
@@ -1177,7 +1175,7 @@ public class Accessor {
             case AccessorType.Resource:
                 return false;
 
-            case AccessorType.BridgeObject:
+            case AccessorType.Object:
                 return false;
 
             case AccessorType.Method:
@@ -1234,8 +1232,8 @@ public class Accessor {
                 Debug.LogError("Accessor: Set: can't set type: Resource str: " + str);
                 return false;
 
-            case AccessorType.BridgeObject:
-                Debug.LogError("Accessor: Set: can't set type: BridgeObject str: " + str);
+            case AccessorType.Object:
+                Debug.LogError("Accessor: Set: can't set type: Object str: " + str);
                 return false;
 
             case AccessorType.Method:
@@ -1259,7 +1257,7 @@ public class Accessor {
 
         JArray jarray = (JArray)obj;
 
-        if ((index > 0) && 
+        if ((index >= 0) && 
             (index < jarray.Count)) {
             // TODO: Automatically convert various types to JSON.
             JToken token = (JToken)obj;
@@ -1274,7 +1272,7 @@ public class Accessor {
 
     public bool Set_Array(object obj, object value)
     {
-        if ((index > 0) && 
+        if ((index >= 0) && 
             (index < objArray.Length)) {
             objArray[index] = value;
             return true;
@@ -1287,7 +1285,7 @@ public class Accessor {
 
     public bool Set_List(object obj, object value)
     {
-        if ((index > 0) && (index < objList.Count)) {
+        if ((index >= 0) && (index < objList.Count)) {
             objList[index] = value;
             return true;
         } else {
@@ -1453,8 +1451,8 @@ public class Accessor {
             case AccessorType.Resource:
                 return typeof(UnityEngine.Object);
 
-            case AccessorType.BridgeObject:
-                return typeof(BridgeObject);
+            case AccessorType.Object:
+                return typeof(object);
 
             case AccessorType.Method:
                 return typeof(object);

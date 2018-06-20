@@ -767,7 +767,32 @@ public class BridgeJsonConverter : JsonConverter {
                 }
             },
 
-            { typeof(Shader), // name
+            { typeof(Material), // class
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Material: reader: " + reader + " objectType: " + objectType);
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.String) {
+                        return false;
+                    }
+
+                    string resourcePath = (string)JValue.Load(reader);
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Material: resourcePath: " + resourcePath);
+
+                    Material resource = (Material)Resources.Load(resourcePath);
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Material: resource: " + resource, resource);
+
+                    result = resource;
+                    return true;
+                }
+            },
+
+            { typeof(Shader), // class
                 delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
 
                     if (reader.TokenType == JsonToken.Null) {
@@ -787,7 +812,7 @@ public class BridgeJsonConverter : JsonConverter {
                 }
             },
 
-            { typeof(ComputeBuffer), // name
+            { typeof(ComputeBuffer), // class
                 delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
 
                     if (reader.TokenType == JsonToken.Null) {

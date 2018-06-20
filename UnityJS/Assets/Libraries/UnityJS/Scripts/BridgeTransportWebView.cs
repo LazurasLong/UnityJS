@@ -39,9 +39,6 @@ public class BridgeTransportWebView : BridgeTransport
     public override void HandleInit()
     {
         driver = "WebView";
-        url = CleanURL(url);
-
-        //Debug.Log("BridgeTransportWebView: HandleInit: url: " + url);
 
         IEnumerator coroutine = StartWebView();
         StartCoroutine(coroutine);
@@ -57,8 +54,6 @@ public class BridgeTransportWebView : BridgeTransport
 
         string sourceDir = Application.streamingAssetsPath;
         string destDir = Application.persistentDataPath;
-
-        //Debug.Log("BridgeTransportWebView: StartWebView: fullURL: " + fullURL + " sourceDir: " + sourceDir + " destDir: " + destDir, this);
 
         string filesPath = sourceDir + "/files.txt";
         string filesData = null;
@@ -131,7 +126,9 @@ public class BridgeTransportWebView : BridgeTransport
 
         unityJSPlugin.SetRect(webViewWidth, webViewHeight);
         unityJSPlugin.SetVisibility(visibility);
-        unityJSPlugin.LoadURL(url);
+
+        string cleanURL = CleanURL(bridge.url);
+        unityJSPlugin.LoadURL(cleanURL);
 
         yield break;
     }

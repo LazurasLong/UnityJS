@@ -39,9 +39,10 @@ public class Bridge : MonoBehaviour {
     // Instance Variables
     
 
-    public Dictionary<string, BridgeObject> idToBridgeObject = new Dictionary<string, BridgeObject>();
-    public Dictionary<BridgeObject, string> bridgeObjectToID = new Dictionary<BridgeObject, string>();
+    public Dictionary<string, object> idToObject = new Dictionary<string, object>();
+    public Dictionary<object, string> objectToID = new Dictionary<object, string>();
     public Dictionary<string, TextureChannelDelegate> textureChannels = new Dictionary<string, TextureChannelDelegate>();
+    public string url = "bridge.html";
     public bool startedJS = false;
     public BridgeTransport transport;
 
@@ -387,8 +388,8 @@ public class Bridge : MonoBehaviour {
                 bridgeObject.id = id;
                 bridgeObject.bridge = this;
                 bridgeObject.interests = interests;
-                bridgeObjectToID[bridgeObject] = id;
-                idToBridgeObject[id] = bridgeObject;
+                objectToID[bridgeObject] = id;
+                idToObject[id] = bridgeObject;
 
                 //Debug.Log("Bridge: DistributeUnityEvent: Create: created, position: " + bridgeObject.transform.position.x + " " + bridgeObject.transform.position.y + " " + bridgeObject.transform.position.z + " bridgeObject: " + bridgeObject, bridgeObject);
 
@@ -422,10 +423,17 @@ public class Bridge : MonoBehaviour {
                     return;
                 }
 
-                BridgeObject bridgeObject = idToBridgeObject[id];
-                //Debug.Log("Bridge: DistributeUnityEvent: bridgeObject: " + bridgeObject);
-                if (bridgeObject == null) {
+                object obj = idToObject[id];
+                //Debug.Log("Bridge: DistributeUnityEvent: obj: " + obj);
+                if (obj == null) {
                     Debug.LogError("Bridge: DistributeUnityEvent: missing id: " + id + " ev: " + ev);
+                    return;
+                }
+
+                BridgeObject bridgeObject = obj as BridgeObject;
+
+                if (bridgeObject == null) {
+                    Debug.LogError("Bridge: DistributeUnityEvent: tried to send eventName: " + eventName + " to non-BridgeObject obj: " + obj + " id: " + id + " ev: " + ev);
                     return;
                 }
 
@@ -440,43 +448,54 @@ public class Bridge : MonoBehaviour {
     }
 
 
-    public BridgeObject GetBridgeObject(string id)
+    public object GetObject(string id)
     {
-        if (!idToBridgeObject.ContainsKey(id)) {
+        if (!idToObject.ContainsKey(id)) {
             return null;
         }
 
-        BridgeObject bridgeObject = idToBridgeObject[id];
+        object obj = idToObject[id];
 
-        return bridgeObject;
+        return obj;
     }
 
 
-    public void DestroyBridgeObject(BridgeObject bridgeObject)
+    public void DestroyObject(object obj)
     {
-        if (bridgeObject.destroyed) {
-            return;
+        BridgeObject bridgeObject = obj as BridgeObject;
+
+        string id = null;
+
+        if (bridgeObject != null) {
+
+            if (bridgeObject.destroyed) {
+                return;
+            }
+
+            id = bridgeObject.id;
+            bridgeObject.destroyed = true;
+
+            //Debug.Log("Bridge: DestroyObject: bridgeObject: " + bridgeObject);
+
+            bridgeObject.SendEventName("Destroyed");
+
+            Destroy(bridgeObject.gameObject);
         }
 
-        bridgeObject.destroyed = true;
-
-        //Debug.Log("Bridge: DestroyBridgeObject: bridgeObject: " + bridgeObject);
-
-        if (idToBridgeObject.ContainsKey(bridgeObject.id)) {
-            idToBridgeObject.Remove(bridgeObject.id);
+        if (objectToID.ContainsKey(obj)) {
+            id = objectToID[obj];
+            objectToID.Remove(obj);
         } else {
-            //Debug.Log("Bridge: DestroyBridgeObject: idToBridgeObject missing bridgeObject id: " + bridgeObject.id, this);
+            //Debug.Log("Bridge: DestroyObject: objectToID missing obj: " + obj, this);
         }
 
-        bridgeObject.SendEventName("Destroyed");
-
-        if (bridgeObjectToID.ContainsKey(bridgeObject)) {
-            bridgeObjectToID.Remove(bridgeObject);
+        if ((id != null) &&
+            idToObject.ContainsKey(id)) {
+            idToObject.Remove(bridgeObject.id);
         } else {
-            //Debug.Log("Bridge: DestroyBridgeObject: missing bridgeObject: " + bridgeObject, this);
+            //Debug.Log("Bridge: DestroyObject: idToObject missing id: " + id, this);
         }
 
-        Destroy(bridgeObject.gameObject);
     }
 
 

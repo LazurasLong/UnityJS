@@ -50,7 +50,6 @@ public class BridgeTransportWebGL : BridgeTransport
         base.HandleInit();
 
         driver = "WebGL";
-        url = "";
         startedJS = true;
         bridge.HandleTransportStarted();
     }

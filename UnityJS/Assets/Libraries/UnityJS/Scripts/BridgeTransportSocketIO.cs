@@ -21,18 +21,15 @@ using StringCallback = System.Action<string>;
 public class BridgeTransportSocketIO : BridgeTransport
 {
 
+    string urlSocketIO = "http://localhost:3000";
     public Socket socket;
 
 
     public override void HandleInit()
     {
-        url = "http://localhost:3000";
-
-        //Debug.Log("BridgeSocketIO: Init: url0: " + url0);
-
         driver = "SocketIO";
 
-        socket = IO.Socket(url);
+        socket = IO.Socket(urlSocketIO);
         
         socket.On(Socket.EVENT_CONNECT, () => {
             socket.Emit("Hi");

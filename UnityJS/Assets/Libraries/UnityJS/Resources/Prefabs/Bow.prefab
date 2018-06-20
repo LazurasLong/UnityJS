@@ -52,6 +52,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 154ecca23ebd14f15982fc0eba7f5cd2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 
+  bridge: {fileID: 0}
+  destroyed: 0
   angle: 0
   fromTransformAttached: 1
   fromTransform: {fileID: 0}
@@ -67,20 +70,20 @@ MonoBehaviour:
   toLocalOffsetRotated: {x: 0, y: 0, z: 0}
   lineRenderer: {fileID: 120906442093127462}
   bowSegments: 50
-  bowHeight: 2
+  bowHeight: 10
   bowRotation: 90
   bowRotationPerSecond: 0
   bowStart: 0
   bowEnd: 1
-  startWidth: 0.2
-  endWidth: 0.2
-  widthMultiplier: 0.2
+  startWidth: 1
+  endWidth: 1
+  widthMultiplier: 1
   textureName: 
   textureURL: 
   texture: {fileID: 0}
   textureOffset: {x: 0, y: 0}
   textureScale: {x: 1, y: 1}
-  textureOffsetPerSecond: {x: -0.5, y: 0}
+  textureOffsetPerSecond: {x: 0, y: 0}
   updateTexture: 0
   updateMaterial: 0
   updateMaterialAlways: 1
@@ -93,14 +96,14 @@ LineRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1858257184602862}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 2
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 0
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: b6c63ce6db3db4ff38a5823010aa973d, type: 2}
+  - {fileID: 2100000, guid: 92a2f2a2e6601444999603dc1f3ce938, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -116,7 +119,7 @@ LineRenderer:
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
+  m_LightmapParameters: {fileID: 15200, guid: 0000000000000000f000000000000000, type: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -173,7 +176,7 @@ LineRenderer:
   - {x: 1, y: 0.49999982, z: 0}
   m_Parameters:
     serializedVersion: 2
-    widthMultiplier: 0.2
+    widthMultiplier: 1
     widthCurve:
       serializedVersion: 2
       m_Curve:

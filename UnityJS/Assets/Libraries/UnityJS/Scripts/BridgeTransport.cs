@@ -17,7 +17,6 @@ public class BridgeTransport : MonoBehaviour
 
 
     public string driver = "Unknown";
-    public string url = "bridge.html";
     public Bridge bridge;
     public List<string> jsToUnityEventQueue = new List<string>();
     public List<string> unityToJSEventQueue = new List<string>();

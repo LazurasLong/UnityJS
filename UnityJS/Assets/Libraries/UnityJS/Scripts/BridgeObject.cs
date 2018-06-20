@@ -37,7 +37,7 @@ public class BridgeObject : MonoBehaviour {
         }
         
         //Debug.Log("BridgeObject: OnDestroy: this: " + this);
-        bridge.DestroyBridgeObject(this);
+        bridge.DestroyObject(this);
     }
     
 
@@ -72,7 +72,7 @@ public class BridgeObject : MonoBehaviour {
         switch (eventName) {
 
             case "Destroy": {
-                bridge.DestroyBridgeObject(this);
+                bridge.DestroyObject(this);
                 break;
             }
 
