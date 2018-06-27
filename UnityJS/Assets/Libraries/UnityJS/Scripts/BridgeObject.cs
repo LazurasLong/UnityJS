@@ -66,7 +66,7 @@ public class BridgeObject : MonoBehaviour {
             return;
         }
 
-        JObject data = (JObject)ev["data"];
+        JToken data = ev["data"];
         //Debug.Log("BridgeObject: HandleEvent: eventName: " + eventName, this);
 
         switch (eventName) {
@@ -77,43 +77,50 @@ public class BridgeObject : MonoBehaviour {
             }
 
             case "Update": {
-                LoadConfig(data);
+                JObject dataObject = (JObject)data;
+                LoadConfig(dataObject);
                 break;
             }
 
             case "UpdateInterests": {
-                UpdateInterests(data);
+                JObject dataObject = (JObject)data;
+                UpdateInterests(dataObject);
                 break;
             }
 
             case "Animate": {
-                AnimateData(data);
+                JArray dataArray = (JArray)data;
+                AnimateData(dataArray);
                 break;
             }
 
             case "Query": {
-                JObject query = (JObject)data["query"];
-                string callbackID = (string)data["callbackID"];
+                JObject dataObject = (JObject)data;
+                JObject query = (JObject)dataObject["query"];
+                string callbackID = (string)dataObject["callbackID"];
                 bridge.SendQueryData(this, query, callbackID);
                 break;
             }
 
             case "AddComponent": {
                 // TODO: AddComponent
-                //string className = (string)data["className"];
+                //JObject dataObject = (JObject)data;
+                //string className = (string)dataObject["className"];
                 //Debug.Log("BridgeObject: HandleEvent: AddComponent: className: " + className);
                 break;
             }
 
             case "DestroyAfter": {
-                float delay = (float)data["delay"];
+                JObject dataObject = (JObject)data;
+                float delay = (float)dataObject["delay"];
                 //Debug.Log("BridgeObject: HandleEvent: DestroyAfter: delay: " + delay + " this: " + this);
                 UnityEngine.Object.Destroy(gameObject, delay);
                 break;
             }
 
             case "AssignTo": {
-                string path = (string)data["path"];
+                JObject dataObject = (JObject)data;
+                string path = (string)dataObject["path"];
                 //Debug.Log("BridgeObject: HandleEvent: AssignTo: path: " + path + " this: " + this);
 
                 Accessor accessor = null;
@@ -136,8 +143,9 @@ public class BridgeObject : MonoBehaviour {
             }
 
             case "SetParent": {
+                JObject dataObject = (JObject)data;
                 //Debug.Log("BridgeObject: HandleEvent: SetParent: this: " + this + " data: " + data);
-                string path = (string)data["path"];
+                string path = (string)dataObject["path"];
                 //Debug.Log("BridgeObject: HandleEvent: SetParent: path: " + path + " this: " + this);
 
                 if (string.IsNullOrEmpty(path)) {
@@ -176,7 +184,11 @@ public class BridgeObject : MonoBehaviour {
 
                                 GameObject go = component.gameObject;
                                 Transform xform = go.transform;
-                                transform.SetParent(xform);
+                                bool worldPositionStays = 
+                                    data.ContainsKey("worldPositionStays")
+                                        ? data.GetBoolean("worldPositionStays")
+                                        : true;
+                                transform.SetParent(xform, worldPositionStays);
 
                             }
 
@@ -213,6 +225,8 @@ public class BridgeObject : MonoBehaviour {
     public virtual void UpdateInterests(JObject newInterests)
     {
         //Debug.Log("BridgeObject: UpdateInterests: newInterests: " + newInterests, this);
+
+        // TODO: Should we support multiple interests on the same event name?
 
         if (interests == null) {
             return;
@@ -340,490 +354,11 @@ public class BridgeObject : MonoBehaviour {
     }
 
 
-    public virtual void AnimateData(JObject data)
+    public virtual void AnimateData(JArray data)
     {
         //Debug.Log("BridgeObject: AnimateData: data: " + data, this);
 
-#if false
-        if (!data.IsList) {
-            Debug.LogError("BridgeObject: AnimateData: not array data: " + data);
-            return;
-        }
-
-        var commandList = data.AsList;
-        foreach (JObject commandData in commandList) {
-
-            if (!commandData.IsList) {
-                Debug.LogError("BridgeObject: AnimateData: not array commandData: " + commandData);
-                continue;
-            }
-
-            var argList = commandData.AsList;
-            var command = argList[0].AsString;
-            switch (command) {
-
-                case "AudioFrom":
-                case "AudioTo": {
-
-                    if (argList.Count == 2) {
-
-                        Hashtable hash = null;
-                        if (ConvertArgs(argList[1], ref hash)) {
-                            switch (command) {
-                                case "AudioFrom":
-                                    iTween.AudioFrom(gameObject, hash);
-                                    break;
-                                case "AudioTo":
-                                    iTween.AudioTo(gameObject, hash);
-                                    break;
-                            }
-                        }
-
-                    } else if (argList.Count == 4) {
-
-                        float volume = 1.0f;
-                        float pitch = 1.0f;
-                        float time = 1.0f;
-                        if (ConvertFloat(argList[1], ref volume) &&
-                            ConvertFloat(argList[2], ref pitch) &&
-                            ConvertFloat(argList[3], ref time)) {
-                            switch (command) {
-                                case "AudioFrom":
-                                    iTween.AudioFrom(gameObject, volume, pitch, time);
-                                    break;
-                                case "AudioTo":
-                                    iTween.AudioTo(gameObject, volume, pitch, time);
-                                    break;
-                            }
-
-                        }
-
-                    } else {
-                        Debug.LogError("BridgeObject: AnimateData: " + command + ": expected length 2 or 4 for argList: " + argList);
-                        continue;
-                    }
-
-                    break;
-                }
-
-                case "ColorFrom":
-                case "ColorTo": {
-
-                    if (argList.Count == 2) {
-
-                        Hashtable hash = null;
-                        if (ConvertArgs(argList[1], ref hash)) {
-                            switch (command) {
-                                case "ColorFrom":
-                                    iTween.ColorFrom(gameObject, hash);
-                                    break;
-                                case "ColorTo":
-                                    iTween.ColorTo(gameObject, hash);
-                                    break;
-                            }
-                        }
-
-                    } else if (argList.Count == 3) {
-
-                        Color color = Color.white;
-                        float time = 1.0f;
-                        if (ConvertColor(argList[1], ref color) &&
-                            ConvertFloat(argList[2], ref time)) {
-                            switch (command) {
-                                case "ColorFrom":
-                                    iTween.ColorFrom(gameObject, color, time);
-                                    break;
-                                case "ColorTo":
-                                    iTween.ColorTo(gameObject, color, time);
-                                    break;
-                            }
-
-                        }
-
-                    } else {
-                        Debug.LogError("BridgeObject: AnimateData: " + command + ": expected length 2 or 3 for argList: " + argList);
-                        continue;
-                    }
-
-                    break;
-                }
-
-                case "FadeFrom":
-                case "FadeTo": {
-
-                    if (argList.Count == 2) {
-
-                        Hashtable hash = null;
-                        if (ConvertArgs(argList[1], ref hash)) {
-                            switch (command) {
-                                case "FadeFrom":
-                                    iTween.FadeFrom(gameObject, hash);
-                                    break;
-                                case "FadeTo":
-                                    iTween.FadeTo(gameObject, hash);
-                                    break;
-                            }
-                        }
-
-                    } else if (argList.Count == 3) {
-
-                        float alpha = 1.0f;
-                        float time = 1.0f;
-                        if (ConvertFloat(argList[1], ref alpha) &&
-                            ConvertFloat(argList[2], ref time)) {
-                            switch (command) {
-                                case "FadeFrom":
-                                    iTween.FadeFrom(gameObject, alpha, time);
-                                    break;
-                                case "FadeTo":
-                                    iTween.FadeTo(gameObject, alpha, time);
-                                    break;
-                            }
-
-                        }
-
-                    } else {
-                        Debug.LogError("BridgeObject: AnimateData: " + command + ": expected length 2 or 3 for argList: " + argList);
-                        continue;
-                    }
-
-                    break;
-                }
-
-                case "LookFrom":
-                case "LookTo":
-                case "MoveAdd":
-                case "MoveBy":
-                case "MoveFrom":
-                case "MoveTo":
-                case "PunchPosition":
-                case "PunchRotation":
-                case "PunchScale":
-                case "RotateAdd":
-                case "RotateBy":
-                case "RotateFrom":
-                case "RotateTo":
-                case "ScaleAdd":
-                case "ScaleBy":
-                case "ScaleFrom":
-                case "ScaleTo":
-                case "ShakePosition":
-                case "ShakeRotation":
-                case "ShakeScale": {
-
-                    if (argList.Count == 2) {
-
-                        Hashtable hash = null;
-                        if (ConvertArgs(argList[1], ref hash)) {
-                            switch (command) {
-                                case "LookFrom":
-                                    iTween.LookFrom(gameObject, hash);
-                                    break;
-                                case "LookTo":
-                                    iTween.LookTo(gameObject, hash);
-                                    break;
-                                case "MoveAdd":
-                                    iTween.MoveAdd(gameObject, hash);
-                                    break;
-                                case "MoveBy":
-                                    iTween.MoveBy(gameObject, hash);
-                                    break;
-                                case "MoveFrom":
-                                    iTween.MoveFrom(gameObject, hash);
-                                    break;
-                                case "MoveTo":
-                                    iTween.MoveTo(gameObject, hash);
-                                    break;
-                                case "PunchPosition":
-                                    iTween.PunchPosition(gameObject, hash);
-                                    break;
-                                case "PunchRotation":
-                                    iTween.PunchRotation(gameObject, hash);
-                                    break;
-                                case "PunchScale":
-                                    iTween.PunchScale(gameObject, hash);
-                                    break;
-                                case "RotateAdd":
-                                    iTween.RotateAdd(gameObject, hash);
-                                    break;
-                                case "RotateBy":
-                                    iTween.RotateBy(gameObject, hash);
-                                    break;
-                                case "RotateFrom":
-                                    iTween.RotateFrom(gameObject, hash);
-                                    break;
-                                case "RotateTo":
-                                    iTween.RotateTo(gameObject, hash);
-                                    break;
-                                case "ScaleAdd":
-                                    iTween.ScaleAdd(gameObject, hash);
-                                    break;
-                                case "ScaleBy":
-                                    iTween.ScaleBy(gameObject, hash);
-                                    break;
-                                case "ScaleFrom":
-                                    iTween.ScaleFrom(gameObject, hash);
-                                    break;
-                                case "ScaleTo":
-                                    iTween.ScaleTo(gameObject, hash);
-                                    break;
-                                case "ShakePosition":
-                                    iTween.ShakePosition(gameObject, hash);
-                                    break;
-                                case "ShakeRotation":
-                                    iTween.ShakeRotation(gameObject, hash);
-                                    break;
-                                case "ShakeScale":
-                                    iTween.ShakeScale(gameObject, hash);
-                                    break;
-                            }
-                        }
-
-                    } else if (argList.Count == 3) {
-
-                        Vector3 vector3 = Vector3.one;
-                        float time = 1.0f;
-                        if (ConvertVector3(argList[1], ref vector3) &&
-                            ConvertFloat(argList[2], ref time)) {
-                            switch (command) {
-                                case "LookFrom":
-                                    iTween.LookFrom(gameObject, vector3, time);
-                                    break;
-                                case "LookTo":
-                                    iTween.LookTo(gameObject, vector3, time);
-                                    break;
-                                case "MoveAdd":
-                                    iTween.MoveAdd(gameObject, vector3, time);
-                                    break;
-                                case "MoveBy":
-                                    iTween.MoveBy(gameObject, vector3, time);
-                                    break;
-                                case "MoveFrom":
-                                    iTween.MoveFrom(gameObject, vector3, time);
-                                    break;
-                                case "MoveTo":
-                                    iTween.MoveTo(gameObject, vector3, time);
-                                    break;
-                                case "PunchPosition":
-                                    iTween.PunchPosition(gameObject, vector3, time);
-                                    break;
-                                case "PunchRotation":
-                                    iTween.PunchRotation(gameObject, vector3, time);
-                                    break;
-                                case "PunchScale":
-                                    iTween.PunchScale(gameObject, vector3, time);
-                                    break;
-                                case "RotateAdd":
-                                    iTween.RotateAdd(gameObject, vector3, time);
-                                    break;
-                                case "RotateBy":
-                                    iTween.RotateBy(gameObject, vector3, time);
-                                    break;
-                                case "RotateFrom":
-                                    iTween.RotateFrom(gameObject, vector3, time);
-                                    break;
-                                case "RotateTo":
-                                    iTween.RotateTo(gameObject, vector3, time);
-                                    break;
-                                case "ScaleAdd":
-                                    iTween.ScaleAdd(gameObject, vector3, time);
-                                    break;
-                                case "ScaleBy":
-                                    iTween.ScaleBy(gameObject, vector3, time);
-                                    break;
-                                case "ScaleFrom":
-                                    iTween.ScaleFrom(gameObject, vector3, time);
-                                    break;
-                                case "ScaleTo":
-                                    iTween.ScaleTo(gameObject, vector3, time);
-                                    break;
-                                case "ShakePosition":
-                                    iTween.ShakePosition(gameObject, vector3, time);
-                                    bstring id0 = null, reak;
-                                case "ShakeRotation":
-                                    iTween.ShakeRotation(gameObject, vector3, time);
-                                    break;
-                                case "ShakeScale":
-                                    iTween.ShakeScale(gameObject, vector3, time);
-                                    break;
-                            }
-
-                        }
-
-                    } else {
-                        Debug.LogError("BridgeObject: AnimateData: " + command + ": expected length 2 or 3 for argList: " + argList);
-                        continue;
-                    }
-
-                    break;
-                }
-
-                case "Stab": {
-
-                    if (argList.Count == 2) {
-
-                        Hashtable hash = null;
-                        if (ConvertArgs(argList[1], ref hash)) {
-                            iTween.Stab(gameObject, hash);
-                        }
-
-                    } else if (argList.Count == 3) {
-
-                        AudioClip audioClip = null;
-                        float delay = 1.0f;
-                        if (ConvertAudioClip(argList[1], ref audioClip) &&
-                            ConvertFloat(argList[2], ref delay)) {
-                            iTween.Stab(gameObject, audioClip, delay);
-                        }
-
-                    } else {
-                        Debug.LogError("BridgeObject: AnimateData: " + command + ": expected length 2 or 3 for argList: " + argList);
-                        continue;
-                    }
-
-                    break;
-                }
-
-                case "PauseAll": {
-
-                    if (argList.Count == 1) {
-
-                        iTween.Pause();
-
-                    } else {
-                        Debug.LogError("BridgeObject: AnimateData: " + command + ": expected length 1 for argList: " + argList);
-                        continue;
-                    }
-
-                    break;
-                }
-
-                case "StopAll": {
-
-                    if (argList.Count == 1) {
-
-                        iTween.Stop();
-
-                    } else {
-                        Debug.LogError("BridgeObject: AnimateData: " + command + ": expected length 1 for argList: " + argList);
-                        continue;
-                    }
-
-                    break;
-                }
-
-                case "Pause":
-                case "Stop": {
-
-                    if (argList.Count == 1) {
-
-                        switch (command) {
-                            case "Pause":
-                                iTween.Pause(gameObject);
-                                break;
-                            case "Stop":
-                                iTween.Stop(gameObject);
-                                break;
-                        }
-
-                    } else if (argList.Count == 2) {
-
-                        JObject arg = argList[1];
-                        if (arg.IsBool) {
-
-                            bool includechildren = arg.AsBool;
-
-                            switch (command) {
-                                case "Pause":
-                                    iTween.Pause(gameObject, includechildren);
-                                    break;
-                                case "Stop":
-                                    iTween.Stop(gameObject, includechildren);
-                                    break;
-                            }
-
-                        } else if (arg.IsString) {
-                            
-                            string type = arg.AsString;
-
-                            switch (command) {
-                                case "Pause":
-                                    iTween.Pause(gameObject, type);
-                                    break;
-                                case "Stop":
-                                    iTween.Stop(gameObject, type);
-                                    break;
-                            }
-
-
-                        } else {
-                            Debug.LogError("BridgeObject: AnimateData: " + command + ": expected bool or string arg: " + arg);
-                            continue;
-                        }
-
-                    } else if (argList.Count == 3) {
-
-                        string type = "";
-                        bool includechildren = false;
-                        if (ConvertString(argList[1], ref type) &&
-                            ConvertBool(argList[2], ref includechildren)) {
-
-                            switch (command) {
-                                case "Pause":
-                                    iTween.Pause(gameObject, type, includechildren);
-                                    break;
-                                case "Stop":
-                                    iTween.Stop(gameObject, type, includechildren);
-                                    break;
-                            }
-
-                        } else {
-                            Debug.LogError("BridgeObject: AnimateData: " + command + ": expected string arg: " + argList[1] + " bool arg: " + argList[2]);
-                            continue;
-                        }
-
-                    }
-
-                    break;
-                }
-
-                case "StopByName": {
-
-                    if (argList.Count == 2) {
-
-                        string name = "";
-                        if (ConvertString(argList[1], ref name)) {
-
-                            iTween.StopByName(name);
-
-                        } else {
-                            Debug.LogError("BridgeObject: AnimateData: " + command + ": expected string arg: " + argList[1]);
-                            continue;
-                        }
-
-                    } else {
-                        Debug.LogError("BridgeObject: AnimateData: " + command + ": expected length 2 for argList: " + argList);
-                        continue;
-                    }
-                    
-                    break;
-                }
-
-                case "ValueTo": {
-                    Debug.LogError("BridgeObject: AnimateData: ValueTo: TODO");
-                    break;
-                }
-
-                default: {
-                    Debug.LogError("BridgeObject: AnimateData: undefined command: " + command);
-                    break;
-                }
-
-            }
-
-        }
-#endif
-
+        LeanTweenBridge.AnimateData(this, data);
     }
 
  

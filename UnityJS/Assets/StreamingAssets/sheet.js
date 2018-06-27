@@ -4,24 +4,29 @@
  */
 
 
-function LoadSheets(sheets, sheetURLs, success, error)
+function LoadSheets(sheetRefs, success, error)
 {
     var xhrs = {};
-    var calledError = false;
+    var data = {
+        spreadsheetName: "Untitled",
+        sheets: {},
+        sheetNames: [],
+        ranges: {},
+        rangeNames: []
+    };
 
-    for (var sheetName in sheetURLs) {
+    var index = 0;
+    for (var sheetName in sheetRefs) {
         (function (sheetName) {
 
-            var sheetURL = 
-                sheetURLs[sheetName];
-            var url =
-                'http://donhopkins.com/home/_p/miniProxy.php?' + 
-                sheetURL +
-                "&rand=" + 
-                Math.random();
-
+            var sheetRef = sheetRefs[sheetName];
+            var sheetURL = GetSheetURL(sheetRef, 'tsv');
+            var url = GetProxyURL(sheetURL);
             var xhr = new XMLHttpRequest();
+
             xhrs[sheetName] = xhr;
+
+            data.sheetNames.push(sheetName);
 
             //console.log("sheets.js: LoadSheets: sheetName: " + sheetName + " url: " + url);
 
@@ -29,37 +34,41 @@ function LoadSheets(sheets, sheetURLs, success, error)
                 var text = xhr.responseText;
 
                 var sheet = ParseSheet(text);
-                sheets[sheetName] = sheet;
 
+                var rows = sheet.length;
+                var columns = 0;
+                for (var row = 0; row < rows; row++) {
+                    var cols = sheet[row].length;
+                    if (cols > columns) {
+                        columns = cols;
+                    }
+                }
+
+                data.sheets[sheetName] = {
+                    name: sheetName,
+                    spreadsheetID: sheetRef[0],
+                    sheetID: sheetRef[1],
+                    index: index,
+                    rows: rows,
+                    columns: columns,
+                    values: sheet
+                };
+
+                index++;
                 delete xhrs[sheetName];
 
                 var sheetsLeft = Object.keys(xhrs).length;
 
-                //console.log("sheets.js: LoadSheets: onload: Loaded sheetName: " + sheetName + " sheetsLeft: " + sheetsLeft);
+                //console.log("sheets.js: LoadSheets: onload: Loaded sheetName: " + sheetName + " sheetsLeft: " + sheetsLeft + " sheet: " + JSON.stringify(data.sheets[sheetName]));
 
                 if (sheetsLeft === 0) {
-                    success();
+                    success(data);
                 }
             };
 
             xhr.onerror = function(error) {
-                console.log("sheets.js: LoadSheets: error 1 loading sheetName: " + sheetName + " url:", url, "xhr:", xhr, "REPLIED:", xhr.statusText, "error:", error);
-                if (!calledError) {
-                    calledError = true;
-                    error();
-                }
-            };
-
-            xhr.onloadend = function(a) {
-                if (xhr.status >= 400) {
-                    console.log("sheets.js: LoadSheets: error 2 loading sheetName: " + sheetName + " url:", url, "xhr:", xhr, "REPLIED:", xhr.statusText);
-                } else if (xhr.status === 0) {
-                    console.log("sheets.js: LoadSheets: error 3 loading sheetName: " + sheetName + " url:", url, "xhr:", xhr, "REPLIED:", xhr.statusText);
-                }
-                if (!calledError) {
-                    calledError = true;
-                    error();
-                }
+                console.log("sheets.js: LoadSheets: error loading sheetName: " + sheetName + " url:", url, "xhr:", xhr, "REPLIED:", xhr.statusText, "error:", error);
+                error();
             };
 
             xhr.open('GET', url);
@@ -70,16 +79,77 @@ function LoadSheets(sheets, sheetURLs, success, error)
 }
 
 
+function LoadSheetsFromApp(appURL, success, error)
+{
+    var url = GetProxyURL(appURL);
+    var xhr = new XMLHttpRequest();
+
+    //console.log("sheets.js: LoadSheetsFromApp: sheetName: " + sheetName + " url: " + url);
+
+    xhr.onload = function() {
+        var text = xhr.responseText;
+        var result = JSON.parse(text);
+        if (result.status != 'success') {
+            console.log("sheet.js: LoadSheetsFromApp: Invalid status: " + text);
+            error();
+            return;
+        }
+
+        success(result.data);
+    };
+
+    xhr.onerror = function(error) {
+        console.log("sheets.js: LoadSheets: error loading url: " + url, "xhr:", xhr, "REPLIED:", xhr.statusText, "error:", error);
+        error();
+    };
+
+    xhr.open('GET', url);
+    xhr.send();
+}
+
+
+function GetSheetURL(sheetRef, format)
+{
+    var sheetURL =
+        'https://docs.google.com/spreadsheets/d/' +
+        sheetRef[0] + 
+        '/export?format=' +
+        format + 
+        '&id=' +
+        sheetRef[0] +
+        '&gid=' +
+        sheetRef[1];
+
+    return sheetURL;
+}
+
+
+function GetProxyURL(url)
+{
+    var proxyURL =
+        'http://donhopkins.com/home/_p/miniProxy.php?' + 
+        url +
+        "&rand=" + 
+        Math.random();
+
+    return proxyURL;
+}
+
+
 function ParseSheet(text)
 {
-    text = text.replace(/\r\n/g, '\n');
-    text = text.replace(/\r/g, '\n');
-    var lines = text.split('\n');
+    text = text.replace(/\r\n|\r/g, '\n');
+    var textRows = text.split('\n');
     var sheet = [];
-    for (var i = 0, n = lines.length; i < n; i++) {
-        var line = lines[i];
-        var columns = line.split('\t');
+    for (var rowIndex = 0, rowCount = textRows.length; rowIndex < rowCount; rowIndex++) {
+        var textRow = textRows[rowIndex];
+        var textColumns = textRow.split('\t');
+        var columns = [];
         sheet.push(columns);
+        for (var columnIndex = 0, columnCount = textColumns.length; columnIndex < columnCount; columnIndex++) {
+            var textCell = textColumns[columnIndex];
+            columns.push(textCell);
+        }
     }
     return sheet;
 }
@@ -90,11 +160,11 @@ function GetSheet(sheets, sheetName)
 {
     var sheet = 
         sheets[sheetName];
-    return sheet;
+    return sheet && sheet.values;
 }
 
 
-function SheetToScope(sheets, sheetName)
+function SheetToScope(sheets, ranges, sheetName)
 {
     if (!sheetName || sheetName.length == 0) {
         return null;
@@ -116,11 +186,14 @@ function SheetToScope(sheets, sheetName)
     };
 
     scope.errorScope =
-        LoadJSONFromSheet(sheets, scope);
+        LoadJSONFromSheet(sheets, ranges, scope);
 
     if (scope.errorScope) {
         if (scope.errorScope.error) {
             scope.error = scope.errorScope.error;
+            scope.errorSheetName = scope.errorScope.errorSheetName;
+            scope.errorRow = scope.errorScope.errorRow;
+            scope.errorColumn = scope.errorScope.errorColumn;
         }
     }
 
@@ -144,7 +217,7 @@ function SheetToScope(sheets, sheetName)
 // Returns null on success, or a scope with an error.
 // The location of the error in the spreadsheet can be determined by the row and column of the errorScope.
 
-function LoadJSONFromSheet(sheets, scope)
+function LoadJSONFromSheet(sheets, ranges, scope)
 {
     var i;
     var name;
@@ -182,6 +255,9 @@ function LoadJSONFromSheet(sheets, scope)
         scope.valueColumn++;
         if (!scope.typeName) {
             scope.error = "Expected a typeName.";
+            scope.errorSheetName = scope.sheetName;
+            scope.errorRow = scope.currentRow;
+            scope.errorColumn = scope.currentColumn;
             return scope; // error
         }
     }
@@ -205,7 +281,7 @@ function LoadJSONFromSheet(sheets, scope)
         case "json":
             scope.value = "" + GetColumnString(scope.valueColumn, true);
             try {
-                scope.value = JSON.parse();
+                scope.value = JSON.parse(scope.value);
             } catch (e) {
                 console.log("JSON PARSING ERROR", e, scope.value);
             }
@@ -224,6 +300,9 @@ function LoadJSONFromSheet(sheets, scope)
 
             if (scope.fixedType) {
                 scope.error = "Type grid can't be used as a fixed type.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
                 return scope; // error
             }
 
@@ -233,6 +312,9 @@ function LoadJSONFromSheet(sheets, scope)
             }
             if (!gridTypeName) {
                 scope.error = "Expected 'grid typeName columns rows'.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.valueColumn;
                 return scope; // error
             }
 
@@ -242,6 +324,9 @@ function LoadJSONFromSheet(sheets, scope)
             }
             if (!gridColumns || (gridColumns < 1)) {
                 scope.error = "Expected 'grid typeName columns rows', missing columns > 0.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.valueColumn + 1;
                 return scope; // error
             }
 
@@ -251,6 +336,9 @@ function LoadJSONFromSheet(sheets, scope)
             }
             if (!gridRows || (gridRows < 1)) {
                 scope.error = "Expected 'grid typeName columns rows', missing rows > 0";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.valueColumn + 2;
                 return scope; // error
             }
 
@@ -275,12 +363,13 @@ function LoadJSONFromSheet(sheets, scope)
                         column: scope.startColumn + gridColumn,
                         rowCount: 1,
                         columnCount: 1,
-                        typeName: gridTypeName
+                        typeName: gridTypeName,
+                        alreadyIndented: true
                     };
 
                     scope.subScopes.push(subScope);
 
-                    scope.errorScope = LoadJSONFromSheet(sheets, subScope);
+                    scope.errorScope = LoadJSONFromSheet(sheets, ranges, subScope);
                     if (scope.errorScope) {
                         return scope.errorScope; // error
                     }
@@ -300,6 +389,9 @@ function LoadJSONFromSheet(sheets, scope)
 
             if (scope.fixedType) {
                 scope.error = "Type object can't be used as a fixed type.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
                 return scope; // error
             }
 
@@ -345,7 +437,7 @@ function LoadJSONFromSheet(sheets, scope)
 
                     scope.subScopes.push(subScope);
 
-                    scope.errorScope = LoadJSONFromSheet(sheets, subScope);
+                    scope.errorScope = LoadJSONFromSheet(sheets, ranges, subScope);
                     if (scope.errorScope) {
                         return scope.errorScope; // error
                     }
@@ -366,6 +458,9 @@ function LoadJSONFromSheet(sheets, scope)
 
             if (scope.fixedType) {
                 scope.error = "Type array can't be used as a fixed type.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
                 return scope; // error
             }
 
@@ -410,7 +505,7 @@ function LoadJSONFromSheet(sheets, scope)
 
                     scope.subScopes.push(subScope);
 
-                    scope.errorScope = LoadJSONFromSheet(sheets, subScope);
+                    scope.errorScope = LoadJSONFromSheet(sheets, ranges, subScope);
                     if (scope.errorScope) {
                         return scope.errorScope; // error
                     }
@@ -432,6 +527,9 @@ function LoadJSONFromSheet(sheets, scope)
 
             if (scope.fixedType) {
                 scope.error = "Type array can't be used as a fixed type.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
                 return scope; // error
             }
 
@@ -447,6 +545,9 @@ function LoadJSONFromSheet(sheets, scope)
             // Make sure we are not at the end of the spreadsheet.
             if (scope.currentRow >= scope.lastRow) {
                 scope.error = "Type table should be followed by a row of table headers.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
                 return scope;
             }
 
@@ -454,6 +555,7 @@ function LoadJSONFromSheet(sheets, scope)
 
             var header;
             var headerColumn;
+            var headerRow = scope.currentRow;
 
             // Make sure the next indented row of headers is not missing.
             scope.previousColumn = scope.currentColumn - (scope.alreadyIndented ? 1 : 0);
@@ -461,6 +563,9 @@ function LoadJSONFromSheet(sheets, scope)
                 header = GetColumnString(headerColumn);
                 if (header != "") {
                     scope.error = "Type table should be follow by an indented row of table headers, not an unindented row.";
+                    scope.errorSheetName = scope.sheetName;
+                    scope.errorRow = scope.currentRow;
+                    scope.errorColumn = headerColumn;
                     return scope;
                 }
             }
@@ -470,6 +575,9 @@ function LoadJSONFromSheet(sheets, scope)
 
             if (header == "") {
                 scope.error = "Type table should be follow by an indented row of table headers. Missing the first header.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = headerColumn;
                 return scope;
             }
 
@@ -480,7 +588,7 @@ function LoadJSONFromSheet(sheets, scope)
                 if (header == "") {
                     continue;
                 }
-                headers.push([header, headerColumn]);
+                headers.push([header, headerRow, headerColumn]);
             }
 
             // Parse the column headers into tokens associated with columns.
@@ -490,14 +598,15 @@ function LoadJSONFromSheet(sheets, scope)
                 var token = "";
                 var headerInfo = headers[headersIndex];
                 header = headerInfo[0];
-                headerColumn = headerInfo[1];
+                headerRow = headerInfo[1];
+                headerColumn = headerInfo[2];
 
                 function finishToken()
                 {
                     if (token == "") {
                         return;
                     }
-                    tokens.push([token, headerColumn]);
+                    tokens.push([token, headerRow, headerColumn]);
                     token = "";
                 }
 
@@ -511,7 +620,7 @@ function LoadJSONFromSheet(sheets, scope)
                         case '[':
                         case ']':
                             finishToken();
-                            tokens.push([ch, headerColumn]);
+                            tokens.push([ch, headerRow, headerColumn]);
                             break;
 
                         case ' ':
@@ -530,7 +639,7 @@ function LoadJSONFromSheet(sheets, scope)
 
             }
 
-            tokens.push(['.', -1]);
+            tokens.push(['.', -1, -1]);
 
             // Go to the next row and read in subsequent rows until the end of the spreadsheet or an unindented row.
             scope.currentRow++;
@@ -554,9 +663,10 @@ function LoadJSONFromSheet(sheets, scope)
 
                 scope.startColumn = scope.currentColumn + (scope.alreadyIndented ? 0 : 1);
 
-                var lastColumn = -1;
                 var tokenIndex = 0;
                 var error = null;
+                var errorRow = scope.currentRow;
+                var errorColumn = scope.startColumn;
                 var value = null;
                 var valueStack = [];
 
@@ -565,7 +675,7 @@ function LoadJSONFromSheet(sheets, scope)
                 {
                     if (tokenIndex >= tokens.length) {
                         console.log("NextTokenInfo: Ran out of tokens!");
-                        return ['.', -1];
+                        return ['.', -1, -1];
                     }
                     var tokenInfo = tokens[tokenIndex++];
                     return tokenInfo;
@@ -605,6 +715,8 @@ function LoadJSONFromSheet(sheets, scope)
                     token = tokenInfo[0];
                     if (token != '.') {
                         error = "ParseTop: did not expect any tokens after final '}' or ']'.";
+                        errorRow = tokenRow;
+                        errorColumn = tokenColumn;
                         return false;
                     }
 
@@ -622,6 +734,8 @@ function LoadJSONFromSheet(sheets, scope)
 
                         var tokenInfo = NextTokenInfo();
                         var token = tokenInfo[0];
+                        var tokenRow = tokenInfo[1];
+                        var tokenColumn = tokenInfo[2];
 
                         switch (token) {
 
@@ -633,6 +747,8 @@ function LoadJSONFromSheet(sheets, scope)
                             case ']':
                             case '.':
                                 error = "ParseObject: expected key of 'key type' or '}' instead of " + token;
+                                errorRow = tokenRow;
+                                errorColumn = tokenColumn;
                                 return false;
 
                             default:
@@ -640,7 +756,8 @@ function LoadJSONFromSheet(sheets, scope)
                                 var key = token;
                                 var typeTokenInfo = NextTokenInfo();
                                 var typeToken = typeTokenInfo[0];
-                                var typeColumn = typeTokenInfo[1];
+                                var typeRow = typeTokenInfo[1];
+                                var typeColumn = typeTokenInfo[2];
 
                                 switch (typeToken) {
 
@@ -676,6 +793,8 @@ function LoadJSONFromSheet(sheets, scope)
                                     case ']':
                                     case '.':
                                         error = "ParseObject: expected type of 'key type' instead of " + token;
+                                        errorRow = tokenRow;
+                                        errorColumn = tokenColumn;
                                         return false;
 
                                     default:
@@ -688,12 +807,13 @@ function LoadJSONFromSheet(sheets, scope)
                                             column: typeColumn,
                                             rowCount: 1,
                                             columnCount: 1,
-                                            typeName: typeName
+                                            typeName: typeName,
+                                            alreadyIndented: true
                                         };
 
                                         scope.subScopes.push(subScope);
 
-                                        scope.errorScope = LoadJSONFromSheet(sheets, subScope);
+                                        scope.errorScope = LoadJSONFromSheet(sheets, ranges, subScope);
                                         if (scope.errorScope) {
                                             return false;
                                         }
@@ -722,7 +842,8 @@ function LoadJSONFromSheet(sheets, scope)
 
                         var tokenInfo = NextTokenInfo();
                         var token = tokenInfo[0];
-                        var tokenColumn = tokenInfo[1];
+                        var tokenRow = tokenInfo[1];
+                        var tokenColumn = tokenInfo[2];
 
                         switch (token) {
 
@@ -732,6 +853,8 @@ function LoadJSONFromSheet(sheets, scope)
                             case '}':
                             case '.':
                                 error = "ParseArray: expected type or ']' instead of " + token;
+                                errorRow = tokenRow;
+                                errorColumn = tokenColumn;
                                 return false;
 
                             case '{':
@@ -773,12 +896,13 @@ function LoadJSONFromSheet(sheets, scope)
                                     column: tokenColumn,
                                     rowCount: 1,
                                     columnCount: 1,
-                                    typeName: typeName
+                                    typeName: typeName,
+                                    alreadyIndented: true
                                 };
 
                                 scope.subScopes.push(subScope);
 
-                                scope.errorScope = LoadJSONFromSheet(sheets, subScope);
+                                scope.errorScope = LoadJSONFromSheet(sheets, ranges, subScope);
                                 if (scope.errorScope) {
                                     return false;
                                 }
@@ -796,6 +920,9 @@ function LoadJSONFromSheet(sheets, scope)
                     scope.value.push(value);
                 } else {
                     scope.error = error;
+                    scope.errorSheetName = scope.sheetName;
+                    scope.errorRow = errorRow;
+                    scope.errorColumn = errorColumn;
                     return scope; // error
                 }
 
@@ -811,15 +938,21 @@ function LoadJSONFromSheet(sheets, scope)
 
         case "sheet":
 
-            var sheetName = GetColumnString(scope.currentColumn + 1);
+            var sheetName = GetColumnString(scope.valueColumn);
             if (sheetName == "") {
                 scope.error = "Expected 'sheet sheetName'.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
                 return scope;
             }
 
-            scope.sheetScope = SheetToScope(sheets, sheetName);
+            scope.sheetScope = SheetToScope(sheets, ranges, sheetName);
             if (!scope.sheetScope) {
                 scope.error = "Could not find sheet: " + sheetName;
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
                 return scope;
             }
 
@@ -836,6 +969,9 @@ function LoadJSONFromSheet(sheets, scope)
 
         default:
             scope.error = "Unexpected typeName: " + scope.typeName;
+            scope.errorSheetName = scope.sheetName;
+            scope.errorRow = scope.currentRow;
+            scope.errorColumn = scope.currentColumn;
             return scope; // error
 
     }

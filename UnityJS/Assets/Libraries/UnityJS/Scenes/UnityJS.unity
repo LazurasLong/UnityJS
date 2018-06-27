@@ -154,5 +154,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   url: game.html
+  configuration: world
   startedJS: 0
   transport: {fileID: 0}

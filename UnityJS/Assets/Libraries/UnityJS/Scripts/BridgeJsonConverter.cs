@@ -792,6 +792,31 @@ public class BridgeJsonConverter : JsonConverter {
                 }
             },
 
+            { typeof(PhysicMaterial), // class
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: PhysicMaterial: reader: " + reader + " objectType: " + objectType);
+
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = null;
+                        return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.String) {
+                        return false;
+                    }
+
+                    string resourcePath = (string)JValue.Load(reader);
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: PhysicMaterial: resourcePath: " + resourcePath);
+
+                    PhysicMaterial resource = (PhysicMaterial)Resources.Load(resourcePath);
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: PhysicMaterial: resource: " + resource, resource);
+
+                    result = resource;
+                    return true;
+                }
+            },
+
             { typeof(Shader), // class
                 delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
 

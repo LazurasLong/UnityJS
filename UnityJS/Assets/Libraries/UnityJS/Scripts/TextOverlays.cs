@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 
@@ -18,6 +19,8 @@ public class TextOverlays: Tracker {
 
 
     public Canvas canvas;
+    public RectTransform panel;
+    public Image image;
     public TextMeshProUGUI topLeftText;
     public TextMeshProUGUI topText;
     public TextMeshProUGUI topRightText;

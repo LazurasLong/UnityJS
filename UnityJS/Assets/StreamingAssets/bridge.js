@@ -11,6 +11,7 @@
 
 var globals = {
     driver: "None",
+    configuration: "world",
     nextID: 0,
     objects: {},
     callbacks: {},
@@ -36,9 +37,9 @@ var globals = {
 ////////////////////////////////////////////////////////////////////////
 
 
-function StartBridge(driver)
+function StartBridge(driver, configuration)
 {
-    console.log("bridge.js: StartBridge: begin");
+    console.log("bridge.js: StartBridge: begin driver " + driver + " configuration: " + configuration);
 
     if (globals.startedUnity) {
         console.log("bridge.js: StartBridge: called again but ignored");
@@ -46,6 +47,7 @@ function StartBridge(driver)
     }
 
     globals.driver = driver || "Unknown";
+    globals.configuration = configuration || "world";
 
     SendEvent({
         event: 'StartedJS'
@@ -87,19 +89,23 @@ function Dump(obj)
 }
 
 
-function CreatePrefab(d)
+function CreatePrefab(template)
 {
-    console.log("bridge.js: CreatePrefab: d:", JSON.stringify(d, null, 4));
+    if (template == null) {
+        var foo = 0;
+    }
+
+    console.log("bridge.js: CreatePrefab: template:", JSON.stringify(template, null, 4));
 
     // prefab, component, obj, config, interests, preEvents, postEvents
 
-    var obj = d.obj || {};
-    var prefab = d.prefab || null;
-    var component = d.component || null;
-    var config = d.config || null;
-    var interests = d.interests || null;
-    var preEvents = d.preEvents || null;
-    var postEvents = d.postEvents || null;
+    var obj = template.obj || {};
+    var prefab = template.prefab || null;
+    var component = template.component || null;
+    var config = template.config || null;
+    var interests = template.interests || null;
+    var preEvents = template.preEvents || null;
+    var postEvents = template.postEvents || null;
 
     //console.log("CreatePrefab", "obj", obj, "prefab", prefab, "component", component, "config", config, "interests", JSON.stringify(interests), "length", interests.length, "preEvent", preEvents, "postEvents", postEvents);
 
@@ -172,6 +178,8 @@ function UpdateObject(obj, data)
 
 function AnimateObject(obj, data)
 {
+    console.log("bridge.js: AnimateObject: data:", JSON.stringify(data, null, 4));
+
     SendEvent({
         event: 'Animate',
         id: obj.id,
@@ -552,6 +560,24 @@ function ShowObjectInfo(obj)
             "\n<size=30%>" + Dump(obj),
             "Info for Object ID:\n" + obj.id);
     }
+}
+
+
+function CreateOverlayText(config)
+{
+    var overlayText = CreatePrefab({
+        prefab: 'Prefabs/OverlayText',
+        config: config,
+        postEvents: [
+            {
+                event: 'SetParent',
+                data: {
+                    path: 'object:' + globals.textOverlays.id + '/panel',
+                    worldPositionStays: false
+                }
+            }
+        ]
+    });
 }
 
 

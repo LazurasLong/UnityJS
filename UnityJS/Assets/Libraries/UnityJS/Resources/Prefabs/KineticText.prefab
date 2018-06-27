@@ -108,7 +108,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: Sample text
+  m_text: X
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 715b80e429c437e40867928a4e1fc975, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 4f9843c79516ed1468b9b5a4f32e67e3, type: 2}
@@ -177,8 +177,8 @@ MonoBehaviour:
     textComponent: {fileID: 114487957226051352}
     characterCount: 11
     spriteCount: 0
-    spaceCount: 1
-    wordCount: 2
+    spaceCount: 0
+    wordCount: 1
     linkCount: 0
     lineCount: 1
     pageCount: 1
@@ -228,7 +228,7 @@ MonoBehaviour:
   screenSize: {x: 0, y: 0}
   mousePosition: {x: 0, y: 0, z: 0}
   mousePositionToCameraOffset: {x: 0, y: 0, z: 0}
-  mouseTrackingRay: 1
+  mouseTrackingRaycast: 1
   mouseRayMaxDistance: Infinity
   mouseRayLayerMask: -5
   mouseRayQueryTriggerInteraction: 0
@@ -236,12 +236,25 @@ MonoBehaviour:
   mouseRaycastHitPointFaceCameraRotation: {x: 0, y: 0, z: 0, w: 0}
   mouseRaycastHitBridgeObject: {fileID: 0}
   mouseRaycastHitBridgeObjectID: 
+  dragTracking: 0
+  dragging: 0
+  draggingSetsIsKinematic: 1
+  draggingLastIsKinematic: 0
+  dragStartDistance: 0
+  dragLastPosition: {x: 0, y: 0, z: 0}
+  dragLastPlanePosition: {x: 0, y: 0, z: 0}
+  dragPlanePosition: {x: 0, y: 0, z: 0}
+  dragLastMousePosition: {x: 0, y: 0, z: 0}
+  dragScreenDistance: {x: 0, y: 0, z: 0}
+  dragPlaneDistance: {x: 0, y: 0, z: 0}
+  rotateAmount: 0
   textMesh: {fileID: 114487957226051352}
   boxColliders: []
   joint: {fileID: 153994349782704750}
   physicMaterial: {fileID: 13400000, guid: 20cee50bf1e3b47a180ab0ff831b7297, type: 2}
   textCollider: 0
   characterColliders: 1
+  trackColor: 0
   colorNormal: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   faceColorNormal: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   outlineColorNormal: {r: 0, g: 0, b: 0, a: 1}
@@ -366,8 +379,8 @@ RectTransform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 20, y: 5}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_SizeDelta: {x: 50, y: 5}
+  m_Pivot: {x: 0.5, y: 0}

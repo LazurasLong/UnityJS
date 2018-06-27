@@ -43,19 +43,30 @@ public class Tracker : BridgeObject {
     public string mouseRaycastHitBridgeObjectID;
     public bool dragTracking = false;
     public bool dragging = false;
+    public bool draggingSetsIsKinematic = true;
+    public bool draggingLastIsKinematic = false;
     public Plane dragPlane = new Plane(Vector3.up, Vector3.zero);
-    public Vector3 dragStartPosition;
-    public Vector3 dragStartPlanePosition;
+    public float dragStartDistance;
+    public Vector3 dragLastPosition;
+    public Vector3 dragLastPlanePosition;
     public Vector3 dragPlanePosition;
-    public Vector3 dragPlaneDistance;
-    public Quaternion dragStartRotation;
-    public Vector3 dragStartScreenPosition;
+    public Vector3 dragLastMousePosition;
     public Vector3 dragScreenDistance;
-    public Vector3 dragDistance;
+    public Vector3 dragPlaneDistance;
+    public float rotateAmount;
 
 
     ////////////////////////////////////////////////////////////////////////
     // Instance Methods
+
+
+    public Vector3 NearestPointOnLine(Vector3 linePnt, Vector3 lineDir, Vector3 pnt)
+    {
+        //lineDir.Normalize(); // This needs to be a unit vector.
+        var v = pnt - linePnt;
+        var d = Vector3.Dot(v, lineDir);
+        return linePnt + lineDir * d;
+    }
 
 
     public virtual void TrackMousePosition()
@@ -131,21 +142,62 @@ public class Tracker : BridgeObject {
 
         if (dragging) {
 
+            float horizontalScale = -2.0f;
+            float verticalScale = 0.5f;
+
             dragScreenDistance = 
-                mousePosition - dragStartScreenPosition;
+                mousePosition - dragLastMousePosition;
+            dragLastMousePosition = mousePosition;
 
             float enter = 0.0f;
             if (dragPlane.Raycast(mouseRay, out enter)) {
                 dragPlanePosition = mouseRay.GetPoint(enter);
-                dragPlaneDistance = dragPlanePosition - dragStartPlanePosition;
+                dragPlaneDistance = dragPlanePosition - dragLastPlanePosition;
+                dragLastPlanePosition = dragPlanePosition;
+
+                if (Input.GetKey("left shift") ||
+                    Input.GetKey("right shift")) {
+                    rotateAmount = dragScreenDistance.x * horizontalScale;
+                    dragPlaneDistance = new Vector3(0.0f, dragScreenDistance.y * verticalScale, 0.0f);
+                } else {
+                    rotateAmount = 0.0f;
+                }
+
+
+            } else {
+                dragPlaneDistance = Vector3.zero;
+                rotateAmount = 0.0f;
             }
 
-            if (dragDistance != dragPlaneDistance) {
+            if ((dragPlaneDistance != Vector3.zero) || 
+                (rotateAmount != 0.0f)) {
 
-                dragDistance = dragPlaneDistance;
+                Vector3 newPosition = 
+                    gameObject.transform.position + dragPlaneDistance;
 
-                transform.position =
-                    dragStartPosition + dragDistance;
+                Quaternion newRotation =
+                    Quaternion.Euler(0.0f, rotateAmount, 0.0f) *
+                    gameObject.transform.rotation;
+
+                Rigidbody rb =
+                    gameObject.GetComponent<Rigidbody>();
+                if (rb != null) {
+
+                    rb.MovePosition(newPosition);
+
+                    if (rotateAmount != 0.0f) {
+                        rb.MoveRotation(newRotation);
+                    }
+
+                } else {
+
+                    transform.position = newPosition;
+
+                    if (rotateAmount != 0.0f) {
+                        transform.rotation = newRotation;
+                    }
+
+                }
 
                 SendEventName("DragMove");
 
@@ -219,23 +271,35 @@ public class Tracker : BridgeObject {
         if (dragTracking) {
             if (mouseDown) {
                 dragging = true;
+                if (draggingSetsIsKinematic) {
+                    Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+                    if (rb != null) {
+                        draggingLastIsKinematic = rb.isKinematic;
+                        rb.isKinematic = true;
+                    }
+                }
                 dragPlane.SetNormalAndPosition(
                     Vector3.up,
                     transform.position);
 
-                float enter = 0.0f;
-                if (!dragPlane.Raycast(mouseRay, out enter)) {
+                if (!dragPlane.Raycast(mouseRay, out dragStartDistance)) {
                     dragging = false;
                     return;
                 }
-                dragStartPlanePosition = mouseRay.GetPoint(enter);
 
-                dragStartPosition = transform.position;
-                dragStartRotation = transform.rotation;
-                dragStartScreenPosition = mousePosition;
+                dragLastPlanePosition = mouseRay.GetPoint(dragStartDistance);
+                dragLastPosition = transform.position;
+                dragLastMousePosition = mousePosition;
+
                 SendEventName("DragStart");
             } else {
                 dragging = false;
+                if (draggingSetsIsKinematic) {
+                    Rigidbody rb = gameObject.GetComponent<Rigidbody>();
+                    if (rb != null) {
+                        rb.isKinematic = draggingLastIsKinematic;
+                    }
+                }
                 SendEventName("DragStop");
             }
         }

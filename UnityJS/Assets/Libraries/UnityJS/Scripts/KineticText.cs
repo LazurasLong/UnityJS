@@ -30,6 +30,7 @@ public class KineticText : Tracker {
 
     public bool textCollider = false;
     public bool characterColliders = true;
+    public bool trackColor = false;
     public Color colorNormal = Color.gray;
     public Color faceColorNormal = Color.gray;
     public Color outlineColorNormal = Color.black;
@@ -47,47 +48,6 @@ public class KineticText : Tracker {
     // Instance Methods
 
 
-    public override void HandleEvent(JObject ev)
-    {
-        base.HandleEvent(ev);
-
-        //Debug.Log("LeanTweenBridge: HandleEvent: this: " + this + " ev: " + ev, this);
-
-        string eventName = (string)ev["event"];
-        //Debug.Log("LeanTweenBridge: HandleEvent: eventName: " + eventName, this);
-        if (string.IsNullOrEmpty(eventName)) {
-            Debug.LogError("LeanTweenBridge: HandleEvent: missing event name in ev: " + ev);
-            return;
-        }
-
-        JObject data = (JObject)ev["data"];
-        //Debug.Log("LeanTweenBridge: HandleEvent: eventName: " + eventName, this);
-
-        switch (eventName) {
-
-            case "Disrupt": {
-                Disrupt();
-                break;
-            }
-
-        }
-    }
-
-
-    public void Disrupt()
-    {
-        Rigidbody rigidbody = gameObject.GetComponent<Rigidbody>();
-        if (rigidbody != null) {
-            rigidbody.AddForce(
-                new Vector3(
-                    Random.Range(-bumpMag, bumpMag),
-                    Random.Range(-bumpMag, bumpMag),
-                    Random.Range(-bumpMag, bumpMag)),
-                ForceMode.Impulse);
-        }
-    }
-
-
     void Update()
     {
         if (textMesh == null) {
@@ -101,13 +61,27 @@ public class KineticText : Tracker {
 
     public void UpdateState()
     {
-        if (mouseEnteredChanged || mouseDownChanged) {
+        if (trackColor && 
+            (mouseEnteredChanged || mouseDownChanged)) {
+
             mouseEnteredChanged = false;
             mouseDownChanged = false;
 
-            textMesh.color = mouseDown ? colorMouseDown : (mouseEntered ? colorMouseEntered : colorNormal);
-            textMesh.faceColor = mouseDown ? faceColorMouseDown : (mouseEntered ? faceColorMouseEntered : faceColorNormal);
-            textMesh.outlineColor = mouseDown ? outlineColorMouseDown : (mouseEntered ? outlineColorMouseEntered : outlineColorNormal);
+            Color colorNew = mouseDown ? colorMouseDown : (mouseEntered ? colorMouseEntered : colorNormal);
+            if (colorNew != textMesh.color) {
+                textMesh.color = colorNew;
+            }
+
+            Color faceColorNew = mouseDown ? faceColorMouseDown : (mouseEntered ? faceColorMouseEntered : faceColorNormal);
+            if (faceColorNew != textMesh.faceColor) {
+                textMesh.faceColor = faceColorNew;
+            }
+            
+            Color outlineColorNew = mouseDown ? outlineColorMouseDown : (mouseEntered ? outlineColorMouseEntered : outlineColorNormal);
+            if (outlineColorNew != textMesh.outlineColor) {
+                textMesh.outlineColor = outlineColorNew;
+            }
+            
         }
     }
 
@@ -131,13 +105,17 @@ public class KineticText : Tracker {
             colliderCount++;
         }
 
+        // This must be called first before depending on textInfo being consistent. 
+        textMesh.ForceMeshUpdate();
+
+        TMP_TextInfo textInfo = textMesh.textInfo;
+        int characterCount = textInfo.characterCount;
+        TMP_CharacterInfo[] characterInfo = textInfo.characterInfo;
+
         if (characterColliders) {
 
-            TMP_TextInfo textInfo = textMesh.textInfo;
-            TMP_CharacterInfo[] characterInfo = textInfo.characterInfo;
-
-            for (int i = 0, n = characterInfo.Length;
-                 i < n;
+            for (int i = 0;
+                 i < characterCount;
                  i++) {
 
                 TMP_CharacterInfo info = characterInfo[i];
@@ -147,6 +125,7 @@ public class KineticText : Tracker {
                 }
 
             }
+
         }
 
         SetColliderCount(colliderCount);
@@ -155,25 +134,27 @@ public class KineticText : Tracker {
 
             Bounds bounds = textMesh.bounds;
             BoxCollider boxCollider = boxColliders[colliderIndex++];
-            boxCollider.material =
-                physicMaterial;
-            boxCollider.center =
-                Vector3.zero;
-            boxCollider.size =
+            boxCollider.material = physicMaterial;
+
+            if (boxCollider.center != Vector3.zero) {
+                boxCollider.center = Vector3.zero;
+            }
+
+            Vector3 newSize =
                 new Vector3(
                     bounds.size.x,
                     bounds.size.y,
                     colliderThickness);
+            if (boxCollider.size != newSize) {
+                boxCollider.size = newSize;
+            }
 
         }
 
         if (characterColliders) {
 
-            TMP_TextInfo textInfo = textMesh.textInfo;
-            TMP_CharacterInfo[] characterInfo = textInfo.characterInfo;
-
-            for (int i = 0, n = characterInfo.Length;
-                 i < n;
+            for (int i = 0;
+                 i < characterCount;
                  i++) {
 
                 TMP_CharacterInfo info = characterInfo[i];
@@ -188,16 +169,24 @@ public class KineticText : Tracker {
                 float top    = info.topRight.y;
 
                 BoxCollider boxCollider = boxColliders[colliderIndex++];
-                boxCollider.center =
+
+                Vector3 newCenter =
                     new Vector3(
                         (left + right) / 2.0f,
                         (top + bottom) / 2.0f,
                         0.0f);
-                boxCollider.size =
+                if (boxCollider.center != newCenter) {
+                    boxCollider.center = newCenter;
+                }
+
+                Vector3 newSize =
                     new Vector3(
                         right - left,
                         top - bottom,
                         colliderThickness);
+                if (boxCollider.size != newSize) {
+                    boxCollider.size = newSize;
+                }
 
             }
 
@@ -215,6 +204,7 @@ public class KineticText : Tracker {
         while (boxColliders.Count < n) {
             BoxCollider collider = gameObject.AddComponent<BoxCollider>();
             boxColliders.Add(collider);
+            //Debug.Log("KineticText: SetColliderCount n: " + n + " Add count: " + boxColliders.Count);
         }
 
         int len;
@@ -222,6 +212,7 @@ public class KineticText : Tracker {
             BoxCollider boxCollider = boxColliders[len - 1];
             boxColliders.RemoveAt(len - 1);
             Destroy(boxCollider);
+            //Debug.Log("KineticText: SetColliderCount n: " + n + " Destroy count: " + boxColliders.Count + " boxCollider: " + boxCollider);
         }
 
     }

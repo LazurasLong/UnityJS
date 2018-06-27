@@ -43,6 +43,7 @@ public class Bridge : MonoBehaviour {
     public Dictionary<object, string> objectToID = new Dictionary<object, string>();
     public Dictionary<string, TextureChannelDelegate> textureChannels = new Dictionary<string, TextureChannelDelegate>();
     public string url = "bridge.html";
+    public string configuration = "world";
     public bool startedJS = false;
     public BridgeTransport transport;
 
@@ -245,7 +246,7 @@ public class Bridge : MonoBehaviour {
         //Debug.Log("Bridge: HandleTransportStarted");
 
         string js =
-            "StartBridge(\"" + transport.driver + "\");";
+            "StartBridge(\"" + transport.driver + "\", \"" + configuration + "\");";
         //Debug.Log("Bridge: HandleTransportStarted: EvaluateJS: " + js);
 
         transport.EvaluateJS(js);
@@ -300,9 +301,10 @@ public class Bridge : MonoBehaviour {
     void DistributeUnityEvent(JObject ev)
     {
         string eventName = (string)ev["event"];
-        JObject data = (JObject)ev["data"];
 
         //Debug.Log("Bridge: DistributeUnityEvent: eventName: " + eventName + " ev: " + ev);
+
+        JObject data = ev["data"] as JObject;
 
         switch (eventName) {
 

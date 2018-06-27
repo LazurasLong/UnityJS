@@ -258,6 +258,17 @@ public static class BridgeExtensions {
     }
     
 
+    public static int ArrayLength(this JToken token)
+    {
+        if (!token.IsArray()) {
+            return 0;
+        }
+
+        JArray array = (JArray)token;
+        return array.Count;
+    }
+    
+
     public static JArray GetArray(this JToken token, string key, JArray def=null)
     {
         if ((key == null) ||
@@ -293,6 +304,29 @@ public static class BridgeExtensions {
                 (token.Type == JTokenType.Object));
     }
     
+
+    public static int ObjectCount(this JToken token)
+    {
+        if (!token.IsObject()) {
+            return 0;
+        }
+
+        JObject obj = (JObject)token;
+        return obj.Count;
+    }
+
+
+    public static bool ContainsKey(this JToken token, string key)
+    {
+        if (!token.IsObject()) {
+            return false;
+        }
+
+        JObject obj = (JObject)token;
+
+        return obj[key] != null;
+    }
+
 
     public static JObject GetObject(this JToken token, string key, JObject def=null)
     {
@@ -669,6 +703,9 @@ public static class BridgeExtensions {
     }
 
 
+    // This method is a work-around for a bug in WebGL that crashes
+    // when I just set renderer.materials[] to an array of strings
+    // through reflection, which works ok on other platforms.
     public static void SetMaterials(this Renderer renderer, JToken materialsToken)
     {
         Debug.Log("BridgeExtensions: Material: SetMaterials: renderer: " + renderer + " materialsToken: " + materialsToken);
@@ -679,9 +716,9 @@ public static class BridgeExtensions {
             return;
         }
 
-        Debug.LogError("BridgeExtensions: SetMaterials: renderer: " + renderer + " BEFORE SET");
+        //Debug.LogError("BridgeExtensions: SetMaterials: renderer: " + renderer + " BEFORE SET");
         renderer.materials = materials;
-        Debug.LogError("BridgeExtensions: SetMaterials: renderer: " + renderer + " AFTER SET");
+        //Debug.LogError("BridgeExtensions: SetMaterials: renderer: " + renderer + " AFTER SET");
     }
 
 

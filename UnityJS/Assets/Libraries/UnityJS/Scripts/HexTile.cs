@@ -68,8 +68,16 @@ public class HexTile : Tracker {
         //Debug.Log("HexTile: Awake: meshCollider: " + meshCollider);
 
         meshCollider.sharedMesh = mesh;
+        meshCollider.convex = true;
 
         //Debug.Log("HexTile: Awake: Created MeshCollider.");
+
+        Rigidbody rb =
+            gameObject.GetComponent<Rigidbody>();
+        if (rb == null) {
+            rb = gameObject.AddComponent<Rigidbody>();
+        }
+
     }
 
 
@@ -86,7 +94,6 @@ public class HexTile : Tracker {
             return;
         }
 
-        JObject data = (JObject)ev["data"];
         //Debug.Log("HexTile: HandleEvent: eventName: " + eventName, this);
 
         switch (eventName) {
