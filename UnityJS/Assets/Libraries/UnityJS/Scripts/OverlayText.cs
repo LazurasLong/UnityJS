@@ -51,6 +51,7 @@ public class OverlayText : BridgeObject {
     public void UpdatePosition()
     {
         bool active = false;
+        bool trackScreen = false;
 
         switch (trackPosition) {
 
@@ -58,7 +59,8 @@ public class OverlayText : BridgeObject {
                 break;
 
             case TrackPosition.Passive:
-                return;
+                active = true;
+                break;
 
             case TrackPosition.Transform:
                  if (transformPosition == null) {
@@ -74,6 +76,7 @@ public class OverlayText : BridgeObject {
 
             case TrackPosition.Screen:
                 active = true;
+                trackScreen = true;
                 break;
 
         }
@@ -82,7 +85,7 @@ public class OverlayText : BridgeObject {
             textMesh.enabled = active;
         }
 
-        if (active) {
+        if (active && trackScreen) {
             RectTransform rt = gameObject.GetComponent<RectTransform>();
             rt.anchoredPosition = screenPosition;
         }

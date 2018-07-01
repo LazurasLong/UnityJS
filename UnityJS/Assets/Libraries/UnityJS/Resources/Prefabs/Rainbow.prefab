@@ -75,3 +75,5 @@ MonoBehaviour:
   lastChildCount: 0
   bows: []
   angle: 0
+  updateBowHeight: 1
+  bowHeight: 40

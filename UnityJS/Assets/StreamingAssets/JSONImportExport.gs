@@ -1,165 +1,438 @@
-/*
- * sheet.js
- * Don Hopkins, Ground Up Software.
- */
+////////////////////////////////////////////////////////////////////////
+// JSON Import Export for Google Sheets
+// By Don Hopkins, Ground Up Software.
 
 
-function LoadSheets(sheetRefs, success, error)
+////////////////////////////////////////////////////////////////////////
+
+
+console = Logger;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+function onOpen() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  ss.addMenu("JSONster", [
+    {name: 'Spreadsheet To JSON', functionName: 'SpreadsheetToJSON'},
+    {name: 'Clear Formatting', functionName: 'ClearFormatting'},
+    {name: 'Clear Groups', functionName: 'ClearGroups'}
+  ]);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+function doGet(e)
 {
-    var xhrs = {};
-    var data = {
-        spreadsheetName: "Untitled",
-        sheets: {},
-        sheetNames: [],
-        ranges: {},
-        rangeNames: []
+  var startTime = new Date();
+  var path = e ? e.pathInfo : '';
+  var parameter = e ? e.parameter : {};
+  var data = GetData(path, parameter);
+  var endTime = new Date();
+  var requestTime = endTime - startTime;
+  
+  var result = {
+    status: 'success',
+    requestTime: requestTime,
+    data: data
+  };
+  
+  var output = JSON.stringify(result);
+  
+  return ContentService.createTextOutput(output)
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+
+function GetData(path, parameter)
+{
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var spreadsheetName = ss.getName();
+  var spreadsheetID = ss.getId();
+  var data = {
+    path: path,
+    parameter: parameter,
+    name: spreadsheetName,
+    spreadsheetID: spreadsheetID,
+    sheets: {},
+    sheetNames: [],
+    ranges: {},
+    rangeNames: []
+  };
+
+  var sheets = ss.getSheets();
+  for (var index = 0, n = sheets.length; index < n; index++) {
+    var sheet = sheets[index];
+    var name = sheet.getName();
+    var rows = sheet.getLastRow();
+    var columns = sheet.getLastColumn();
+    var values = sheet.getSheetValues(1, 1, rows, columns);
+    var sheetID = sheet.getSheetId();
+    data.sheetNames.push(name);
+    data.sheets[name] = {
+      name: name,
+      spreadsheetID: spreadsheetID,
+      sheetID: sheetID,
+      index: index,
+      rows: rows,
+      columns: columns,
+      values: values
     };
+  }
 
-    var index = 0;
-    for (var sheetName in sheetRefs) {
-        (function (sheetName) {
+  var namedRanges = ss.getNamedRanges();
+  for (var index = 0, n = namedRanges.length; index < n; index++) {
+    var namedRange = namedRanges[index];
+    var name = namedRange.getName();
+    var range = namedRange.getRange();
+    var row = range.getRow();
+    var column = range.getColumn();
+    var width = range.getWidth();
+    var height = range.getHeight();
+    var sheet = range.getSheet();
+    var sheetName = sheet.getName();
+    data.rangeNames.push(name);
+    data.ranges[name] = {
+      name: name,
+      index: index,
+      row: row,
+      column: column,
+      width: width,
+      height: height,
+      sheet: sheetName
+    };
+  }
 
-            var sheetRef = sheetRefs[sheetName];
-            var sheetURL = GetSheetURL(sheetRef, 'tsv');
-            var url = GetProxyURL(sheetURL);
-            var xhr = new XMLHttpRequest();
+  return data;
+}
 
-            xhrs[sheetName] = xhr;
 
-            data.sheetNames.push(sheetName);
+////////////////////////////////////////////////////////////////////////
 
-            //console.log("sheets.js: LoadSheets: sheetName: " + sheetName + " url: " + url);
 
-            xhr.onload = function() {
-                var text = xhr.responseText;
+var gDefaultSheetName = "world";
+//var gDefaultSheetName = "test";
 
-                var sheet = ParseSheet(text);
 
-                var rows = sheet.length;
-                var columns = 0;
-                for (var row = 0; row < rows; row++) {
-                    var cols = sheet[row].length;
-                    if (cols > columns) {
-                        columns = cols;
-                    }
-                }
+function SpreadsheetToJSON(sheetName, isSingleSheet)
+{
+  if (!sheetName) {
+    //sheetName = gDefaultSheetName;
+    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = spreadsheet.getActiveSheet();
+    sheetName = sheet.getSheetName();
+    isSingleSheet = true;
+  }
+  
+  var sheets = {};
+  var ranges = {};
 
-                data.sheets[sheetName] = {
-                    name: sheetName,
-                    spreadsheetID: sheetRef[0],
-                    sheetID: sheetRef[1],
-                    index: index,
-                    rows: rows,
-                    columns: columns,
-                    values: sheet
-                };
+  var scope = SheetToScope(sheets, ranges, sheetName, isSingleSheet);
+  
+  if (!scope) {
+    console.log("SpreadsheetToJSON: SheetToScope returned null.");
+  } else if (scope.error) {
+    console.log("SpreadsheetToJSON: SheetToScope returned error: " + scope.error);
+    return false;
+  }
+  
+  console.log("SpreadsheetToJSON: result: " + ((scope == null) ? "NULL" : JSON.stringify(scope.value)));
+  
+  RenderToSheet(sheets, ranges, scope);
+}
 
-                index++;
-                delete xhrs[sheetName];
 
-                var sheetsLeft = Object.keys(xhrs).length;
+function RenderToSheet(sheets, ranges, scope)
+{
+  var sheetName = scope.sheetName;
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName(sheetName);
+  var maxRows = sheet.getMaxRows();
+  var maxColumns = sheet.getMaxColumns();
+  var fullRange = sheet.getRange(1, 1, maxRows, maxColumns);
 
-                //console.log("sheets.js: LoadSheets: onload: Loaded sheetName: " + sheetName + " sheetsLeft: " + sheetsLeft + " sheet: " + JSON.stringify(data.sheets[sheetName]));
+  ClearGroups(fullRange);
+  ClearFormatting(fullRange);
 
-                if (sheetsLeft === 0) {
-                    success(data);
-                }
-            };
+  RenderScope(sheet, scope);
+}
 
-            xhr.onerror = function(error) {
-                console.log("sheets.js: LoadSheets: error loading sheetName: " + sheetName + " url:", url, "xhr:", xhr, "REPLIED:", xhr.statusText, "error:", error);
-                error();
-            };
 
-            xhr.open('GET', url);
-            xhr.send();
+function ClearGroups(fullRange)
+{
+  if (!sheet) {
+    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = spreadsheet.getActiveSheet();
+    fullRange = sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns());
+  }
 
-        })(sheetName);
+  fullRange.shiftRowGroupDepth(-1000);
+  fullRange.shiftColumnGroupDepth(-1000);
+  sheet.setRowGroupControlPosition(SpreadsheetApp.GroupControlTogglePosition.BEFORE);
+}
+
+
+function ClearFormatting(fullRange)
+{
+  if (!sheet) {
+    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = spreadsheet.getActiveSheet();
+    fullRange = sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns());
+  }
+
+  fullRange.clearFormat();
+}
+
+
+function RenderScope(sheet, scope)
+{
+  var dataRange = sheet.getDataRange();
+  
+  if (scope.inObject) {
+    RenderObjectKey(sheet, dataRange, scope.row, scope.column, scope.rowCount, scope.columnCount, scope.keyRow, scope.keyColumn, scope.key, scope.index);
+  }
+  
+  if (scope.inArray) {
+    RenderArrayIndex(sheet, dataRange, scope.row, scope.column, scope.rowCount, scope.columnCount, scope.index);
+  }
+  
+  if (scope.gotType) {
+    RenderType(sheet, dataRange, scope.typeRow, scope.typeColumn, scope.typeName);
+  }
+
+  if (scope.gotValue) {
+    RenderValue(sheet, dataRange, scope.valueRow, scope.valueColumn, scope.valueRows, scope.valueColumns);
+  }
+
+  if (scope.gotParams) {
+    RenderParams(sheet, dataRange, scope.paramsRow, scope.paramsColumn, scope.paramsRows, scope.paramsColumns);
+  }
+  
+  if (scope.hasChildRows) {
+    console.log("hasChildRows firstChildRow " + scope.firstChildRow + " lastChildRow " + scope.lastChildRow + " rowsUsed " + scope.rowsUsed);
+    RenderChildRows(sheet, dataRange, scope.firstChildRow, scope.lastChildRow);
+  }
+
+  var comments = scope.comments;
+  if (comments) {
+    for (var commentIndex = 0, commentCount = comments.length;
+         commentIndex < commentCount;
+         commentIndex++) {
+      var commentInfo = comments[commentIndex];
+      RenderComment(sheet, dataRange, commentInfo[0], commentInfo[1], commentInfo[3]);
     }
-}
-
-
-function LoadSheetsFromApp(appURL, success, error)
-{
-    var url = GetProxyURL(appURL);
-    var xhr = new XMLHttpRequest();
-
-    //console.log("sheets.js: LoadSheetsFromApp: sheetName: " + sheetName + " url: " + url);
-
-    xhr.onload = function() {
-        var text = xhr.responseText;
-        var result = JSON.parse(text);
-        if (result.status != 'success') {
-            console.log("sheet.js: LoadSheetsFromApp: Invalid status: " + text);
-            error();
-            return;
-        }
-
-        success(result.data);
-    };
-
-    xhr.onerror = function(error) {
-        console.log("sheets.js: LoadSheets: error loading url: " + url, "xhr:", xhr, "REPLIED:", xhr.statusText, "error:", error);
-        error();
-    };
-
-    xhr.open('GET', url);
-    xhr.send();
-}
-
-
-function GetSheetURL(sheetRef, format)
-{
-    var sheetURL =
-        'https://docs.google.com/spreadsheets/d/' +
-        sheetRef[0] + 
-        '/export?format=' +
-        format + 
-        '&id=' +
-        sheetRef[0] +
-        '&gid=' +
-        sheetRef[1];
-
-    return sheetURL;
-}
-
-
-function GetProxyURL(url)
-{
-    var proxyURL =
-        'http://donhopkins.com/home/_p/miniProxy.php?' + 
-        url +
-        "&rand=" + 
-        Math.random();
-
-    return proxyURL;
-}
-
-
-function ParseSheet(text)
-{
-    text = text.replace(/\r\n|\r/g, '\n');
-    var textRows = text.split('\n');
-    var sheet = [];
-    for (var rowIndex = 0, rowCount = textRows.length; rowIndex < rowCount; rowIndex++) {
-        var textRow = textRows[rowIndex];
-        var textColumns = textRow.split('\t');
-        var columns = [];
-        sheet.push(columns);
-        for (var columnIndex = 0, columnCount = textColumns.length; columnIndex < columnCount; columnIndex++) {
-            var textCell = textColumns[columnIndex];
-            columns.push(textCell);
-        }
+  }
+  
+  var subScopes = scope.subScopes;
+  if (subScopes) {
+    for (var subScopeIndex = 0, subScopeCount = subScopes.length;
+         subScopeIndex < subScopeCount;
+         subScopeIndex++) {
+      var subScope = subScopes[subScopeIndex];
+      var subSheet =
+          scope.isTopInSheet
+              ? SpreadsheetApp.getActiveSpreadsheet().getSheetByName(subScope.sheetName)
+              : sheet;
+      RenderScope(subSheet, subScope);
     }
-    return sheet;
+  }
+
+}
+
+// borders
+//   top left bottom right vertical horizontal
+//   color
+//   style
+//     dotted dashed solid solid_medium solid_thick double
+// background color
+// font color
+// font family
+// font size
+// font weigh
+//   bold normal
+// font style
+//   italic normal
+// font line
+//   underline line-through none
+// horizontal alignment
+//   left center right
+// vertical alignment
+//   top middle bottom
+// text direction
+//   left_to_right right_to_left
+// text rotation
+// vertical text
+// wrap
+// wrap strategy
+//   wrap overflow clip
+// note
+// protected
+// data validation
+// number format
+
+
+var gObjectKeyBackgroundColors = [
+  "#fff1ce", "#fee49d", "#fbe5ce", "#f8ca9f"
+];
+var gObjectKeyHorizontalAlignment = 'right';
+var gObjectKeyFontFamily = 'Arial';
+
+function RenderObjectKey(sheet, dataRange, row, column, rows, columns, keyRow, keyColumn, key, index)
+{
+  var range = sheet.getRange(keyRow + 1, keyColumn, rows, columns + 2);
+  range.setHorizontalAlignment(gObjectKeyHorizontalAlignment);
+  range.setFontFamily(gObjectKeyFontFamily);
+  var color =
+    gObjectKeyBackgroundColors[
+      (index & 1) | ((column & 1) << 1)]
+  range.setBackground(color);
+}
+
+
+var gArrayIndexBackgroundColors = [
+  "#d0e3f2", "#a0c6e6", "#d9d2e8", "#b4a8d5"
+];
+
+function RenderArrayIndex(sheet, dataRange, row, column, rows, columns, index)
+{
+  var range = sheet.getRange(row + 1, column, rows, columns + 1);
+  var color =
+    gArrayIndexBackgroundColors[
+      (index & 1) | ((column & 1) << 1)]
+  range.setBackground(color);
+}
+
+
+var gTypeColor = '#008000';
+var gTypeBackgroundColor = '#c0ffc0';
+var gTypeHorizontalAlignment = 'center';
+var gTypeFontFamily = 'Courier';
+var gTypeFontWeight = 'bold';
+var gTypeFontBorderStyle = SpreadsheetApp.BorderStyle.SOLID_MEDIUM;
+
+function RenderType(sheet, dataRange, row, column, type)
+{
+  var range = sheet.getRange(row + 1, column + 1);
+  range.setHorizontalAlignment(gTypeHorizontalAlignment);
+  range.setBackground(gTypeBackgroundColor);
+  range.setFontFamily(gTypeFontFamily);
+  range.setFontWeight(gTypeFontWeight);
+  range.setBorder(true, true, true, true, false, false, gTypeColor, gTypeFontBorderStyle);
+}
+
+
+var gValueColor = '#000000';
+var gValueFontFamily = 'Arial';
+var gValueHorizontalAlignment = 'left';
+
+function RenderValue(sheet, dataRange, row, column, rows, columns)
+{
+  if ((rows == 1) && (columns == 1)) {
+    var range = sheet.getRange(row + 1, column + 1);
+    range.setFontFamily(gValueFontFamily);
+    range.setHorizontalAlignment(gValueHorizontalAlignment);
+  }
+}
+
+
+function RenderParams(sheet, dataRange, row, column, rows, columns)
+{
+  
+}
+
+
+var gCommentColor = '#0000ff';
+var gCommentFontFamily = 'Comic Sans MS';
+var gCommentFontStyle = 'italic';
+var gCommentLeftBorderStyle = SpreadsheetApp.BorderStyle.DOUBLE;
+var gCommentHorizontalAlignment = 'left';
+
+function RenderComment(sheet, dataRange, row, column, comment)
+{
+  var range = sheet.getRange(row + 1, column + 1);
+  range.setFontFamily(gCommentFontFamily);
+  range.setFontStyle(gCommentFontStyle);
+  range.setFontColor(gCommentColor);
+  range.setBorder(false, true, false, false, false, false, gCommentColor, gCommentLeftBorderStyle);
+  range.setHorizontalAlignment(gCommentHorizontalAlignment);
+}
+
+
+function RenderChildRows(sheet, dataRange, firstChildRow, lastChildRow)
+{
+  if (lastChildRow == firstChildRow) {
+    return;
+  }
+  var range = sheet.getRange(firstChildRow + 1, 1, lastChildRow - firstChildRow, 1);
+  range.shiftRowGroupDepth(1);
 }
 
 
 function GetSheet(sheets, sheetName)
 {
-    var sheet = 
-        sheets[sheetName];
-    return sheet && sheet.values;
+  var values = sheets[sheetName];
+  if (values) {
+    return values;
+  }
+
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName(sheetName);
+  
+  if (!sheet) {
+    return null;
+  }
+  
+  var dataRange = sheet.getDataRange();
+  var numRows = dataRange.getNumRows();
+  var numColumns = dataRange.getNumColumns();
+  values = dataRange.getValues();
+
+  // Make sure the rows are all filled!
+  var nullString = "";
+  for (var row = 0; row < numRows; row++) {
+    var columnValues = values[row];
+    while (columnValues.length < numColumns) {
+      columnValues.push(nullString);
+    }
+  }
+  
+  return values;
+}
+
+
+function ParseSheet(sheetName)
+{
+    if (!sheetName || sheetName.length == 0) {
+        return null;
+    }
+
+    var sheet = GetSheet(sheetName);
+
+    //console.log("ParseSheet: sheet: " + JSON.stringify(sheet));
+
+    if (!sheet || sheet.length == 0) {
+        return null;
+    }
+
+    var scope = {
+        sheetName: sheetName,
+        sheet: sheet,
+        row: 0,
+        column: 0,
+        rowCount: sheet.length,
+        columnCount: sheet[0].length
+    };
+
+    var result =
+        LoadJSONFromSheet(scope);
+  
+    console.log("ParseSheet: result: " + result + " scope: " + scope);
+
+    return scope;
 }
 
 
@@ -183,7 +456,7 @@ function SheetToScope(sheets, ranges, sheetName, isSingleSheet)
         rowCount: sheet.length,
         columnCount: sheet[0].length,
         isTopInSheet: true,
-        isSingleSheet: !!isSingleSheet
+        isSingleSheet: !!isSingleSheet 
     };
 
     scope.errorScope =
@@ -1154,5 +1427,6 @@ function LoadJSONFromSheet(sheets, ranges, scope)
     }
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////

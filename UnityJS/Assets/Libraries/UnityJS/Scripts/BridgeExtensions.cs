@@ -722,4 +722,13 @@ public static class BridgeExtensions {
     }
 
 
+    public static Vector3[] GetLinePositions(this LineRenderer lineRenderer)
+    {
+        //Debug.Log("BridgeExtensions: Material: GetLinePositions: lineRenderer: " + lineRenderer);
+        Vector3[] positions = new Vector3[lineRenderer.positionCount];
+        lineRenderer.GetPositions(positions);
+        return positions;
+    }
+
+
 }

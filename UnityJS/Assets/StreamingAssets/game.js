@@ -45,8 +45,17 @@ globals.sheetRefs = {
     prefabMap:      [globals.spreadsheetID, '1469835123'],
     tiles:          [globals.spreadsheetID, '1579247368'],
     rainbows:       [globals.spreadsheetID, '164091207'],
-    bowConfigs:     [globals.spreadsheetID, '1544589805'],
+    bows_rgbymc:    [globals.spreadsheetID, '1544589805'],
+    bows_red:       [globals.spreadsheetID, '1854560943'],
+    bows_green:     [globals.spreadsheetID, '1454515772'],
+    bows_blue:      [globals.spreadsheetID, '1466670725'],
+    bows_yellow:    [globals.spreadsheetID, '1541060846'],
+    bows_magenta:   [globals.spreadsheetID, '1996689157'],
+    bows_cyan:      [globals.spreadsheetID, '724646415'],
+    bows_arrow:     [globals.spreadsheetID, '568829119'],
+    bows_cobra:     [globals.spreadsheetID, '335200639'],
     blobs:          [globals.spreadsheetID, '412054745'],
+    jsonsters:      [globals.spreadsheetID, '131799685'],
     players:        [globals.spreadsheetID, '1362487343'],
     amazon:         [globals.spreadsheetID, '886538810'],
     amazon_1996:    [globals.spreadsheetID, '194146645'],
@@ -71,16 +80,21 @@ function CreateObjects()
 }
 
 
-function TrackInputString(inputString)
+function TrackKeyEvent(results)
 {
-    //console.log("game.js: TrackInputString: inputString: " + inputString);
+    console.log("game.js: TrackKeyEvent: results: " + JSON.stringify(results));
 
-    switch (inputString) {
+    switch (results.keyCode) {
 
-        case 'r':
-            console.log("game.js: TrackInputString: r: Reloading world...");
-            ClearWorld();
-            LoadObjects();
+        case 'R':
+            if ((results.type == "keyDown") && 
+                (results.modifiers == "Control")) {
+
+                console.log("game.js: TrackInputString: Ctrl-R: Reloading world...");
+                ClearWorld();
+                LoadObjects();
+
+            }
             break;
 
     }
@@ -133,6 +147,8 @@ function LoadObjects()
         }
 
         var scope = SheetToScope(globals.sheets, globals.ranges, globals.worldSheetName);
+        globals.scope = scope;
+
         var error = scope.error;
         var world = scope.value;
 
@@ -167,8 +183,8 @@ function CreateLoadedObjects()
 
     CreateTemplatedObjects();
     CreateMap();
-    CreateRainbow();
     CreateBlobs();
+    CreateJsonsters();
     CreatePlayers();
     CreateTests();
 }
@@ -240,7 +256,7 @@ function CreateMap()
                 var tileHeight = 14;
 
                 var height =
-                    tiles.tileHeight[y][x];
+                    Math.max(1, tiles.tileHeight[y][x]);
 
                 var lift = 1;
                 var tileZScale = 
@@ -260,14 +276,14 @@ function CreateMap()
                 var tilePrefab =
                     CreatePrefab({
                         prefab: prefabName, 
-                        component: component, // component
-                        obj: { // obj
+                        component: component,
+                        obj: {
                             x: x,
                             y: y,
                             tileX: tileX,
                             tileY: tileY
                         }, 
-                        config: { // config 
+                        config: {
                             "transform/localPosition": {x: tileX, y: tileZ, z: tileY},
                             "transform/localScale": {x: 0.01, y: 0.01, z: 0.01},
                             "transform/localRotation": {yaw: 90},
@@ -279,13 +295,14 @@ function CreateMap()
                             "component:MeshRenderer/materials": [materialName, materialName, materialName],
                             "dragTracking": true
                         }, 
-                        interests: { // interests
+                        interests: {
                             MouseDown: {
                                 query: {
                                     position: "transform/localPosition"
                                 },
                                 handler: function(obj, result) {
                                     console.log("MouseDown on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
+                                    if (obj.onMouseDown) obj.onMouseDown(obj, result);
                                 }
                             },
                             DragStart: {
@@ -294,6 +311,7 @@ function CreateMap()
                                 },
                                 handler: function(obj, result) {
                                     //console.log("DragStart on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
+                                    if (obj.onDragStart) obj.onDragStart(obj, result);
                                 }
                             },
                             DragMove: {
@@ -302,6 +320,7 @@ function CreateMap()
                                 },
                                 handler: function(obj, result) {
                                     //console.log("DragMove on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
+                                    if (obj.onDragMove) obj.onDragMove(obj, result);
                                 }
                             },
                             DragEnd: {
@@ -310,6 +329,7 @@ function CreateMap()
                                 },
                                 handler: function(obj, result) {
                                     //console.log("DragEnd on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
+                                    if (obj.onDragEnd) obj.onDragEnd(obj, result);
                                 }
                             }
                         },
@@ -338,17 +358,16 @@ function CreateMap()
                     var vegPrefab =
                         CreatePrefab({
                             prefab: vegPrefabName, 
-                            //component: component, // component
-                            obj: { // obj
+                            obj: {
                                 x: x,
                                 y: y,
                                 tileX: tileX,
                                 tileY: tileY
                             }, 
-                            config: { // config 
+                            config: {
                                 "transform/localPosition": {x: tileX, y: tileZ, z: tileY}
                             }, 
-                            interests: { // interests
+                            interests: {
                                 MouseDown: {
                                     query: {
                                         position: "transform/localPosition"
@@ -381,63 +400,49 @@ function CreateMap()
 
     }
 
-}
+    if (world.createRainbow) {
 
+        var fromTile = rows[0][0][0];
+        var toTile = rows[tiles.tileRows - 1][tiles.tileColumns - 1][0];
 
-function CreateRainbow()
-{
-    var world = globals.world;
+        var rb = CreateRainbow(tiles.rainbowType, fromTile, toTile);
+        
+        fromTile.onMouseDown = function(obj, result) {
 
-    if (!world.createRainbow) {
-        return;
-    }
+            console.log("Rainbow Tile Mouse Down", obj, result);
 
-    var rainbows = world.rainbows;
-    var fromTile = world.rows[0][0][0];
-    var toTile = world.rows[world.tileRows - 1][world.tileColumns - 1][0];
-    var bowCount = rainbows.bowConfigs.length;
+            QueryObject(rb.bows[0], {
+                    positions: 'component:LineRenderer/method:GetLinePositions'
+                }, function(result) {
+                    var positions = result.positions;
+                    console.log("POSITIONS", JSON.stringify(positions));
 
-    //console.log("bowConfigs", JSON.stringify(world.bowConfigs));
+                    var label = CreatePrefab({
+                        prefab: "Prefabs/ProText",
+                        config: {
+                            'transform/position': positions[0],
+                            'textMesh/text': 'WEEEE!!!',
+                            'textMesh/fontSize': 50,
+                            trackPosition: 'Passive',
+                            trackRotation: 'CameraRotation'
+                        },
+                        postEvents: [
+                            {
+                                event: 'Animate',
+                                data: [
+                                    {
+                                        command: 'moveSpline',
+                                        time: 3,
+                                        'path': positions
+                                    }
+                                ]
+                            }
+                        ]
+                    });
 
-    var rainbow =
-        CreatePrefab({
-            prefab: 'Prefabs/Rainbow',
-            obj: {
-                bows: []
-            },
-            config: {
-                'fromTransform!': 'object:' + fromTarget.id + '/transform',
-                'toTransform!': 'object:' + toTarget.id + '/transform',
-                fromWidth: rainbows.rainbowWidth,
-                toWidth: rainbows.rainbowWidth
-            }
-        });
+                });
 
-    world.rainbow = rainbow;
-
-    for (var bowIndex = 0;
-         bowIndex < bowCount;
-         bowIndex++) {
-
-        var bowConfig = 
-            world.bowConfigs[bowIndex];
-
-        //console.log("bowConfig", JSON.stringify(bowConfig));
-
-        var bow =
-            CreatePrefab({
-                prefab: 'Prefabs/Bow',
-                config: bowConfig,
-                postEvents: [
-                    {
-                        event: 'SetParent',
-                        data: {
-                            'path': 'object:' + world.rainbow.id
-                        }
-                    }
-                ]});
-
-        rainbow.bows.push(bow);
+        };
 
     }
 
@@ -458,6 +463,8 @@ function CreateBlobs()
     var bloopData = blobs.bloopData;
     var bleepData = blobs.bleepData;
     var tinyScale = { x: 0.01, y: 0.01, z: 0.01 };
+    var label;
+    var t;
 
     var blob = CreatePrefab({
         prefab: 'Prefabs/Bubble',
@@ -502,17 +509,36 @@ function CreateBlobs()
 
     globals.blob = blob;
 
-    var t = CreateOverlayText({
-        "trackPosition": "Transform",
-        "transformPosition!": "object:" + blob.id + "/transform",
-        "textMesh/text": "blob " + id++,
-        "textMesh/fontSize": 24,
-        "textMesh/color": { r: 1, g: 0.5, b: 0.5 },
-        "component:RectTransform/sizeDelta": { 
-            x: 100,
-            y: 50
-        }
-    });
+    label = null; t = null;
+
+    if (blobData.createProText) {
+        label = CreatePrefab({
+            prefab: "Prefabs/ProText",
+            config: {
+                'textMesh/text': 'Blob',
+                'textMesh/fontSize': blobData.proTextFontSize,
+                'component:RectTransform/sizeDelta': {x: 100, y: 50},
+                trackPosition: 'Transform',
+                'transformPosition!': 'object:' + blob.id + '/transform',
+                extraOffset: { y: blobData.size * 1.2 },
+                trackRotation: 'CameraRotation'
+            }
+        });
+    }
+
+    if (blobData.createOverlayText) {
+        t = CreateOverlayText({
+            "trackPosition": "Transform",
+            "transformPosition!": "object:" + blob.id + "/transform",
+            "textMesh/text": "blob " + id++,
+            "textMesh/fontSize": blobData.overlayTextFontSize,
+            "textMesh/color": { r: 1, g: 0.5, b: 0.5 },
+            "component:RectTransform/sizeDelta": { 
+                x: 100,
+                y: 50
+            }
+        });
+    }
 
     var lastBloopParent = blob;
 
@@ -571,17 +597,40 @@ function CreateBlobs()
 
         blob.bloops.push(bloop);
 
-        var t = CreateOverlayText({
-            "trackPosition": "Transform",
-            "transformPosition!": "object:" + bloop.id + "/transform",
-            "textMesh/text": "bloop " + id++,
-            "textMesh/fontSize": 18,
-            "textMesh/color": { r: 0.5, g: 1, b: 0.5 },
-            "component:RectTransform/sizeDelta": { 
-                x: 100,
-                y: 50
-            }
-        });
+        label = null; t = null;
+
+        if (bloopData.createProText) {
+            label = CreatePrefab({
+                prefab: "Prefabs/ProText",
+                config: {
+                    'textMesh/text': 'Bloop',
+                    'textMesh/fontSize': bloopData.proTextFontSize,
+                    'component:RectTransform/sizeDelta': {x: 100, y: 50},
+                    trackPosition: 'Transform',
+                    'transformPosition!': 'object:' + bloop.id + '/transform',
+                    extraOffset: { y: bloopData.size * 1.2 },
+                    trackRotation: 'CameraRotation'
+                }
+            });
+        }
+
+        if (bloopData.createOverlayText) {
+            t = CreateOverlayText({
+                "trackPosition": "Transform",
+                "transformPosition!": "object:" + bloop.id + "/transform",
+                "textMesh/text": "bloop " + id++,
+                "textMesh/fontSize": bloopData.overlayTextFontSize,
+                "textMesh/color": { r: 0.5, g: 1, b: 0.5 },
+                "component:RectTransform/sizeDelta": { 
+                    x: 100,
+                    y: 50
+                }
+            });
+        }
+
+        if (bloopData.createRainbow) {
+            var r = CreateRainbow(bloopData.rainbowType, lastBloopParent, label || bloop);
+        }
 
         if (bloopData.linear) {
             lastBloopParent = bloop;
@@ -652,17 +701,40 @@ function CreateBlobs()
 
             bloop.bleeps.push(bleep);
 
-            var t = CreateOverlayText({
-                "trackPosition": "Transform",
-                "transformPosition!": "object:" + bleep.id + "/transform",
-                "textMesh/text": "bleep " + id++,
-                "textMesh/fontSize": 12,
-                "textMesh/color": { r: 0.5, g: 0.5, b: 1 },
-                "component:RectTransform/sizeDelta": { 
-                    x: 100,
-                    y: 50
-                }
-            });
+            label = null; t = null;
+
+            if (bleepData.createProText) {
+                label = CreatePrefab({
+                    prefab: "Prefabs/ProText",
+                    config: {
+                        'textMesh/text': 'Bleep',
+                        'textMesh/fontSize': bleepData.proTextFontSize,
+                        'component:RectTransform/sizeDelta': {x: 100, y: 50},
+                        trackPosition: 'Transform',
+                        'transformPosition!': 'object:' + bleep.id + '/transform',
+                        extraOffset: { y: bleepData.size * 1.2 },
+                        trackRotation: 'CameraRotation'
+                    }
+                });
+            }
+
+            if (bleepData.createOverlayText) {
+                t = CreateOverlayText({
+                    "trackPosition": "Transform",
+                    "transformPosition!": "object:" + bleep.id + "/transform",
+                    "textMesh/text": "bleep " + id++,
+                    "textMesh/fontSize": bleepData.overlayTextFontSize,
+                    "textMesh/color": { r: 0.5, g: 0.5, b: 1 },
+                    "component:RectTransform/sizeDelta": { 
+                        x: 100,
+                        y: 50
+                    }
+                });
+            }
+
+            if (bleepData.createRainbow) {
+                var r = CreateRainbow(bleepData.rainbowType, lastBleepParent, label || bleep);
+            }
 
             if (bleepData.linear) {
                 lastBleepParent = bleep;
@@ -671,6 +743,305 @@ function CreateBlobs()
 
 
     }
+
+}
+
+
+function CreateJsonsters()
+{
+    var world = globals.world;
+
+    if (!world.createJsonsters) {
+        return;
+    }
+/*
+    var id = 0;
+    var blobs = world.blobs;
+    var blobData = blobs.blobData;
+    var bloopData = blobs.bloopData;
+    var bleepData = blobs.bleepData;
+    var tinyScale = { x: 0.01, y: 0.01, z: 0.01 };
+    var label;
+    var t;
+
+    var blob = CreatePrefab({
+        prefab: 'Prefabs/Bubble',
+        component: 'Tracker',
+        obj: { // obj
+            bloops: []
+        },
+        config: { // config 
+            "dragTracking": true,
+            "transform/localPosition": blobData.position,
+            "transform/localScale": tinyScale,
+            "transform:Ball/transform:A/component:MeshRenderer/materials": [blobData.material],
+            "transform:Ball/transform:A/component:Collider/sharedMaterial": blobData.physicMaterial,
+            "transform:Ball/transform:A/component:Collider/radius": blobData.colliderRadius,
+            "transform:Ball/transform:A/transform/localPosition": {y: -blobData.ballSpread + blobData.ballOffset},
+            "transform:Ball/transform:A/transform/localScale": {x: blobData.ballAScale, y: blobData.ballAScale, z: blobData.ballAScale},
+            "transform:Ball/transform:B/component:MeshRenderer/materials": [blobData.material],
+            "transform:Ball/transform:B/component:Collider/sharedMaterial": blobData.physicMaterial,
+            "transform:Ball/transform:B/component:Collider/radius": blobData.colliderRadius,
+            "transform:Ball/transform:B/transform/localPosition": {y: blobData.ballSpread + blobData.ballOffset},
+            "transform:Ball/transform:B/transform/localScale": {x: blobData.ballBScale, y: blobData.ballBScale, z: blobData.ballBScale},
+            "component:Rigidbody/isKinematic": blobData.isKinematic,
+            "component:Rigidbody/useGravity": blobData.useGravity,
+            "component:Rigidbody/mass": blobData.mass,
+            "component:Rigidbody/drag": blobData.drag,
+            "component:Rigidbody/angularDrag": blobData.angularDrag
+        },
+        postEvents: [
+            {
+                event: 'Animate',
+                data: [
+                    {
+                        command: 'scale',
+                        to: {x: blobData.size, y: blobData.size, z: blobData.size},
+                        time: blobData.animateTime
+                    }
+                ]
+            }
+        ]
+
+    });
+
+    globals.blob = blob;
+
+    label = null; t = null;
+
+    if (blobData.createProText) {
+        label = CreatePrefab({
+            prefab: "Prefabs/ProText",
+            config: {
+                'textMesh/text': 'Blob',
+                'textMesh/fontSize': blobData.proTextFontSize,
+                'component:RectTransform/sizeDelta': {x: 100, y: 50},
+                trackPosition: 'Transform',
+                'transformPosition!': 'object:' + blob.id + '/transform',
+                extraOffset: { y: blobData.size * 1.2 },
+                trackRotation: 'CameraRotation'
+            }
+        });
+    }
+
+    if (blobData.createOverlayText) {
+        t = CreateOverlayText({
+            "trackPosition": "Transform",
+            "transformPosition!": "object:" + blob.id + "/transform",
+            "textMesh/text": "blob " + id++,
+            "textMesh/fontSize": blobData.overlayTextFontSize,
+            "textMesh/color": { r: 1, g: 0.5, b: 0.5 },
+            "component:RectTransform/sizeDelta": { 
+                x: 100,
+                y: 50
+            }
+        });
+    }
+
+    var lastBloopParent = blob;
+
+    for (var bloopIndex = 0; bloopIndex < bloopData.count; bloopIndex++) {
+
+        var ang = bloopIndex * (2.0 * Math.PI / bloopData.count);
+        var deptX = blobData.position.x + Math.cos(ang) * bloopData.distance;
+        var deptY = blobData.position.y;
+        var deptZ = blobData.position.z + Math.sin(ang) * bloopData.distance;
+        var bloop = CreatePrefab({
+            prefab: 'Prefabs/Bubble', 
+            component: 'Tracker',
+            obj: { // obj
+                //blob: blob,
+                index: bloopIndex,
+                bleeps: []
+            },
+            config: { // config 
+                "dragTracking": true,
+                "transform/localPosition": {x: deptX, y: deptY, z: deptZ},
+                "transform/localScale": tinyScale,
+                "transform:Ball/transform:A/component:MeshRenderer/materials": [bloopData.material],
+                "transform:Ball/transform:A/component:Collider/sharedMaterial": bloopData.physicMaterial,
+                "transform:Ball/transform:A/component:Collider/radius": bloopData.colliderRadius,
+                "transform:Ball/transform:A/transform/localPosition": {y: -bloopData.ballSpread + bloopData.ballOffset},
+                "transform:Ball/transform:A/transform/localScale": {x: bloopData.ballAScale, y: bloopData.ballAScale, z: bloopData.ballAScale},
+                "transform:Ball/transform:B/component:MeshRenderer/materials": [bloopData.material],
+                "transform:Ball/transform:B/component:Collider/sharedMaterial": bloopData.physicMaterial,
+                "transform:Ball/transform:B/component:Collider/radius": bloopData.colliderRadius,
+                "transform:Ball/transform:B/transform/localPosition": {y: bloopData.ballSpread + bloopData.ballOffset},
+                "transform:Ball/transform:B/transform/localScale": {x: bloopData.ballBScale, y: bloopData.ballBScale, z: bloopData.ballBScale},
+                "component:Rigidbody/isKinematic": bloopData.isKinematic,
+                "component:Rigidbody/useGravity": bloopData.useGravity,
+                "component:Rigidbody/mass": bloopData.mass,
+                "component:Rigidbody/drag": bloopData.drag,
+                "component:Rigidbody/angularDrag": bloopData.angularDrag,
+                "component:SpringJoint/spring": bloopData.spring,
+                "component:SpringJoint/autoConfigureConnectedAnchor": false,
+                "component:SpringJoint/enableCollision": true,
+                "component:SpringJoint/connectedBody!": "object:" + lastBloopParent.id + "/component:Rigidbody"
+            },
+            postEvents: [
+                {
+                    event: 'Animate',
+                    data: [
+                        {
+                            command: 'scale',
+                            to: {x: bloopData.size, y: bloopData.size, z: bloopData.size},
+                            time: bloopData.animateTime
+                        }
+                    ]
+                }
+            ]
+
+        });
+
+        blob.bloops.push(bloop);
+
+        label = null; t = null;
+
+        if (bloopData.createProText) {
+            label = CreatePrefab({
+                prefab: "Prefabs/ProText",
+                config: {
+                    'textMesh/text': 'Bloop',
+                    'textMesh/fontSize': bloopData.proTextFontSize,
+                    'component:RectTransform/sizeDelta': {x: 100, y: 50},
+                    trackPosition: 'Transform',
+                    'transformPosition!': 'object:' + bloop.id + '/transform',
+                    extraOffset: { y: bloopData.size * 1.2 },
+                    trackRotation: 'CameraRotation'
+                }
+            });
+        }
+
+        if (bloopData.createOverlayText) {
+            t = CreateOverlayText({
+                "trackPosition": "Transform",
+                "transformPosition!": "object:" + bloop.id + "/transform",
+                "textMesh/text": "bloop " + id++,
+                "textMesh/fontSize": bloopData.overlayTextFontSize,
+                "textMesh/color": { r: 0.5, g: 1, b: 0.5 },
+                "component:RectTransform/sizeDelta": { 
+                    x: 100,
+                    y: 50
+                }
+            });
+        }
+
+        if (bloopData.createRainbow) {
+            var r = CreateRainbow(bloopData.rainbowType, lastBloopParent, label || bloop);
+        }
+
+        if (bloopData.linear) {
+            lastBloopParent = bloop;
+        }
+
+        var color = {
+            r: Math.random(),
+            g: Math.random(),
+            b: Math.random(),
+            a: 0.5
+        };
+
+        var lastBleepParent = bloop;
+
+        for (var bleepIndex = 0; bleepIndex < bleepData.count; bleepIndex++) {
+
+            var ang2 = bleepIndex * (2.0 * Math.PI / bleepData.count);
+            var offX = deptX + Math.cos(ang2) * bleepData.distance;
+            var offY = deptY;
+            var offZ = deptZ + Math.sin(ang2) * bleepData.distance;
+            var bleep = CreatePrefab({
+                prefab: 'Prefabs/Bubble', 
+                component: 'Tracker',
+                obj: { // obj
+                    //bloop: bloop,
+                    index: bleepIndex
+                },
+                config: { // config 
+                    "dragTracking": true,
+                    "transform/localPosition": {x: offX, y: offY, z: offZ},
+                    "transform/localScale": tinyScale,
+                    "transform:Ball/transform:A/component:MeshRenderer/materials": [bleepData.material],
+                    "transform:Ball/transform:A/component:MeshRenderer/material/color": color,
+                    "transform:Ball/transform:A/component:Collider/sharedMaterial": bleepData.physicMaterial,
+                    "transform:Ball/transform:A/component:Collider/radius": bleepData.colliderRadius,
+                    "transform:Ball/transform:A/transform/localPosition": {y: -bleepData.ballSpread + bleepData.ballOffset},
+                    "transform:Ball/transform:A/transform/localScale": {x: bleepData.ballAScale, y: bleepData.ballAScale, z: bleepData.ballAScale},
+                    "transform:Ball/transform:B/component:MeshRenderer/materials": [bleepData.material],
+                    "transform:Ball/transform:B/component:MeshRenderer/material/color": color,
+                    "transform:Ball/transform:B/component:Collider/sharedMaterial": bleepData.physicMaterial,
+                    "transform:Ball/transform:B/component:Collider/radius": bleepData.colliderRadius,
+                    "transform:Ball/transform:B/transform/localPosition": {y: bleepData.ballSpread + bleepData.ballOffset},
+                    "transform:Ball/transform:B/transform/localScale": {x: bleepData.ballBScale, y: bleepData.ballBScale, z: bleepData.ballBScale},
+                    "component:Rigidbody/isKinematic": bleepData.isKinematic,
+                    "component:Rigidbody/useGravity": bleepData.useGravity,
+                    "component:Rigidbody/mass": bleepData.mass,
+                    "component:Rigidbody/drag": bleepData.drag,
+                    "component:Rigidbody/angularDrag": bleepData.angularDrag,
+                    "component:SpringJoint/spring": bleepData.spring,
+                    "component:SpringJoint/autoConfigureConnectedAnchor": false,
+                    "component:SpringJoint/enableCollision": true,
+                    "component:SpringJoint/connectedBody!": "object:" + lastBleepParent.id + "/component:Rigidbody"
+                },
+                postEvents: [
+                    {
+                        event: 'Animate',
+                        data: [
+                            {
+                                command: 'scale',
+                                to: {x: bleepData.size, y: bleepData.size, z: bleepData.size},
+                                time: bleepData.animateTime
+                            }
+                        ]
+                    }
+                ]
+
+            });
+
+            bloop.bleeps.push(bleep);
+
+            label = null; t = null;
+
+            if (bleepData.createProText) {
+                label = CreatePrefab({
+                    prefab: "Prefabs/ProText",
+                    config: {
+                        'textMesh/text': 'Bleep',
+                        'textMesh/fontSize': bleepData.proTextFontSize,
+                        'component:RectTransform/sizeDelta': {x: 100, y: 50},
+                        trackPosition: 'Transform',
+                        'transformPosition!': 'object:' + bleep.id + '/transform',
+                        extraOffset: { y: bleepData.size * 1.2 },
+                        trackRotation: 'CameraRotation'
+                    }
+                });
+            }
+
+            if (bleepData.createOverlayText) {
+                t = CreateOverlayText({
+                    "trackPosition": "Transform",
+                    "transformPosition!": "object:" + bleep.id + "/transform",
+                    "textMesh/text": "bleep " + id++,
+                    "textMesh/fontSize": bleepData.overlayTextFontSize,
+                    "textMesh/color": { r: 0.5, g: 0.5, b: 1 },
+                    "component:RectTransform/sizeDelta": { 
+                        x: 100,
+                        y: 50
+                    }
+                });
+            }
+
+            if (bleepData.createRainbow) {
+                var r = CreateRainbow(bleepData.rainbowType, lastBleepParent, label || bleep);
+            }
+
+            if (bleepData.linear) {
+                lastBleepParent = bleep;
+            }
+        }
+
+
+    }
+*/
 
 }
 
@@ -685,44 +1056,308 @@ function CreatePlayers()
 
     var players = world.players;
     var playerData = players.playerData;
+    var yearSpacing = playerData.yearSpacing;
+    var yearHeight = playerData.yearHeight;
+    var yearSizeMin = playerData.yearSizeMin;
+    var yearSizeMax = playerData.yearSizeMax;
+    var yearSizeRange = yearSizeMax - yearSizeMin;
+    var unitSizeMin = playerData.unitSizeMin;
+    var unitSizeMax = playerData.unitSizeMax;
+    var unitSizeRange = unitSizeMax - unitSizeMin;
+    var marketSizeMin = playerData.marketSizeMin;
+    var marketSizeMax = playerData.marketSizeMax;
+    var marketSizeRange = marketSizeMax - marketSizeMin;
+    var amazon = world.amazon;
+    var valuationMin = amazon.valuationMin;
+    var valuationMax = amazon.valuationMax;
+    var valuationRange = valuationMax - valuationMin;
+    var years = amazon.years;
+    var yearCount = years.length;
+    var yearInfos = amazon.yearInfos;
+    var financialLabels = amazon.financialLabels;
+    var marketDimension = amazon.marketsDimensions;
+    var marketLabels = amazon.marketsLabels;
+    var unitLabels = amazon.unitLabels;
+    var unitCount = unitLabels.length;
+    var subjects = amazon.subjects;
+    var verbs = amazon.verbs;
     var tinyScale = { x:0.01, y: 0.01, z: 0.01 };
+    var x = -0.5 * yearSpacing * yearCount;
+    var y = yearHeight;
+    var z = 0;
 
     globals.players = [];
 
-    var player = CreatePrefab({
-        prefab: 'Prefabs/Ball',
-        component: 'Tracker',
-        obj: { // obj
-        },
+    var lastYearObject = CreatePrefab({
         config: { // config 
-            "dragTracking": true,
-            "transform/localPosition": {x: 0, y: 50, z: 0},
-            "transform/localScale": tinyScale,
-            "component:MeshRenderer/materials": [playerData.material],
-            "component:Collider/sharedMaterial": playerData.physicMaterial,
-            "component:Collider/radius": playerData.colliderRadius,
-            "component:Rigidbody/isKinematic": playerData.isKinematic,
-            "component:Rigidbody/useGravity": playerData.useGravity,
-            "component:Rigidbody/mass": playerData.mass,
-            "component:Rigidbody/drag": playerData.drag,
-            "component:Rigidbody/angularDrag": playerData.angularDrag
-        },
-        postEvents: [
-            {
-                event: 'Animate',
-                data: [
-                    {
-                        command: 'scale',
-                        to: {x: playerData.size, y: playerData.size, z: playerData.size},
-                        time: playerData.animateTime
-                    }
-                ]
-            }
-        ]
-
+            "transform/localPosition": {x: x, y: y, z: z},
+            "transform/localScale": tinyScale
+        }
     });
 
-    globals.players.push(player);
+    globals.players.push(lastYearObject);
+
+    x += yearSpacing;
+
+    for (var yearIndex = 0; yearIndex < yearCount; yearIndex++) {
+        var year = years[yearIndex];
+        var yearInfo = yearInfos[year];
+        var yearValuation = yearInfo.valuation.total;
+        var valuationSize =
+            yearSizeMin +
+            (yearSizeRange *
+             ((yearValuation - valuationMin) / 
+              valuationRange));
+
+        console.log("yearIndex", yearIndex, "yearCount", yearCount, "yearSizeRange", yearSizeRange, "valuationRange", valuationRange, "yearValuation", yearValuation, "valuationSize", valuationSize, "yearSizeMin", yearSizeMin, "valuationMin", valuationMin, "yearInfo", JSON.stringify(yearInfo)); 
+
+        var units = [];
+
+        yearObject = CreatePrefab({
+            prefab: 'Prefabs/Ball',
+            component: 'Tracker',
+            obj: {
+                year: year,
+                yearIndex: yearIndex,
+                yearInfo: yearInfo,
+                units: units
+            },
+            config: { // config 
+                "dragTracking": true,
+                "transform/localPosition": {x: x, y: y, z: z},
+                "transform/localScale": tinyScale,
+                "component:MeshRenderer/materials": [playerData.material],
+                "component:Collider/sharedMaterial": playerData.physicMaterial,
+                "component:Collider/radius": playerData.colliderRadius,
+                "component:Rigidbody/isKinematic": playerData.isYearKinematic,
+                "component:Rigidbody/useGravity": playerData.useGravity,
+                "component:Rigidbody/mass": playerData.mass,
+                "component:Rigidbody/drag": playerData.drag,
+                "component:Rigidbody/angularDrag": playerData.angularDrag
+            },
+            postEvents: [
+                {
+                    event: 'Animate',
+                    data: [
+                        {
+                            command: 'scale',
+                            to: {x: valuationSize, y: valuationSize, z: valuationSize},
+                            time: playerData.animateTime
+                        }
+                    ]
+                }
+            ]
+
+        });
+
+        var label = CreatePrefab({
+            prefab: "Prefabs/ProText",
+            config: {
+                'textMesh/text': "" + year,
+                'textMesh/fontSize': playerData.yearLabelFontSize,
+                trackPosition: 'Transform',
+                'transformPosition!': 'object:' + yearObject.id + '/transform',
+                extraOffset: { y: valuationSize + playerData.labelHeightExtra },
+                trackRotation: 'CameraRotation'
+            }
+        });
+
+        globals.players.push(yearObject);
+
+        var unitsMax = yearInfo.unitsMax;
+        var unitsSum = yearInfo.unitsSum;
+        var marketsMax = yearInfo.marketsMax;
+        var marketsSum = yearInfo.marketsSum;
+
+        var yearUnit;
+        var unitIndex;
+        var nonZeroUnitCount = 0;
+        for (unitIndex = 0; unitIndex < unitCount; unitIndex++) {
+            yearUnit = yearInfo.units[unitIndex];
+            if (yearUnit != 0) {
+                nonZeroUnitCount++;
+            }
+        }
+
+        console.log("nonZeroUnitCount", nonZeroUnitCount);
+
+        var parentStack = [
+            [yearObject, -1]
+        ];
+
+        var nonZeroUnitIndex = 0;
+        for (unitIndex = 0; unitIndex < unitCount; unitIndex++) {
+
+            yearUnit = yearInfo.units[unitIndex];
+            if (yearUnit == 0) {
+                continue;
+            }
+
+            var unitLabel = unitLabels[unitIndex];
+
+            var unitIndent = 0;
+            for (var indent = 0, n = unitLabel.length; indent < n; indent++) {
+                if (unitLabel[indent] != ' ') {
+                    break;
+                }
+            }
+
+            while (indent <= parentStack[parentStack.length - 1][1]) {
+                parentStack.pop();
+            }
+
+            var parentObject = parentStack[parentStack.length - 1][0];
+
+            var ang = nonZeroUnitIndex * (2.0 * Math.PI / nonZeroUnitCount);
+            nonZeroUnitIndex++;
+
+            var unitSize =
+                unitSizeMin +
+                (unitSizeRange *
+                 (yearUnit / unitsMax));
+
+            var unitDistance = unitSize + playerData.unitRadiusExtra;
+            var unitX = x + Math.cos(ang) * unitDistance;
+            var unitY = y + Math.sin(ang) * unitDistance;
+            var unitZ = z;
+
+            var unitObject = CreatePrefab({
+                prefab: 'Prefabs/Ball',
+                component: 'Tracker',
+                obj: {
+                    year: year,
+                    yearIndex: yearIndex,
+                    yearInfo: yearInfo
+                },
+                config: { // config 
+                    "dragTracking": true,
+                    "transform/localPosition": {x: unitX, y: unitY, z: unitZ},
+                    "transform/localScale": tinyScale,
+                    "component:MeshRenderer/materials": [playerData.material],
+                    "component:Collider/sharedMaterial": playerData.physicMaterial,
+                    "component:Collider/radius": playerData.colliderRadius,
+                    "component:Rigidbody/isKinematic": playerData.isUnitKinematic,
+                    "component:Rigidbody/useGravity": playerData.useGravity,
+                    "component:Rigidbody/mass": playerData.mass,
+                    "component:Rigidbody/drag": playerData.drag,
+                    "component:Rigidbody/angularDrag": playerData.angularDrag,
+                    "component:SpringJoint/spring": playerData.unitSpring,
+                    "component:SpringJoint/autoConfigureConnectedAnchor": false,
+                    "component:SpringJoint/enableCollision": true,
+                    "component:SpringJoint/connectedBody!": "object:" + parentObject.id + "/component:Rigidbody"
+                },
+                postEvents: [
+                    {
+                        event: 'Animate',
+                        data: [
+                            {
+                                command: 'scale',
+                                to: {x: unitSize, y: unitSize, z: unitSize},
+                                time: playerData.animateTime
+                            }
+                        ]
+                    }
+                ]
+
+            });
+
+            units.push(unitObject);
+            parentStack.push([unitObject, indent]);
+
+            CreateRainbow(playerData.unitRainbowType, parentObject, unitObject);
+
+            var label = CreatePrefab({
+                prefab: "Prefabs/ProText",
+                config: {
+                    'textMesh/text': unitLabel.trim(),
+                    'textMesh/fontSize': playerData.unitLabelFontSize,
+                    trackPosition: 'Transform',
+                    'transformPosition!': 'object:' + unitObject.id + '/transform',
+                    extraOffset: { y: unitSize + playerData.labelHeightExtra },
+                    trackRotation: 'CameraRotation'
+                }
+            });
+
+        }
+
+        x += yearSpacing;
+
+/*
+        CreateRainbow('rgbymc', lastYearObject, yearObject);
+*/
+
+        var verbSubjects = yearInfo.verbSubjects;
+        var bowCount = verbSubjects.length;
+
+        if (bowCount > 0) {
+
+            var rainbowWidth = bowCount;
+
+            var rainbowObject =
+                CreatePrefab({
+                    prefab: 'Prefabs/Rainbow',
+                    obj: {
+                        bows: []
+                    },
+                    config: {
+                        'fromTransform!': 'object:' + lastYearObject.id + '/transform',
+                        'toTransform!': 'object:' + yearObject.id + '/transform',
+                        bowHeight: playerData.bowHeight,
+                        fromWidth: rainbowWidth,
+                        toWidth: rainbowWidth
+                    }
+                });
+
+            var bows = rainbowObject.bows;
+            for (var bowIndex = 0;
+                 bowIndex < bowCount;
+                 bowIndex++) {
+
+                var bowName = verbSubjects[bowIndex];
+
+                //console.log("bowConfig", JSON.stringify(bowConfig));
+
+                var bowColor = {
+                    r: Math.random(),
+                    g: Math.random(),
+                    b: Math.random()
+                };
+
+                var bowObject =
+                    CreatePrefab({
+                        prefab: 'Prefabs/Bow',
+                        config: {
+                            bowStart: 0,
+                            bowEnd: 1,
+                            startWidth: 1,
+                            endWidth: 1,
+                            textureScale: { x: 1, y: 1 },
+                            "lineRenderer/material/method:UpdateMaterial": [
+                                {
+                                    texture_MainTex: 'Joao Paulo/Textures/Crystal_001/Crystal_001_COLOR',
+                                    texture_BumpMap: 'Joao Paulo/Textures/Crystal_001/Crystal_001_NORMAL',
+                                    color: { r: 1, g: 1, b: 1, a: playerData.rainbowAlpha },
+                                    color_EmissionColor: bowColor
+                                }
+                            ]
+                        },
+                        postEvents: [
+                            {
+                                event: 'SetParent',
+                                data: {
+                                    'path': 'object:' + rainbowObject.id
+                                }
+                            }
+                        ]});
+
+                rainbowObject.bows.push(bowObject);
+            }
+
+        }
+
+        lastYearObject = yearObject;
+
+    }
 
 }
 
@@ -829,6 +1464,60 @@ function CreateTests()
     ]);
     x += step;
 
+}
+
+
+function CreateRainbow(kind, fromTarget, toTarget)
+{
+    var world = globals.world;
+    var rainbows = world.rainbows;
+    var rainbow = rainbows[kind];
+
+    //console.log("bowConfigs", JSON.stringify(world.bowConfigs));
+
+    var rainbowObject =
+        CreatePrefab({
+            prefab: 'Prefabs/Rainbow',
+            obj: {
+                bows: []
+            },
+            config: {
+                'fromTransform!': 'object:' + fromTarget.id + '/transform',
+                'toTransform!': 'object:' + toTarget.id + '/transform',
+                bowHeight: rainbow.bowHeight,
+                fromWidth: rainbow.rainbowWidth,
+                toWidth: rainbow.rainbowWidth
+            }
+        });
+
+    world.rainbow = rainbow;
+
+    var bows = rainbow.bows;
+    for (var bowIndex = 0;
+         bowIndex < bows.length;
+         bowIndex++) {
+
+        var bowConfig = bows[bowIndex];
+
+        //console.log("bowConfig", JSON.stringify(bowConfig));
+
+        var bowObject =
+            CreatePrefab({
+                prefab: 'Prefabs/Bow',
+                config: bowConfig,
+                postEvents: [
+                    {
+                        event: 'SetParent',
+                        data: {
+                            'path': 'object:' + rainbowObject.id
+                        }
+                    }
+                ]});
+
+        rainbowObject.bows.push(bowObject);
+    }
+
+    return rainbowObject;
 }
 
 

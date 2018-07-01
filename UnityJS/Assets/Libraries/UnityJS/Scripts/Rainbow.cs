@@ -37,6 +37,8 @@ public class Rainbow: BridgeObject {
     public int lastChildCount = 0;
     public Bow[] bows = new Bow[0];
     public float angle;
+    public bool updateBowHeight = true;
+    public float bowHeight = 40.0f;
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -146,6 +148,11 @@ public class Rainbow: BridgeObject {
                         0.0f, 
                         (t * toWidth *
                          Mathf.Sin(toAngle)));
+
+                if (updateBowHeight) {
+                    bow.bowHeight = bowHeight;
+                }
+
             }
 
         }

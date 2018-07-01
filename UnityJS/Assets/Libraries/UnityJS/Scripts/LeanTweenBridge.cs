@@ -550,6 +550,45 @@ public class LeanTweenBridge : BridgeObject {
 
             }
 
+            if (result != null) {
+
+/*
+                pause
+                resume
+                axis
+                delay
+                direction
+                ease
+                from
+                ignoreTimeScale
+                loopClamp
+                loopOnce
+                loopPingPong
+                onComplete
+                onCompleteOnRepeat
+                onCompleteOnStart
+                onCompleteParam
+                onStart
+                onUpdate
+                onUpdateParam
+                orientToPath
+                orientToPath2d
+                overshoot
+                passed
+                period
+                point
+                recursive
+                repeat
+                scale
+                speed
+                time
+                to
+                useFrames
+                updateNow
+*/
+
+            }
+
         }
 
     }
