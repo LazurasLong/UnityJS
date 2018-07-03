@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-// JSON Import Export for Google Sheets
+// JSONster for Google Sheets
 // By Don Hopkins, Ground Up Software.
 
 
@@ -10,9 +10,11 @@ console = Logger;
 
 
 ////////////////////////////////////////////////////////////////////////
+// Set up the Goole Sheet menus when the spreadsheet is opened.
 
 
-function onOpen() {
+function onOpen()
+{
   var ss = SpreadsheetApp.getActiveSpreadsheet();
 
   ss.addMenu("JSONster", [
@@ -24,6 +26,7 @@ function onOpen() {
 
 
 ////////////////////////////////////////////////////////////////////////
+// Serve http requests.
 
 
 function doGet(e)
@@ -46,6 +49,10 @@ function doGet(e)
   return ContentService.createTextOutput(output)
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+
+////////////////////////////////////////////////////////////////////////
+// Return a JSON representation of the sheets and named ranges.
 
 
 function GetData(path, parameter)
@@ -112,6 +119,7 @@ function GetData(path, parameter)
 
 
 ////////////////////////////////////////////////////////////////////////
+// Parse the spreadsheet as JSON and render the formatting and outline.
 
 
 var gDefaultSheetName = "world";
