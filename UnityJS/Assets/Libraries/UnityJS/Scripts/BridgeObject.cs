@@ -77,14 +77,14 @@ public class BridgeObject : MonoBehaviour {
             }
 
             case "Update": {
-                JObject dataObject = (JObject)data;
-                LoadConfig(dataObject);
+                JObject update = (JObject)data;
+                LoadUpdate(update);
                 break;
             }
 
             case "UpdateInterests": {
-                JObject dataObject = (JObject)data;
-                UpdateInterests(dataObject);
+                JObject newInterests = (JObject)data;
+                UpdateInterests(newInterests);
                 break;
             }
 
@@ -206,19 +206,25 @@ public class BridgeObject : MonoBehaviour {
     }
 
 
-    public void LoadConfig(JObject config)
+    public void LoadUpdate(JObject update)
     {
-        //Debug.Log("BridgeObject: LoadConfig: this: " + this + " config: " + config);
+        //Debug.Log("BridgeObject: LoadUpdate: this: " + this + " update: " + update);
 
-        foreach (var item in config) {
+        foreach (var item in update) {
             string key = item.Key;
             JToken value = (JToken)item.Value;
 
-            //Debug.Log("BridgeObject: LoadConfig: this: " + this + " SetProperty: " + key + ": " + value);
+            //Debug.Log("BridgeObject: LoadUpdate: this: " + this + " SetProperty: " + key + ": " + value);
 
             Accessor.SetProperty(this, key, value);
         }
 
+    }
+
+
+    public virtual void AddInterests(JObject newInterests)
+    {
+        interests = newInterests;
     }
 
 
@@ -294,34 +300,57 @@ public class BridgeObject : MonoBehaviour {
         }
 
         bool foundInterest = false;
+        bool doNotSend = false;
 
         if (interests != null) {
 
-            JObject interest = (JObject)interests[eventName];
+            JObject interest = interests[eventName] as JObject;
             //Debug.Log("BridgeObject: SendEventName: eventName: " + eventName + " interest: " + interest, this);
             if (interest != null) {
 
-                JToken disabledToken = interest["disabled"];
-                bool disabled = 
-                    (disabledToken != null) &&
-                    (bool)disabledToken;
-
+                bool disabled = interest.GetBoolean("disabled");
                 if (!disabled) {
 
                     foundInterest = true;
                     //Debug.Log("BridgeObject: SendEventName: foundInterest: eventName: " + eventName + " interest: " + interest, this);
 
-                    JObject query = (JObject)interest["query"];
-                    if (query != null) {
+                    JObject update = interest["update"] as JObject;
+                    if (update != null) {
 
-                        //Debug.Log("BridgeObject: SendEventName: event interest query: " + query);
+                        Debug.Log("BridgeObject: SendEventName: event interest update: " + update);
 
-                        if (data == null) {
-                            data = new JObject();
+                        LoadUpdate(update);
+                    }
+
+                    JArray events = interest["events"] as JArray;
+                    if (events != null) {
+
+                        Debug.Log("BridgeObject: SendEventName: event interest events: " + events);
+
+                        HandleEvents(events);
+                    }
+
+                    doNotSend = interest.GetBoolean("doNotSend");
+
+                    if (doNotSend) {
+                        Debug.Log("BridgeObject: SendEventName: doNotSend: interest: " + interest);
+                    }
+
+                    if (!doNotSend) {
+
+                        JObject query = interest["query"] as JObject;
+                        if (query != null) {
+
+                            //Debug.Log("BridgeObject: SendEventName: event interest query: " + query);
+
+                            if (data == null) {
+                                data = new JObject();
+                            }
+
+                            bridge.AddQueryData(this, query, data);
+                            //Debug.Log("BridgeObject: SendEventName: event interest query data: " + dagta);
+
                         }
-
-                        bridge.AddQueryData(this, query, data);
-                        //Debug.Log("BridgeObject: SendEventName: event interest query data: " + dagta);
 
                     }
 
@@ -332,9 +361,10 @@ public class BridgeObject : MonoBehaviour {
         }
 
         // Always send Created and Destoyed events.
-        if (foundInterest ||
-            (eventName == "Created") ||
-            (eventName == "Destroyed")) {
+        if ((!doNotSend) &&
+            (foundInterest ||
+             (eventName == "Created") ||
+             (eventName == "Destroyed"))) {
 
             JObject ev = new JObject();
 

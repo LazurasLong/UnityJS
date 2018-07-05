@@ -149,14 +149,66 @@ public class LeanTweenBridge : BridgeObject {
         foreach (JObject data in dataArray) {
 
             LTDescr result = null;
+            GameObject target = go;
 
             float time = 1.0f;
             if (data.ContainsKey("time")) {
                 time = data.GetFloat("time");
                 if (time <= 0.0f) {
-                    Debug.Log("LeanTweenBridge: AnimateData: time must be > 0. data: " + data);
+                    Debug.LogError("LeanTweenBridge: AnimateData: time must be > 0. data: " + data);
                     return;
                 }
+            }
+
+            if (data.ContainsKey("target")) {
+                string targetPath = data.GetString("target");
+
+                if (targetPath == "") {
+                    Debug.LogError("LeanTweenBridge: AnimateData: empty targetPath");
+                    return;
+                }
+
+                Accessor accessor = null;
+                if (!Accessor.FindAccessor(
+                        bridgeObject,
+                        targetPath,
+                        ref accessor)) {
+
+                    Debug.LogError("LeanTweenBridge: AnimateData: target: can't find accessor for targetPath: " + targetPath);
+                    return;
+
+                }
+
+                object obj = null;
+                if (!accessor.Get(ref obj)) {
+
+                    if (!accessor.conditional) {
+                        Debug.LogError("LeanTweenBridge: AnimateData: target: can't get accessor: " + accessor + " targetPath: " + targetPath);
+                        return;
+                    }
+
+                }
+
+                GameObject goTarget = obj as GameObject;
+                if (goTarget == null) {
+                    Transform xform = obj as Transform;
+                    if (xform != null) {
+                        goTarget = xform.gameObject;
+                    } else {
+                        Component component = obj as Component;
+                        if (component != null) {
+                            goTarget = component.gameObject;
+                        }
+                    }
+                }
+
+                if (goTarget == null) {
+                    Debug.LogError("LeanTweenBridge: AnimateData: null targetPath: " + targetPath + " obj: " + obj);
+                    return;
+                }
+
+                Debug.Log("LeanTweenBridge: AnimateData: targetPath: " + targetPath + " goTarget: " + goTarget);
+                target = goTarget;
             }
 
             var command = (string)data.GetString("command");
@@ -227,11 +279,11 @@ public class LeanTweenBridge : BridgeObject {
                         switch (command) {
 
                             case "move":
-                                result = LeanTween.move(go, position, time);
+                                result = LeanTween.move(target, position, time);
                                 break;
 
                             case "moveLocal":
-                                result = LeanTween.moveLocal(go, position, time);
+                                result = LeanTween.moveLocal(target, position, time);
                                 break;
 
                             case "moveSpline":
@@ -272,7 +324,7 @@ public class LeanTweenBridge : BridgeObject {
                         switch (command) {
 
                             case "move":
-                                result = LeanTween.move(go, xform, time);
+                                result = LeanTween.move(target, xform, time);
                                 break;
 
                             case "moveLocal":
@@ -294,19 +346,19 @@ public class LeanTweenBridge : BridgeObject {
                         switch (command) {
 
                             case "move":
-                                result = LeanTween.move(go, path, time);
+                                result = LeanTween.move(target, path, time);
                                 break;
 
                             case "moveLocal":
-                                result = LeanTween.moveLocal(go, path, time);
+                                result = LeanTween.moveLocal(target, path, time);
                                 break;
 
                             case "moveSpline":
-                                result = LeanTween.moveSpline(go, path, time);
+                                result = LeanTween.moveSpline(target, path, time);
                                 break;
 
                             case "moveSplineLocal":
-                                result = LeanTween.moveSplineLocal(go, path, time);
+                                result = LeanTween.moveSplineLocal(target, path, time);
                                 break;
 
                         }
@@ -322,7 +374,7 @@ public class LeanTweenBridge : BridgeObject {
                         switch (command) {
 
                             case "moveSpline":
-                                result = LeanTween.moveSpline(go, spline, time);
+                                result = LeanTween.moveSpline(target, spline, time);
                                 break;
 
                             case "move":
@@ -356,15 +408,15 @@ public class LeanTweenBridge : BridgeObject {
                     switch (command) {
 
                         case "moveX":
-                            result = LeanTween.moveX(go, moveTo, time);
+                            result = LeanTween.moveX(target, moveTo, time);
                             break;
 
                         case "moveY":
-                            result = LeanTween.moveY(go, moveTo, time);
+                            result = LeanTween.moveY(target, moveTo, time);
                             break;
 
                         case "moveZ":
-                            result = LeanTween.moveZ(go, moveTo, time);
+                            result = LeanTween.moveZ(target, moveTo, time);
                             break;
 
                     }
@@ -392,11 +444,11 @@ public class LeanTweenBridge : BridgeObject {
                     switch (command) {
 
                         case "rotate":
-                            result = LeanTween.rotate(go, rotateTo, time);
+                            result = LeanTween.rotate(target, rotateTo, time);
                             break;
 
                         case "rotateLocal":
-                            result = LeanTween.rotateLocal(go, rotateTo, time);
+                            result = LeanTween.rotateLocal(target, rotateTo, time);
                             break;
 
                     }
@@ -421,15 +473,15 @@ public class LeanTweenBridge : BridgeObject {
                     switch (command) {
 
                         case "rotateX":
-                            result = LeanTween.rotateX(go, rotateToValue, time);
+                            result = LeanTween.rotateX(target, rotateToValue, time);
                             break;
 
                         case "rotateY":
-                            result = LeanTween.rotateY(go, rotateToValue, time);
+                            result = LeanTween.rotateY(target, rotateToValue, time);
                             break;
 
                         case "rotateZ":
-                            result = LeanTween.rotateZ(go, rotateToValue, time);
+                            result = LeanTween.rotateZ(target, rotateToValue, time);
                             break;
 
                     }
@@ -464,11 +516,11 @@ public class LeanTweenBridge : BridgeObject {
                     switch (command) {
 
                         case "rotateAround":
-                            result = LeanTween.rotateAround(go, rotateAroundAxis, rotateAroundTo, time);
+                            result = LeanTween.rotateAround(target, rotateAroundAxis, rotateAroundTo, time);
                             break;
 
                         case "rotateLocalLocal":
-                            result = LeanTween.rotateAroundLocal(go, rotateAroundAxis, rotateAroundTo, time);
+                            result = LeanTween.rotateAroundLocal(target, rotateAroundAxis, rotateAroundTo, time);
                             break;
 
                     }
@@ -492,7 +544,7 @@ public class LeanTweenBridge : BridgeObject {
                         return;
                     }
 
-                    result = LeanTween.scale(go, to, time);
+                    result = LeanTween.scale(target, to, time);
 
                     break;
 
@@ -512,15 +564,15 @@ public class LeanTweenBridge : BridgeObject {
                     switch (command) {
 
                         case "scaleX":
-                            result = LeanTween.scaleX(go, scaleTo, time);
+                            result = LeanTween.scaleX(target, scaleTo, time);
                             break;
 
                         case "scaleY":
-                            result = LeanTween.scaleY(go, scaleTo, time);
+                            result = LeanTween.scaleY(target, scaleTo, time);
                             break;
 
                         case "scaleZ":
-                            result = LeanTween.scaleZ(go, scaleTo, time);
+                            result = LeanTween.scaleZ(target, scaleTo, time);
                             break;
 
                     }
@@ -610,9 +662,11 @@ public class LeanTweenBridge : BridgeObject {
     }
 
 
-    public void OnDestroy()
+    public override void OnDestroy()
     {
         //Debug.Log("LeanTweenBridge: OnDestroy: this: " + this + " leanTweenBridge: " +  ((leanTweenBridge == null) ? "null" : ("" + leanTweenBridge)));
+
+        base.OnDestroy();
 
         if (leanTweenBridge == this) {
             leanTweenBridge = null;

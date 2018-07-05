@@ -106,6 +106,9 @@ public class Rainbow: BridgeObject {
 
             for (int i = 0, n = bows.Length; i < n; i++) {
                 Bow bow = bows[i];
+                if (bow == null) {
+                    continue;
+                }
 
                 float t = 
                     (n == 1)

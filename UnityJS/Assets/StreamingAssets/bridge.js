@@ -97,17 +97,17 @@ function CreatePrefab(template)
 
     console.log("bridge.js: CreatePrefab: template:", JSON.stringify(template, null, 4));
 
-    // prefab, component, obj, config, interests, preEvents, postEvents
+    // prefab, component, obj, update, interests, preEvents, postEvents
 
     var obj = template.obj || {};
     var prefab = template.prefab || null;
     var component = template.component || null;
-    var config = template.config || null;
+    var update = template.update || null;
     var interests = template.interests || null;
     var preEvents = template.preEvents || null;
     var postEvents = template.postEvents || null;
 
-    //console.log("CreatePrefab", "obj", obj, "prefab", prefab, "component", component, "config", config, "interests", JSON.stringify(interests), "length", interests.length, "preEvent", preEvents, "postEvents", postEvents);
+    //console.log("CreatePrefab", "obj", obj, "prefab", prefab, "component", component, "update", update, "interests", JSON.stringify(interests), "length", interests.length, "preEvent", preEvents, "postEvents", postEvents);
 
     var remoteInterests = {};
     if (interests) {
@@ -131,7 +131,7 @@ function CreatePrefab(template)
     obj.id = id;
     obj.prefab = prefab;
     obj.component = component;
-    obj.config = config;
+    obj.update = update;
     obj.interests = interests;
     obj.preEvents = preEvents;
     obj.postEvents = postEvents;
@@ -142,7 +142,7 @@ function CreatePrefab(template)
         id: id,
         prefab: prefab,
         component: component,
-        config: config,
+        update: update,
         interests: remoteInterests,
         preEvents: preEvents,
         postEvents: postEvents
@@ -563,11 +563,11 @@ function ShowObjectInfo(obj)
 }
 
 
-function CreateOverlayText(config)
+function CreateOverlayText(update)
 {
     var overlayText = CreatePrefab({
         prefab: 'Prefabs/OverlayText',
-        config: config,
+        update: update,
         postEvents: [
             {
                 event: 'SetParent',
@@ -993,7 +993,7 @@ function CreatePieTracker()
             trackingCameraPosition: false,
             trackingCameraRotation: false
         },
-        interests: { // interests:
+        interests: {
             MouseButtonDown: {
                 query: {
                     mousePosition: "mousePosition",
@@ -1166,7 +1166,7 @@ function CreateKeyboardTracker()
             inputStringTracking: true,
             keyEventTracking: true
         },
-        interests: { // interests:
+        interests: {
             InputString: {
                 query: {
                     inputString: "inputString"
@@ -1218,10 +1218,10 @@ function CreateCanvas()
         obj: {
             doNotDelete: true
         },
-        config: { // config:
+        update: {
             'label/text': 'Eval'
         },
-        interests: { // interests:
+        interests: {
             Click: {
                 query: {
                     js: canvasRef + '/transform:Panel/transform:JSField/component:TMPro.TMP_InputField/text'
@@ -1233,7 +1233,7 @@ function CreateCanvas()
                 }
             }
         },
-        postEvents: [ // postEvents:
+        postEvents: [
             {
                 event: 'SetParent',
                 data: {
@@ -1248,10 +1248,10 @@ function CreateCanvas()
         obj: {
             doNotDelete: true
         },
-        config: { // config:
+        update: {
             'label/text': 'Foo'
         },
-        interests: { // interests:
+        interests: {
             Click: {
                 query: {
                     text: 'object:' + globals.canvas.id + '/transform:Panel/transform:TextField/component:TMPro.TMP_InputField/text'
@@ -1262,7 +1262,7 @@ function CreateCanvas()
                 }
             }
         },
-        postEvents: [ // postEvents:
+        postEvents: [
             {
                 event: 'SetParent',
                 data: {
@@ -1277,10 +1277,10 @@ function CreateCanvas()
         obj: {
             doNotDelete: true
         },
-        config: { // config:
+        update: {
             'label/text': 'Bar'
         },
-        interests: { // interests:
+        interests: {
             Click: {
                 query: {
                     text: 'object:' + globals.canvas.id + '/transform:Panel/transform:TextField/component:TMPro.TMP_InputField/text'
@@ -1291,7 +1291,7 @@ function CreateCanvas()
                 }
             }
         },
-        postEvents: [ // postEvents:
+        postEvents: [
             {
                 event: 'SetParent',
                 data: {
@@ -1312,7 +1312,7 @@ function CreateJunk()
         obj: {
             doNotDelete: true
         },
-        config: { // config:
+        update: {
             "transform/localPosition": {x: 500, y: -200, z: -50},
             "transform/localScale": {x: 300, y: 300, z: 300},
             "transform/localRotation": {roll: 30, pitch: 45, yaw: 0}
@@ -1324,7 +1324,7 @@ function CreateJunk()
         obj: {
             doNotDelete: true
         },
-        config: { // config:
+        update: {
             "transform/localPosition": {x: -600, y: -200, z: -50},
             "transform/localScale": {x: 200, y: 200, z: 200},
             "transform/localRotation": {roll: 0, pitch: 45, yaw: 45}
@@ -1342,7 +1342,7 @@ function CreateParticleSystem()
         obj: {
             doNotDelete: true
         },
-        config: { // config:
+        update: {
             "transform/localPosition": {x: 0, y: 0, z: -0},
             "transform/localScale": {x: 1, y: 1, z: 1},
             "transform/localRotation": {roll: 0, pitch: 0, yaw: 0},

@@ -332,12 +332,12 @@ public class Bridge : MonoBehaviour {
                 string prefab = GetStringDefault(data, "prefab");
                 string component = GetStringDefault(data, "component");
                 string id = GetStringDefault(data, "id");
-                JObject config = GetJObjectDefault(data, "config");
+                JObject update = GetJObjectDefault(data, "update");
                 JObject interests = GetJObjectDefault(data, "interests");
                 JArray preEvents = GetJArrayDefault(data, "preEvents");
                 JArray postEvents = GetJArrayDefault(data, "postEvents");
 
-                //Debug.Log("Bridge: DistributeUnityEvent: Create: prefab: " + prefab + " id: " + id + " config: " + config + " interests: " + interests + " preEvents: " + preEvents + " postEvents: " + postEvents);
+                //Debug.Log("Bridge: DistributeUnityEvent: Create: prefab: " + prefab + " id: " + id + " update: " + update + " interests: " + interests + " preEvents: " + preEvents + " postEvents: " + postEvents);
 
                 GameObject instance = null;
                 if (string.IsNullOrEmpty(prefab)) {
@@ -389,7 +389,7 @@ public class Bridge : MonoBehaviour {
                 instance.name = id;
                 bridgeObject.id = id;
                 bridgeObject.bridge = this;
-                bridgeObject.interests = interests;
+                bridgeObject.AddInterests(interests);
                 objectToID[bridgeObject] = id;
                 idToObject[id] = bridgeObject;
 
@@ -399,8 +399,8 @@ public class Bridge : MonoBehaviour {
                     bridgeObject.HandleEvents(preEvents);
                 }
 
-                if (config != null) {
-                    bridgeObject.LoadConfig(config);
+                if (update != null) {
+                    bridgeObject.LoadUpdate(update);
                 }
 
                 bridgeObject.SendEventName("Created");

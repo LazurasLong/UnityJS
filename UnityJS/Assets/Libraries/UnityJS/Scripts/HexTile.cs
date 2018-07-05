@@ -33,7 +33,7 @@ public class HexTile : Tracker {
         if (currentCollider != null) {
 
             if (!makeCollider) {
-                DestroyObject(currentCollider);
+                Object.Destroy(currentCollider, 0);
             }
 
             return;

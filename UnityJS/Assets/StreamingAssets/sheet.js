@@ -81,10 +81,10 @@ function LoadSheets(sheetRefs, success, error)
 
 function LoadSheetsFromApp(appURL, success, error)
 {
-    var url = GetProxyURL(appURL);
+    var url = appURL; // GetProxyURL(appURL);
     var xhr = new XMLHttpRequest();
 
-    //console.log("sheets.js: LoadSheetsFromApp: sheetName: " + sheetName + " url: " + url);
+    console.log("sheets.js: LoadSheetsFromApp: url: " + url);
 
     xhr.onload = function() {
         var text = xhr.responseText;

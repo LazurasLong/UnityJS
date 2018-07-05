@@ -6,5 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Libraries/unity-js/Scenes/Bridge.unity
-    guid: 6a49a326de96140da98c2d8354b1ecbf
+    path: Assets/Libraries/UnityJS/Scenes/UnityJSPrivate.unity
+    guid: 833ded1ccfb324780921a5973c83f38f
+  m_configObjects: {}
