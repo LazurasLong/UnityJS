@@ -161,7 +161,6 @@ function CreatePrivate()
     var firstYearIndex = -1;
     var lastYearIndex = yearCount - 1;
     var yearsShown = (lastYearIndex - firstYearIndex) + 1;
-    var yearScaleBig = 20;
     var x = -0.5 * yearSpacing * (yearsShown - 1);
     var y = yearHeight;
     var z = 0;
@@ -179,17 +178,16 @@ function CreatePrivate()
         var yearInfo = year ? yearInfos[year] : null;
 
         var unitObjects = [];
-        var baseScale = 1;
-        var baseHeight = 0.25;
-        var basePosition = {x: x, y: 0, z: z};
+        var basePosition = {x: x, y: playerData.baseElevation, z: z};
 
         var anchorObject =  CreatePrefab({
             prefab: "Prefabs/Anchor",
             update: {
-                "transform/localPosition": basePosition,
                 dragTracking: true,
-                "component:Rigidbody/drag": 10,
-                "component:Rigidbody/constraints": "FreezePositionY,FreezeRotationX,FreezeRotationY,FreezeRotationZ",
+                "transform/localPosition": basePosition,
+                "component:Rigidbody/drag": playerData.anchorDrag,
+                "component:Rigidbody/constraints": playerData.anchorConstraints,
+                "component:Rigidbody/collisionDetectionMode": playerData.anchorCollisionDetectionMode,
                 "component:Rigidbody/isKinematic": false
             },
             interests: {
@@ -214,11 +212,6 @@ function CreatePrivate()
             }
         });
 
-        var baseMass = 1;
-        var baseSpring = 100;
-        var baseDamper = 5;
-        var baseDrag = 5;
-
         var baseObject = CreatePrefab({
             prefab: 'Prefabs/HexBase',
             component: 'Tracker',
@@ -227,16 +220,19 @@ function CreatePrivate()
             },
             update: {
                 "transform/localPosition": basePosition,
-                "transform:Hexes/localScale": {x: baseScale, y: baseHeight, z: baseScale},
+                "transform:Hexes/localScale": {x: playerData.baseScale, y: playerData.baseHeight, z: playerData.baseScale},
                 "component:Rigidbody/isKinematic": false,
-                "component:Rigidbody/useGravity": playerData.useGravity,
-                "component:Rigidbody/mass": baseMass,
-                "component:Rigidbody/drag": baseDrag,
+                "component:Rigidbody/useGravity": false,
+                "component:Rigidbody/mass": playerData.baseMass,
+                "component:Rigidbody/drag": playerData.baseDrag,
                 "component:Rigidbody/constraints": "FreezePositionY,FreezeRotationX,FreezeRotationY,FreezeRotationZ",
-                "component:SpringJoint/spring": baseSpring,
-                "component:SpringJoint/damper": baseDamper,
+                "component:Rigidbody/collisionDetectionMode": playerData.baseCollisionDetectionMode,
+                "component:SpringJoint/spring": playerData.baseSpring,
+                "component:SpringJoint/damper": playerData.baseDamper,
+                "component:SpringJoint/tolerance": playerData.baseTolerance,
                 "component:SpringJoint/autoConfigureConnectedAnchor": false,
-                "component:SpringJoint/enableCollision": true,
+                "component:SpringJoint/connectedAnchor": { x: 0, y: 0, z: 0 },
+                "component:SpringJoint/enableCollision": playerData.baseEnableCollision,
                 "component:SpringJoint/connectedBody!": "object:" + anchorObject.id + "/component:Rigidbody",
                 "component:TrackerProxy/target!": "object:" + anchorObject.id
             },
@@ -244,9 +240,16 @@ function CreatePrivate()
                 MouseDown: {
                     handler: function (obj, result) {
                         var animations = [];
-                        if (world.currentBaseObject != null) {
-                            if (world.currentBaseObject.yearObject != null) {
-                                var unitObjects = world.currentBaseObject.yearObject.unitObjects;
+                        // Select or toggle this base as the current base.
+                        // First deselect the current base, if there is one.
+                        if (world.currentBaseObject) {
+
+                            // If the current base has a year, then un-puff all of its units and move it back down.
+                            var yearObject = world.currentBaseObject.yearObject;
+                            if (yearObject != null) {
+
+                                // Un-puff all of the current base's units.
+                                var unitObjects = yearObject.unitObjects;
                                 for (var i = 0, n = unitObjects.length; i < n; i++) {
                                     var unitObject = unitObjects[i];
                                     animations.push({
@@ -256,26 +259,35 @@ function CreatePrivate()
                                         to: { x: 1, y: 1, z: 1 }
                                     });
                                 }
-                                if (world.currentBaseObject.yearObject) {
-                                    UpdateObject(world.currentBaseObject.yearObject, {
-                                        'component:Rigidbody/method:WakeUp': []
-                                    });
-                                    AnimateObject(world.currentBaseObject.yearObject, [
-                                        {
-                                            command: 'moveLocal',
-                                            time: playerData.yearLiftTime,
-                                            position: world.currentBaseObject.yearObject.localPosition
-                                        }
-                                    ]);
-                                }
+
+                                // Move the year back down.
+                                animations.push({
+                                    command: 'moveLocal',
+                                    target: 'object:' + yearObject.id,
+                                    time: playerData.yearLiftTime,
+                                    position: yearObject.localPosition
+                                });
+
                             }
                         }
+
+                        // If this was already the current base, then toggle off.
                         if (world.currentBaseObject == obj) {
+
+                            // Now no base is selected.
                             world.currentBaseObject = null;
+
                         } else {
+
+                            // Select this base as the current base.
                             world.currentBaseObject = obj;
-                            if (obj.yearObject != null) {
-                                var unitObjects = obj.yearObject.unitObjects;
+
+                            // If this base has a year, then puff all of its units and move it up.
+                            var yearObject = obj.yearObject;
+                            if (yearObject != null) {
+
+                                // Puff up all of this base's units.
+                                var unitObjects = yearObject.unitObjects;
                                 for (var i = 0, n = unitObjects.length; i < n; i++) {
                                     var unitObject = unitObjects[i];
                                     animations.push({
@@ -285,25 +297,28 @@ function CreatePrivate()
                                         to: { x: playerData.unitColliderPuff, y: playerData.unitColliderPuff, z: playerData.unitColliderPuff }
                                     });
                                 }
-                                UpdateObject(obj.yearObject, {
-                                    'component:Rigidbody/method:WakeUp': []
-                                });
-                                AnimateObject(obj.yearObject, [
-                                    {
-                                        command: 'moveLocal',
-                                        time: playerData.yearLiftTime,
-                                        position: { 
-                                            x: obj.yearObject.localPosition.x, 
-                                            y: obj.yearObject.localPosition.y + playerData.yearLiftHeight, 
-                                            z: obj.yearObject.localPosition.z
-                                        }
+
+                                // Move the year up.
+                                animations.push({
+                                    command: 'moveLocal',
+                                    target: 'object:' + yearObject.id,
+                                    time: playerData.yearLiftTime,
+                                    position: { 
+                                        x: yearObject.localPosition.x, 
+                                        y: yearObject.localPosition.y + playerData.yearLiftHeight, 
+                                        z: yearObject.localPosition.z
                                     }
-                                ]);
+                                });
+
                             }
+
                         }
+
+                        // Perform all the animations, if any.
                         if (animations.length > 0) {
                             AnimateObject(obj, animations);
                         }
+
                     }
                 }
             }});
@@ -337,14 +352,17 @@ function CreatePrivate()
                     "dragTracking": false,
                     "transform/position": {x: x, y: y, z: z},
                     "transform/localScale": tinyScale,
-                    "component:MeshRenderer/materials": [playerData.material],
-                    "component:Collider/sharedMaterial": playerData.physicMaterial,
-                    "component:Collider/radius": playerData.colliderRadius,
-                    "component:Rigidbody/isKinematic": false,
-                    "component:Rigidbody/constraints": "FreezePositionX,FreezePositionY,FreezePositionZ,FreezeRotationX,FreezeRotationY,FreezeRotationZ",
-                    "component:Rigidbody/useGravity": false,
-                    "component:Rigidbody/mass": playerData.mass,
-                    "component:Rigidbody/angularDrag": playerData.angularDrag
+                    "component:MeshRenderer/materials": [playerData.yearMaterial],
+                    "component:MeshRenderer/enabled": playerData.yearRendererEnabled,
+                    "component:Collider/sharedMaterial": playerData.yearPhysicMaterial,
+                    "component:Collider/radius": playerData.yearColliderRadius,
+                    "component:Collider/enabled": playerData.yearColliderEnabled,
+                    "component:Rigidbody/isKinematic": playerData.yearIsKinematic,
+                    "component:Rigidbody/useGravity": playerData.yearUseGraviy,
+                    "component:Rigidbody/constraints": playerData.yearConstraints,
+                    "component:Rigidbody/collisionDetectionMode": playerData.yearCollisionDetectionMode,
+                    "component:Rigidbody/mass": playerData.yearMass,
+                    "component:Rigidbody/angularDrag": playerData.yearAngularDrag
                 },
                 postEvents: [
                     {
@@ -359,17 +377,23 @@ function CreatePrivate()
             anchorObject.yearObject = yearObject;
             baseObject.yearObject = yearObject;
 
-            labelObject = CreatePrefab({
-                prefab: "Prefabs/ProText",
-                update: {
-                    'textMesh/text': "" + year,
-                    'textMesh/fontSize': playerData.yearLabelFontSize,
-                    trackPosition: 'Transform',
-                    'transformPosition!': 'object:' + yearObject.id + '/transform',
-                    extraOffset: { y: playerData.yearLabelHeight },
-                    trackRotation: 'TransformYaw'
-                }
-            });
+            if (playerData.yearLabels) {
+
+                labelObject = CreatePrefab({
+                    prefab: "Prefabs/ProText",
+                    update: {
+                        'textMesh/text': "" + year,
+                        'textMesh/fontSize': playerData.yearLabelFontSize,
+                        trackPosition: 'Transform',
+                        'transformPosition!': 'object:' + yearObject.id + '/transform',
+                        extraOffset: { y: playerData.yearLabelHeight },
+                        trackRotation: 'TransformYaw'
+                    }
+                });
+
+                yearObject.labelObject = labelObject;
+
+            }
 
             globals.players.push(yearObject);
 
@@ -446,27 +470,26 @@ function CreatePrivate()
                 var unitY = y + Math.sin(ang) * unitDistance;
                 var unitZ = z + Math.random() - 0.5;
 
-                var unitModelString = amazon.unitModels[unit.index % amazon.unitModels.length];
-                if (unitModelString.trim() != "") {
-                    var unitModelList = unitModelString.split(',');
-                    for (var i = 0, n = unitModelList.length; i < n; i++) {
-                        var unitModel = unitModelList[i].trim();
-                        if (unitModel == '') {
-                            continue;
+                var modelNames = [];
+                var modelNumbers = [];
+                var modelPals = [];
+                var modelString = amazon.unitModels[unit.index % amazon.unitModels.length];
+                if (modelString.trim() != "") {
+                    modelNames = modelString.split(',');
+                    for (var i = 0, n = modelNames.length; i < n; i++) {
+                        var modelName = modelNames[i].trim();
+                        modelNames[i] = modelName;
+                        var modelNumber = amazon.models.indexOf(modelName);
+                        if (modelNumber == -1) {
+                            modelNumber = 0;
+                            console.log("private.js: can't find modelNumber for i: " + i + " modelName: " + modelName + " unitModels: " + JSON.stringify(amazon.unitModels));
                         }
-                        unitModelList[i] = unitModel;
-                        var modelIndex = amazon.models.indexOf(unitModel);
-                        if (modelIndex == -1) {
-                            modelIndex = 0;
-                            console.log("private.js: can't find modelIndex for i: " + i + " unitModel: " + unitModel + " modelIndex: " + modelIndex + " models: " + JSON.stringify(amazon.models));
-                        }
-                        var paletteIndex = modelIndex % palette.length;
+                        modelNumbers.push(modelNumber);
+                        var paletteIndex = modelNumber % palette.length;
                         pal = palette[paletteIndex];
-                        break;
+                        modelPals.push(pal);
                     }
                 }
-
-                var flingForce = 1000.0;
 
                 var unitObject = CreatePrefab({
                     prefab: 'Prefabs/Unit',
@@ -482,18 +505,20 @@ function CreatePrivate()
                         "dragTracking": true,
                         "transform/localPosition": {x: unitX, y: unitY, z: unitZ},
                         "transform/localScale": tinyScale,
-                        "component:MeshRenderer/materials": [playerData.material],
-                        "component:MeshRenderer/material/color": { r: pal.color.r, g: pal.color.g, b: pal.color.b },
-                        "transform:Collider/component:Collider/sharedMaterial": playerData.physicMaterial,
-                        "transform:Collider/component:Collider/radius": playerData.colliderRadius,
-                        "component:Rigidbody/isKinematic": playerData.isUnitKinematic,
-                        "component:Rigidbody/useGravity": false,
-                        "component:Rigidbody/mass": playerData.mass,
-                        "component:Rigidbody/drag": playerData.drag,
-                        "component:Rigidbody/angularDrag": playerData.angularDrag,
+                        "transform:Collider/component:Collider/sharedMaterial": playerData.unitPhysicMaterial,
+                        "transform:Collider/component:Collider/radius": playerData.unitColliderRadius,
+                        "component:Rigidbody/isKinematic": playerData.unitIsKinematic,
+                        "component:Rigidbody/useGravity": playerData.unitUseGravity,
+                        "component:Rigidbody/mass": playerData.unitMass,
+                        "component:Rigidbody/drag": playerData.unitDrag,
+                        "component:Rigidbody/angularDrag": playerData.unitAngularDrag,
+                        "component:Rigidbody/collisionDetectionMode": playerData.unitCollisionDetectionMode,
                         "component:SpringJoint/spring": playerData.unitSpring,
+                        "component:SpringJoint/damper": playerData.unitDamper,
+                        "component:SpringJoint/tolerance": playerData.unitTolerance,
                         "component:SpringJoint/autoConfigureConnectedAnchor": false,
-                        "component:SpringJoint/enableCollision": true,
+                        "component:SpringJoint/connectedAnchor": { x: 0, y: 0, z: 0 },
+                        "component:SpringJoint/enableCollision": playerData.unitEnableCollision,
                         "component:SpringJoint/connectedBody!": "object:" + yearObject.id + "/component:Rigidbody"
                     },
                     postEvents: [
@@ -503,7 +528,7 @@ function CreatePrivate()
                                 {
                                     command: 'scale',
                                     to: {x: unitSize, y: unitSize, z: unitSize},
-                                    time: playerData.animateTime
+                                    time: playerData.unitCreateAnimateTime
                                 }
                             ]
                         }
@@ -511,14 +536,47 @@ function CreatePrivate()
                     interests: {
                     }});
 
+                for (var modelIndex = 0, modelCount = modelNames.length; modelIndex < modelCount; modelIndex++) {
+                    var modelName = modelNames[modelIndex];
+                    var modelNumber = modelNumbers[modelIndex];
+                    var modelPal = modelPals[modelIndex];
+                    var ang = modelIndex * (2.0 * Math.PI / modelCount);
+                    var dist = playerData.unitModelOffset;
+                    var dx = Math.cos(ang) * dist;
+                    var dy = Math.sin(ang) * dist;
+                    var modelObject = CreatePrefab({
+                        prefab: 'Prefabs/UnitModel',
+                        obj: {
+                            name: modelName,
+                            number: modelNumber,
+                            pal: modelPal
+                        },
+                        update: {
+                            "transform/localPosition": {x: dx, y: 0, z: dy},
+                            "component:MeshRenderer/materials": [playerData.material],
+                            "component:MeshRenderer/material/color": { r: modelPal.color.r, g: modelPal.color.g, b: modelPal.color.b }
+                        },
+                        postEvents: [
+                            {
+                                event: 'SetParent',
+                                data: {
+                                    path: 'object:' + unitObject.id,
+                                    worldPositionStays: false
+                                }
+                            }
+                        ]
+                    });
+
+                }
+
                 unitObjects.push(unitObject);
                 parentStack.push([unitObject, indent]);
 
-                if (playerData.createUnitRainbows) {
+                if (playerData.unitArrows) {
                     CreateRainbow(playerData.unitRainbowType, parentObject, unitObject);
                 }
 
-                if (playerData.createUnitLabels) {
+                if (playerData.unitLabels) {
                     var label = CreatePrefab({
                         prefab: "Prefabs/ProText",
                         update: {
@@ -548,10 +606,26 @@ function CreatePrivate()
                 var rainbowYearElevation = playerData.rainbowYearElevation;
                 var rainbowHeight = playerData.rainbowHeight;
                 var rainbowHeightStep = playerData.rainbowHeightStep;
-                var fromID = lastBaseObject.yearObject ? lastBaseObject.yearObject.id : lastBaseObject.id;
-                var fromHeight = lastBaseObject.yearObject ? rainbowYearElevation : rainbowBaseElevation;
-                var toID = baseObject.yearObject ? baseObject.yearObject.id : baseObject.id;
-                var toHeight = baseObject.yearObject ? rainbowYearElevation : rainbowBaseElevation;
+
+                var fromID = 
+                    lastBaseObject.yearObject
+                        ? lastBaseObject.yearObject.id
+                        : lastBaseObject.id;
+
+                var fromHeight = 
+                    lastBaseObject.yearObject
+                        ? rainbowYearElevation
+                        : rainbowBaseElevation;
+
+                var toID = 
+                    baseObject.yearObject
+                        ? baseObject.yearObject.id
+                        : baseObject.id;
+
+                var toHeight = 
+                    baseObject.yearObject
+                        ? rainbowYearElevation
+                        : rainbowBaseElevation;
 
                 var rainbowObject =
                     CreatePrefab({
@@ -562,14 +636,12 @@ function CreatePrivate()
                         update: {
                             'fromTransform!': 'object:' + fromID + '/transform',
                             'toTransform!': 'object:' + toID + '/transform',
-                            bowHeight: playerData.bowHeight,
                             fromWidth: rainbowWidth,
                             toWidth: rainbowWidth,
                             fromRotation: 90,
                             toRotation: -90,
-                            fromLocalOffset: { x: rainbowWidth * 0.5, y: fromHeight },
-                            toLocalOffset: { x: rainbowWidth * -0.5, y: toHeight },
-                            updateBowHeight: false
+                            fromLocalOffset: { x: rainbowWidth * 0.5, y: fromHeight }, // Left justify the start the rainbow.
+                            toLocalOffset: { x: rainbowWidth * -0.5, y: toHeight } // Right justify the end of the rainbow.
                         }
                     });
 
@@ -600,8 +672,8 @@ function CreatePrivate()
                                     {
                                         texture_MainTex: pal.texture,
                                         texture_BumpMap: pal.bumpMap,
-                                        color: { r: 1, g: 1, b: 1, a: pal.color.a },
-                                        color_EmissionColor: { r: pal.color.r, g: pal.color.g, b: pal.color.b }
+                                        color: { r: 1, g: 1, b: 1, a: pal.color.a }, // Main color is pure white with transparency.
+                                        color_EmissionColor: { r: pal.color.r, g: pal.color.g, b: pal.color.b } // Emissive rgb color without alpha.
                                     }
                                 ]
                             },

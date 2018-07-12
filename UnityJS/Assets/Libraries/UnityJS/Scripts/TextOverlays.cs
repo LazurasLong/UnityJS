@@ -30,10 +30,39 @@ public class TextOverlays: Tracker {
     public TextMeshProUGUI bottomLeftText;
     public TextMeshProUGUI bottomText;
     public TextMeshProUGUI bottomRightText;
+    public RectTransform console;
+    public ScrollRect consoleTextScrollView;
+    public TextMeshProUGUI consoleText;
+    public ScrollRect consoleInputScrollView;
+    public TMP_InputField consoleInputField;
 
 
     ////////////////////////////////////////////////////////////////////////
     // Instance Methods
 
+
+    public void HandleConsoleInputFieldValueChanged()
+    {
+        Debug.Log("TextOverlays: HandleConsoleInputFieldValueChanged");
+    }
+    
+
+    public void HandleConsoleInputFieldEndEdit()
+    {
+        Debug.Log("TextOverlays: HandleConsoleInputFieldEndEdit");
+    }
+    
+
+    public void HandleConsoleInputFieldSelect()
+    {
+        Debug.Log("TextOverlays: HandleConsoleInputFieldSelect");
+    }
+    
+
+    public void HandleConsoleInputFieldDeselect()
+    {
+        Debug.Log("TextOverlays: HandleConsoleInputFieldDeselect");
+    }
+    
 
 }
