@@ -4,8 +4,8 @@
  */
 
 
+globals.useApp = false;
 globals.appURL = 'https://script.google.com/macros/s/AKfycbwZsTt8rUekSzwrK4PSnndaoGsMWXwIZnKm1IOFlg/exec';
-
 globals.spreadsheetID = '1m7FANuMTPAfugSTw20pHSSpTF-Ugj0Hg11Z52nRtuLY';
 
 globals.sheetRefs = {
@@ -136,9 +136,6 @@ function CreatePrivate()
     var playerData = players.playerData;
     var yearSpacing = playerData.yearSpacing;
     var yearHeight = playerData.yearHeight;
-    var yearSizeMin = playerData.yearSizeMin;
-    var yearSizeMax = playerData.yearSizeMax;
-    var yearSizeRange = yearSizeMax - yearSizeMin;
     var unitSizeMin = playerData.unitSizeMin;
     var unitSizeMax = playerData.unitSizeMax;
     var unitSizeRange = unitSizeMax - unitSizeMin;
@@ -161,304 +158,499 @@ function CreatePrivate()
     var verbs = amazon.verbs;
     var palette = world.palette;
     var tinyScale = { x:0.01, y: 0.01, z: 0.01 };
-    var x = -0.5 * yearSpacing * yearCount;
+    var firstYearIndex = -1;
+    var lastYearIndex = yearCount - 1;
+    var yearsShown = (lastYearIndex - firstYearIndex) + 1;
+    var yearScaleBig = 20;
+    var x = -0.5 * yearSpacing * (yearsShown - 1);
     var y = yearHeight;
     var z = 0;
 
     globals.players = [];
 
-    var lastYearObject = CreatePrefab({
-        update: {
-            "transform/localPosition": {x: x, y: y, z: z},
-            "transform/localScale": tinyScale
-        }
-    });
+    var lastBaseObject = null;
 
-    globals.players.push(lastYearObject);
+    for (var yearIndex = firstYearIndex; yearIndex <= lastYearIndex; yearIndex++) {
+        var year =
+            ((yearIndex >= 0) &&
+             (yearIndex < years.length))
+                ? years[yearIndex]
+                : 0;
+        var yearInfo = year ? yearInfos[year] : null;
 
-    x += yearSpacing;
+        var unitObjects = [];
+        var baseScale = 1;
+        var baseHeight = 0.25;
+        var basePosition = {x: x, y: 0, z: z};
 
-    for (var yearIndex = 0; yearIndex < yearCount; yearIndex++) {
-        var year = years[yearIndex];
-        var yearInfo = yearInfos[year];
-        var yearValuation = yearInfo.valuation.total;
-        var valuationSize =
-            yearSizeMin +
-            (yearSizeRange *
-             ((yearValuation - valuationMin) / 
-              valuationRange));
+        var anchorObject =  CreatePrefab({
+            prefab: "Prefabs/Anchor",
+            update: {
+                "transform/localPosition": basePosition,
+                dragTracking: true,
+                "component:Rigidbody/drag": 10,
+                "component:Rigidbody/constraints": "FreezePositionY,FreezeRotationX,FreezeRotationY,FreezeRotationZ",
+                "component:Rigidbody/isKinematic": false
+            },
+            interests: {
+                DragStart: {
+                    handler: function(obj, result) {
+                        //console.log("private.js: Anchor: DragStart", obj.id);
+                    }
+                },
+                DragStop: {
+                    handler: function(obj, result) {
+                        //console.log("private.js: Anchor: DragStop", obj.id);
+                        QueryObject(obj.baseObject, {
+                                position: 'transform/position'
+                            }, function(result) {
+                                //console.log("Moving anchor " + obj.id + " to " + result.position.x + " " + result.position.y + " " + result.position.z);
+                                UpdateObject(obj, {
+                                    "transform/position": result.position
+                                });
+                            });
+                    }
+                }
+            }
+        });
 
-        console.log("yearIndex", yearIndex, "yearCount", yearCount, "yearSizeRange", yearSizeRange, "valuationRange", valuationRange, "yearValuation", yearValuation, "valuationSize", valuationSize, "yearSizeMin", yearSizeMin, "valuationMin", valuationMin, "yearInfo", JSON.stringify(yearInfo)); 
+        var baseMass = 1;
+        var baseSpring = 100;
+        var baseDamper = 5;
+        var baseDrag = 5;
 
-        var units = [];
-
-        var yearObject = CreatePrefab({
-            prefab: 'Prefabs/Ball',
+        var baseObject = CreatePrefab({
+            prefab: 'Prefabs/HexBase',
             component: 'Tracker',
             obj: {
-                year: year,
-                yearIndex: yearIndex,
-                yearInfo: yearInfo,
-                units: units
+                anchorObject: anchorObject
             },
             update: {
-                "dragTracking": true,
-                "transform/localPosition": {x: x, y: y, z: z},
-                "transform/localScale": tinyScale,
-                "component:MeshRenderer/materials": [playerData.material],
-                "component:Collider/sharedMaterial": playerData.physicMaterial,
-                "component:Collider/radius": playerData.colliderRadius,
-                "component:Rigidbody/isKinematic": playerData.isYearKinematic,
+                "transform/localPosition": basePosition,
+                "transform:Hexes/localScale": {x: baseScale, y: baseHeight, z: baseScale},
+                "component:Rigidbody/isKinematic": false,
                 "component:Rigidbody/useGravity": playerData.useGravity,
-                "component:Rigidbody/mass": playerData.mass,
-                "component:Rigidbody/drag": playerData.drag,
-                "component:Rigidbody/angularDrag": playerData.angularDrag
+                "component:Rigidbody/mass": baseMass,
+                "component:Rigidbody/drag": baseDrag,
+                "component:Rigidbody/constraints": "FreezePositionY,FreezeRotationX,FreezeRotationY,FreezeRotationZ",
+                "component:SpringJoint/spring": baseSpring,
+                "component:SpringJoint/damper": baseDamper,
+                "component:SpringJoint/autoConfigureConnectedAnchor": false,
+                "component:SpringJoint/enableCollision": true,
+                "component:SpringJoint/connectedBody!": "object:" + anchorObject.id + "/component:Rigidbody",
+                "component:TrackerProxy/target!": "object:" + anchorObject.id
             },
-            postEvents: [
-                {
-                    event: 'Animate',
-                    data: [
-                        {
-                            command: 'scale',
-                            to: {x: valuationSize, y: valuationSize, z: valuationSize},
-                            time: playerData.animateTime
+            interests: {
+                MouseDown: {
+                    handler: function (obj, result) {
+                        var animations = [];
+                        if (world.currentBaseObject != null) {
+                            if (world.currentBaseObject.yearObject != null) {
+                                var unitObjects = world.currentBaseObject.yearObject.unitObjects;
+                                for (var i = 0, n = unitObjects.length; i < n; i++) {
+                                    var unitObject = unitObjects[i];
+                                    animations.push({
+                                        command: 'scale',
+                                        target: 'object:' + unitObject.id + '/transform:Collider',
+                                        time: playerData.unitColliderUnPuffTime,
+                                        to: { x: 1, y: 1, z: 1 }
+                                    });
+                                }
+                                if (world.currentBaseObject.yearObject) {
+                                    UpdateObject(world.currentBaseObject.yearObject, {
+                                        'component:Rigidbody/method:WakeUp': []
+                                    });
+                                    AnimateObject(world.currentBaseObject.yearObject, [
+                                        {
+                                            command: 'moveLocal',
+                                            time: playerData.yearLiftTime,
+                                            position: world.currentBaseObject.yearObject.localPosition
+                                        }
+                                    ]);
+                                }
+                            }
                         }
-                    ]
+                        if (world.currentBaseObject == obj) {
+                            world.currentBaseObject = null;
+                        } else {
+                            world.currentBaseObject = obj;
+                            if (obj.yearObject != null) {
+                                var unitObjects = obj.yearObject.unitObjects;
+                                for (var i = 0, n = unitObjects.length; i < n; i++) {
+                                    var unitObject = unitObjects[i];
+                                    animations.push({
+                                        command: 'scale',
+                                        target: 'object:' + unitObject.id + '/transform:Collider',
+                                        time: playerData.unitColliderPuffTime,
+                                        to: { x: playerData.unitColliderPuff, y: playerData.unitColliderPuff, z: playerData.unitColliderPuff }
+                                    });
+                                }
+                                UpdateObject(obj.yearObject, {
+                                    'component:Rigidbody/method:WakeUp': []
+                                });
+                                AnimateObject(obj.yearObject, [
+                                    {
+                                        command: 'moveLocal',
+                                        time: playerData.yearLiftTime,
+                                        position: { 
+                                            x: obj.yearObject.localPosition.x, 
+                                            y: obj.yearObject.localPosition.y + playerData.yearLiftHeight, 
+                                            z: obj.yearObject.localPosition.z
+                                        }
+                                    }
+                                ]);
+                            }
+                        }
+                        if (animations.length > 0) {
+                            AnimateObject(obj, animations);
+                        }
+                    }
                 }
-            ]
+            }});
 
-        });
+        anchorObject.baseObject = baseObject;
 
-        var label = CreatePrefab({
-            prefab: "Prefabs/ProText",
-            update: {
-                'textMesh/text': "" + year,
-                'textMesh/fontSize': playerData.yearLabelFontSize,
-                trackPosition: 'Transform',
-                'transformPosition!': 'object:' + yearObject.id + '/transform',
-                extraOffset: { y: valuationSize + playerData.labelHeightExtra },
-                trackRotation: 'CameraRotation'
-            }
-        });
+        var labelObject = null;
 
-        globals.players.push(yearObject);
+        var baseSpecs = [];
 
-        var unitsMax = yearInfo.unitsMax;
-        var unitsSum = yearInfo.unitsSum;
-        var marketsMax = yearInfo.marketsMax;
-        var marketsSum = yearInfo.marketsSum;
+        if (!yearInfo) {
+            UpdateObject(baseObject, {
+                'transform:Hexes/transform:HexBase_0/gameObject/method:SetActive': [true],
+                'transform:Hexes/transform:HexBase_0/component:MeshRenderer/material/color': { r: 0.5, g: 0.5, b: 0.5 }
+            });
+        } else {
 
-        var yearUnit;
-        var unitIndex;
-        var nonZeroUnitCount = 0;
-        for (unitIndex = 0; unitIndex < unitCount; unitIndex++) {
-            yearUnit = yearInfo.units[unitIndex];
-            if (yearUnit != 0) {
-                nonZeroUnitCount++;
-            }
-        }
-
-        console.log("nonZeroUnitCount", nonZeroUnitCount);
-
-        var parentStack = [
-            [yearObject, -1]
-        ];
-
-        var nonZeroUnitIndex = 0;
-        for (unitIndex = 0; unitIndex < unitCount; unitIndex++) {
-
-            yearUnit = yearInfo.units[unitIndex];
-            if (yearUnit == 0) {
-                continue;
-            }
-
-            var unitLabel = unitLabels[unitIndex];
-
-            var unitIndent = 0;
-            for (var indent = 0, n = unitLabel.length; indent < n; indent++) {
-                if (unitLabel[indent] != ' ') {
-                    break;
-                }
-            }
-
-            while (indent <= parentStack[parentStack.length - 1][1]) {
-                parentStack.pop();
-            }
-
-            var parentObject = parentStack[parentStack.length - 1][0];
-
-            var ang = nonZeroUnitIndex * (2.0 * Math.PI / nonZeroUnitCount);
-            nonZeroUnitIndex++;
-
-            var unitSize =
-                unitSizeMin +
-                (unitSizeRange *
-                 (yearUnit / unitsMax));
-
-            var unitDistance = unitSize + playerData.unitRadiusExtra;
-            var unitX = x + Math.cos(ang) * unitDistance;
-            var unitY = y + Math.sin(ang) * unitDistance;
-            var unitZ = z;
-
-            var unitModelString = amazon.unitModels[unitIndex % amazon.unitModels.length];
-            var unitModelList = unitModelString.split(',');
-            for (var i = 0, n = unitModelList.length; i < n; i++) {
-                var unitModel = unitModelList[i].trim();
-                unitModelList[i] = unitModel;
-                var modelIndex = amazon.models.indexOf(unitModel);
-                if (modelIndex == -1) {
-                    modelIndex = 0;
-                    console.log("private.js: can't find modelIndex for bowIndex: " + bowIndex + " unitModel: " + unitModel + " models: " + JSON.stringify(amazon.models));
-                }
-                var paletteIndex = modelIndex % palette.length;
-                var pal = palette[paletteIndex];
-
-            }
-
-            var unitObject = CreatePrefab({
+            var yearObject = CreatePrefab({
                 prefab: 'Prefabs/Ball',
                 component: 'Tracker',
                 obj: {
+                    anchorObject: anchorObject,
+                    baseObject: baseObject,
                     year: year,
                     yearIndex: yearIndex,
-                    yearInfo: yearInfo
+                    yearInfo: yearInfo,
+                    unitObjects: unitObjects,
+                    localPosition: {x: 0, y: y, z: 0}
                 },
                 update: {
-                    "dragTracking": true,
-                    "transform/localPosition": {x: unitX, y: unitY, z: unitZ},
+                    "dragTracking": false,
+                    "transform/position": {x: x, y: y, z: z},
                     "transform/localScale": tinyScale,
                     "component:MeshRenderer/materials": [playerData.material],
-                    "component:MeshRenderer/material/color": { r: pal.color.r, g: pal.color.g, b: pal.color.b },
                     "component:Collider/sharedMaterial": playerData.physicMaterial,
                     "component:Collider/radius": playerData.colliderRadius,
-                    "component:Rigidbody/isKinematic": playerData.isUnitKinematic,
-                    "component:Rigidbody/useGravity": playerData.useGravity,
+                    "component:Rigidbody/isKinematic": false,
+                    "component:Rigidbody/constraints": "FreezePositionX,FreezePositionY,FreezePositionZ,FreezeRotationX,FreezeRotationY,FreezeRotationZ",
+                    "component:Rigidbody/useGravity": false,
                     "component:Rigidbody/mass": playerData.mass,
-                    "component:Rigidbody/drag": playerData.drag,
-                    "component:Rigidbody/angularDrag": playerData.angularDrag,
-                    "component:SpringJoint/spring": playerData.unitSpring,
-                    "component:SpringJoint/autoUpdateureConnectedAnchor": false,
-                    "component:SpringJoint/enableCollision": true,
-                    "component:SpringJoint/connectedBody!": "object:" + parentObject.id + "/component:Rigidbody"
+                    "component:Rigidbody/angularDrag": playerData.angularDrag
                 },
                 postEvents: [
                     {
-                        event: 'Animate',
-                        data: [
-                            {
-                                command: 'scale',
-                                to: {x: unitSize, y: unitSize, z: unitSize},
-                                time: playerData.animateTime
-                            }
-                        ]
+                        event: 'SetParent',
+                        data: {
+                            'path': 'object:' + baseObject.id
+                        }
                     }
                 ]
-
             });
 
-            units.push(unitObject);
-            parentStack.push([unitObject, indent]);
+            anchorObject.yearObject = yearObject;
+            baseObject.yearObject = yearObject;
 
-            if (playerData.createUnitRainbows) {
-                CreateRainbow(playerData.unitRainbowType, parentObject, unitObject);
-            }
+            labelObject = CreatePrefab({
+                prefab: "Prefabs/ProText",
+                update: {
+                    'textMesh/text': "" + year,
+                    'textMesh/fontSize': playerData.yearLabelFontSize,
+                    trackPosition: 'Transform',
+                    'transformPosition!': 'object:' + yearObject.id + '/transform',
+                    extraOffset: { y: playerData.yearLabelHeight },
+                    trackRotation: 'TransformYaw'
+                }
+            });
 
-            if (playerData.createUnitLabels) {
-                var label = CreatePrefab({
-                    prefab: "Prefabs/ProText",
-                    update: {
-                        'textMesh/text': unitLabel.trim(),
-                        'textMesh/fontSize': playerData.unitLabelFontSize,
-                        trackPosition: 'Transform',
-                        'transformPosition!': 'object:' + unitObject.id + '/transform',
-                        extraOffset: { y: unitSize + playerData.labelHeightExtra },
-                        trackRotation: 'CameraRotation'
-                    }
+            globals.players.push(yearObject);
+
+            var unitsMax = yearInfo.unitsMax;
+            var unitsSum = yearInfo.unitsSum;
+            var marketsMax = yearInfo.marketsMax;
+            var marketsSum = yearInfo.marketsSum;
+
+            var yearUnit;
+            var unitIndex;
+            var nonZeroUnits = [];
+            for (unitIndex = 0; unitIndex < unitCount; unitIndex++) {
+                yearUnit = yearInfo.units[unitIndex];
+                if (yearUnit == 0) {
+                    continue;
+                }
+                nonZeroUnits.push({
+                    index: unitIndex,
+                    value: yearUnit,
+                    label: unitLabels[unitIndex],
+                    children: []
                 });
             }
 
-        }
+            var nonZeroUnitCount = nonZeroUnits.length;
+            var parentStack = [
+                [yearObject, -1]
+            ];
+            yearObject.children = [];
+            for (unitIndex = 0; unitIndex < nonZeroUnitCount; unitIndex++) {
+                var unit = nonZeroUnits[unitIndex];
+                var unitLabel = unit.label;
 
-        x += yearSpacing;
+                for (var indent = 0, labelLength = unitLabel.length; indent < labelLength; indent++) {
+                    if (unitLabel[indent] != ' ') {
+                        break;
+                    }
+                }
 
-        var verbSubjects = yearInfo.verbSubjects;
-        var bowCount = verbSubjects.length;
+                while (indent <= parentStack[parentStack.length - 1][1]) {
+                    parentStack.pop();
+                }
 
-        if (bowCount > 0) {
+                var parentObject = parentStack[parentStack.length - 1][0];
 
-            var rainbowWidth = bowCount;
-            var rainbowHeight = playerData.rainbowHeight;
-            var rainbowHeightStep = playerData.rainbowHeightStep;
+                unit.indent = indent;
+                unit.depth = parentStack.length;
+                unit.parent = parentObject;
+                parentObject.children.push(unit);
+            }
 
-            var rainbowObject =
-                CreatePrefab({
-                    prefab: 'Prefabs/Rainbow',
+            var leafUnits = [];
+            for (unitIndex = 0; unitIndex < nonZeroUnitCount; unitIndex++) {
+                var unit = nonZeroUnits[unitIndex];
+                if (unit.children.length) {
+                    continue;
+                }
+                leafUnits.push(unit);
+            }
+
+            var leafUnitCount = leafUnits.length;
+            for (unitIndex = 0; unitIndex < leafUnitCount; unitIndex++) {
+                var unit = leafUnits[unitIndex];
+                var ang = unitIndex * (2.0 * Math.PI / leafUnitCount);
+                var pal = palette[0];
+
+                var unitSize =
+                    unitSizeMin +
+                    (unitSizeRange *
+                     (unit.value / amazon.unitValueMax));
+
+                var unitDistance = unitSize + playerData.unitRadiusExtra;
+                var unitX = x + Math.cos(ang) * unitDistance;
+                var unitY = y + Math.sin(ang) * unitDistance;
+                var unitZ = z + Math.random() - 0.5;
+
+                var unitModelString = amazon.unitModels[unit.index % amazon.unitModels.length];
+                if (unitModelString.trim() != "") {
+                    var unitModelList = unitModelString.split(',');
+                    for (var i = 0, n = unitModelList.length; i < n; i++) {
+                        var unitModel = unitModelList[i].trim();
+                        if (unitModel == '') {
+                            continue;
+                        }
+                        unitModelList[i] = unitModel;
+                        var modelIndex = amazon.models.indexOf(unitModel);
+                        if (modelIndex == -1) {
+                            modelIndex = 0;
+                            console.log("private.js: can't find modelIndex for i: " + i + " unitModel: " + unitModel + " modelIndex: " + modelIndex + " models: " + JSON.stringify(amazon.models));
+                        }
+                        var paletteIndex = modelIndex % palette.length;
+                        pal = palette[paletteIndex];
+                        break;
+                    }
+                }
+
+                var flingForce = 1000.0;
+
+                var unitObject = CreatePrefab({
+                    prefab: 'Prefabs/Unit',
+                    component: 'Tracker',
                     obj: {
-                        bows: []
+                        year: year,
+                        yearObject: yearObject,
+                        yearIndex: yearIndex,
+                        yearInfo: yearInfo,
+                        unitSize: unitSize
                     },
                     update: {
-                        'fromTransform!': 'object:' + lastYearObject.id + '/transform',
-                        'toTransform!': 'object:' + yearObject.id + '/transform',
-                        bowHeight: playerData.bowHeight,
-                        fromWidth: rainbowWidth,
-                        toWidth: rainbowWidth,
-                        fromRotation: 90,
-                        toRotation: -90,
-                        updateBowHeight: false
-                    }
-                });
-
-            var bows = rainbowObject.bows;
-
-            for (var bowIndex = 0;
-                 bowIndex < bowCount;
-                 bowIndex++) {
-
-                var paletteIndex = bowIndex % palette.length;
-                var pal = palette[paletteIndex];
-                var bowName = verbSubjects[bowIndex];
-
-                //console.log("bowUpdate", JSON.stringify(bowUpdate));
-
-                var bowObject =
-                    CreatePrefab({
-                        prefab: 'Prefabs/Bow',
-                        update: {
-                            bowStart: 0,
-                            bowEnd: 1,
-                            startWidth: 1,
-                            endWidth: 1,
-                            bowRotation: 0,
-                            bowHeight: rainbowHeight,
-                            textureScale: pal.textureScale,
-                            "lineRenderer/material/method:UpdateMaterial": [
+                        "dragTracking": true,
+                        "transform/localPosition": {x: unitX, y: unitY, z: unitZ},
+                        "transform/localScale": tinyScale,
+                        "component:MeshRenderer/materials": [playerData.material],
+                        "component:MeshRenderer/material/color": { r: pal.color.r, g: pal.color.g, b: pal.color.b },
+                        "transform:Collider/component:Collider/sharedMaterial": playerData.physicMaterial,
+                        "transform:Collider/component:Collider/radius": playerData.colliderRadius,
+                        "component:Rigidbody/isKinematic": playerData.isUnitKinematic,
+                        "component:Rigidbody/useGravity": false,
+                        "component:Rigidbody/mass": playerData.mass,
+                        "component:Rigidbody/drag": playerData.drag,
+                        "component:Rigidbody/angularDrag": playerData.angularDrag,
+                        "component:SpringJoint/spring": playerData.unitSpring,
+                        "component:SpringJoint/autoConfigureConnectedAnchor": false,
+                        "component:SpringJoint/enableCollision": true,
+                        "component:SpringJoint/connectedBody!": "object:" + yearObject.id + "/component:Rigidbody"
+                    },
+                    postEvents: [
+                        {
+                            event: 'Animate',
+                            data: [
                                 {
-                                    texture_MainTex: pal.texture,
-                                    texture_BumpMap: pal.bumpMap,
-                                    color: { r: 1, g: 1, b: 1, a: pal.color.a },
-                                    color_EmissionColor: { r: pal.color.r, g: pal.color.g, b: pal.color.b }
+                                    command: 'scale',
+                                    to: {x: unitSize, y: unitSize, z: unitSize},
+                                    time: playerData.animateTime
                                 }
                             ]
-                        },
-                        postEvents: [
-                            {
-                                event: 'SetParent',
-                                data: {
-                                    'path': 'object:' + rainbowObject.id
-                                }
-                            }
-                        ]});
+                        }
+                    ],
+                    interests: {
+                    }});
 
-                rainbowObject.bows.push(bowObject);
+                unitObjects.push(unitObject);
+                parentStack.push([unitObject, indent]);
 
-                rainbowHeight += rainbowHeightStep;
+                if (playerData.createUnitRainbows) {
+                    CreateRainbow(playerData.unitRainbowType, parentObject, unitObject);
+                }
+
+                if (playerData.createUnitLabels) {
+                    var label = CreatePrefab({
+                        prefab: "Prefabs/ProText",
+                        update: {
+                            'textMesh/text': unitLabel.trim(),
+                            'textMesh/fontSize': playerData.unitLabelFontSize,
+                            trackPosition: 'Transform',
+                            'transformPosition!': 'object:' + unitObject.id + '/transform',
+                            extraOffset: { y: unitSize + playerData.labelHeightExtra },
+                            trackRotation: 'CameraRotation'
+                        }
+                    });
+                }
+
             }
+
+            var verbSubjects = yearInfo.verbSubjects;
+            var bowCount = verbSubjects.length;
+            while ((bowCount > 0) && 
+                   (verbSubjects[bowCount - 1] == "")) {
+                bowCount--;
+            }
+
+            if (bowCount > 0) {
+
+                var rainbowWidth = bowCount;
+                var rainbowBaseElevation = playerData.rainbowBaseElevation;
+                var rainbowYearElevation = playerData.rainbowYearElevation;
+                var rainbowHeight = playerData.rainbowHeight;
+                var rainbowHeightStep = playerData.rainbowHeightStep;
+                var fromID = lastBaseObject.yearObject ? lastBaseObject.yearObject.id : lastBaseObject.id;
+                var fromHeight = lastBaseObject.yearObject ? rainbowYearElevation : rainbowBaseElevation;
+                var toID = baseObject.yearObject ? baseObject.yearObject.id : baseObject.id;
+                var toHeight = baseObject.yearObject ? rainbowYearElevation : rainbowBaseElevation;
+
+                var rainbowObject =
+                    CreatePrefab({
+                        prefab: 'Prefabs/Rainbow',
+                        obj: {
+                            bows: []
+                        },
+                        update: {
+                            'fromTransform!': 'object:' + fromID + '/transform',
+                            'toTransform!': 'object:' + toID + '/transform',
+                            bowHeight: playerData.bowHeight,
+                            fromWidth: rainbowWidth,
+                            toWidth: rainbowWidth,
+                            fromRotation: 90,
+                            toRotation: -90,
+                            fromLocalOffset: { x: rainbowWidth * 0.5, y: fromHeight },
+                            toLocalOffset: { x: rainbowWidth * -0.5, y: toHeight },
+                            updateBowHeight: false
+                        }
+                    });
+
+                var bows = rainbowObject.bows;
+
+                for (var bowIndex = 0;
+                     bowIndex < bowCount;
+                     bowIndex++) {
+
+                    var paletteIndex = bowIndex % palette.length;
+                    var pal = palette[paletteIndex];
+                    var bowName = verbSubjects[bowIndex];
+
+                    //console.log("bowUpdate", JSON.stringify(bowUpdate));
+
+                    var bowObject =
+                        CreatePrefab({
+                            prefab: 'Prefabs/Bow',
+                            update: {
+                                bowStart: 0,
+                                bowEnd: 1,
+                                startWidth: 1,
+                                endWidth: 1,
+                                bowRotation: 0,
+                                bowHeight: rainbowHeight,
+                                textureScale: pal.textureScale,
+                                "lineRenderer/material/method:UpdateMaterial": [
+                                    {
+                                        texture_MainTex: pal.texture,
+                                        texture_BumpMap: pal.bumpMap,
+                                        color: { r: 1, g: 1, b: 1, a: pal.color.a },
+                                        color_EmissionColor: { r: pal.color.r, g: pal.color.g, b: pal.color.b }
+                                    }
+                                ]
+                            },
+                            postEvents: [
+                                {
+                                    event: 'SetParent',
+                                    data: {
+                                        'path': 'object:' + rainbowObject.id
+                                    }
+                                }
+                            ]});
+
+                    rainbowObject.bows.push(bowObject);
+
+                    rainbowHeight += rainbowHeightStep;
+                }
+
+            }
+
+            var modelCount = yearInfo.models.length;
+            while ((modelCount > 1) &&
+                   (yearInfo.models[modelCount - 1] == "")) {
+                modelCount--;
+            }
+
+            var update = {};
+            for (var modelIndex = 0; modelIndex < modelCount; modelIndex++) {
+                var paletteIndex = modelIndex % palette.length;
+                pal = palette[paletteIndex];
+                update['transform:Hexes/transform:HexBase_' + modelIndex + '/gameObject/method:SetActive'] = [true];
+                update['transform:Hexes/transform:HexBase_' + modelIndex + '/component:MeshRenderer/material/color'] = pal.color;
+            }
+            UpdateObject(baseObject, update);
 
         }
 
-        lastYearObject = yearObject;
+        lastBaseObject = baseObject;
+        x += yearSpacing;
 
     }
+
+
+    UpdateObject(globals.proCamera, {
+        'component:ProCamera/moveSpeed': playerData.proCameraMoveSpeed,
+        'component:ProCamera/rotateSpeed': playerData.proCameraRotateSpeed,
+        'component:ProCamera/zoomSpeed': playerData.proCameraZoomSpeed,
+        'component:ProCamera/panSpeed': playerData.proCameraPanSpeed
+    });
+
 
 }
 

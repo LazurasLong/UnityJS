@@ -113,25 +113,27 @@ public class Bow: BridgeObject {
             updateLine = false;
 
             Vector3[] points = new Vector3[bowSegments];
+
             if (fromTransformAttached &&
                 (fromTransform != null)) {
                 fromPosition = 
-                    fromTransform.position + fromOffset + fromLocalOffsetRotated;
+                    fromTransform.position + fromOffset;
             }
 
             if (toTransformAttached &&
                 (toTransform != null)) {
                 toPosition = 
-                    toTransform.position + toOffset + toLocalOffsetRotated;
+                    toTransform.position + toOffset;
             }
 
             angle =
+                (180.0f / Mathf.PI) *
                 Mathf.Atan2(
                     toPosition.z - fromPosition.z,
                     toPosition.x - fromPosition.x);
 
             Quaternion aroundAngle =
-                Quaternion.AngleAxis(-angle * (180.0f / Mathf.PI), Vector3.up);
+                Quaternion.AngleAxis(-angle, Vector3.up);
 
             fromLocalOffsetRotated =
                 aroundAngle * fromLocalOffset;
@@ -155,7 +157,7 @@ public class Bow: BridgeObject {
                 //Debug.Log("i " + i + " t " + t + " h " + h + " height " + height);
 
                 Vector3 point =
-                    Vector3.Lerp(fromPosition, toPosition, t) +
+                    Vector3.Lerp(fromPosition + fromLocalOffsetRotated, toPosition + toLocalOffsetRotated, t) +
                     new Vector3(0.0f, height, 0.0f);
 
                 //Debug.Log("i " + i + " bowSegments " + bowSegments + " height " + height + " point " + point.x + " " + point.y + " " + point.z);

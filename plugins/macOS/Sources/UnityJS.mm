@@ -219,13 +219,13 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
         case kUnityGfxDeviceEventInitialize: {
             currentPluginID = 0;
             unityRendererType = unityGraphics->GetRenderer();
-            NSLog(@"CUnityJSPlugin: OnGraphicsDeviceEvent: kUnityGfxDeviceEventInitialize: unityRendererType: %d", (int)unityRendererType);
+            //NSLog(@"CUnityJSPlugin: OnGraphicsDeviceEvent: kUnityGfxDeviceEventInitialize: unityRendererType: %d", (int)unityRendererType);
             // TODO: user initialization code
             break;
         }
         case kUnityGfxDeviceEventShutdown: {
             unityRendererType = kUnityGfxRendererNull;
-            NSLog(@"CUnityJSPlugin: OnGraphicsDeviceEvent: kUnityGfxDeviceEventShutdown: unityRendererType: %d", (int)unityRendererType);
+            //NSLog(@"CUnityJSPlugin: OnGraphicsDeviceEvent: kUnityGfxDeviceEventShutdown: unityRendererType: %d", (int)unityRendererType);
             for (NSString *key in [plugins allKeys]) {
                 [plugins removeObjectForKey:key];
             }
@@ -360,7 +360,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
 
 - (void)dealloc
 {
-    NSLog(@"CUnityJSPlugin: dealloc pluginID %@ webView %@", pluginID, webView);
+    //NSLog(@"CUnityJSPlugin: dealloc pluginID %@ webView %@", pluginID, webView);
 
     if (plugins != nil) {
         @synchronized(plugins) {
@@ -410,7 +410,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
 
 - (void)loadURL:(const char *)url
 {
-    NSLog(@"CUnityJSPlugin: loadURL: pluginID: %@ url: %s", pluginID, url);
+    //NSLog(@"CUnityJSPlugin: loadURL: pluginID: %@ url: %s", pluginID, url);
 
     if (webView == nil) {
         return;
@@ -705,7 +705,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
 {
 
 #if TARGET_OS_OSX
-    NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@", pluginID);
+    //NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@", pluginID);
 
     if (renderTextureHandle == 0) {
 
@@ -736,7 +736,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
         ((samplesPerPixel == 3) ||
          (samplesPerPixel == 4))) {
 
-        NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@ initializing image samplesPerPixel: %d w: %d h: %d", pluginID, samplesPerPixel, (int)[renderTextureBitmap pixelsWide], (int)[renderTextureBitmap pixelsHigh]);
+        //NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@ initializing image samplesPerPixel: %d w: %d h: %d", pluginID, samplesPerPixel, (int)[renderTextureBitmap pixelsWide], (int)[renderTextureBitmap pixelsHigh]);
 
         glTexSubImage2D(
             GL_TEXTURE_2D,
@@ -749,7 +749,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
             GL_UNSIGNED_BYTE,
             [renderTextureBitmap bitmapData]);
 
-        NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@ initialized image", pluginID);
+        //NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@ initialized image", pluginID);
 
     }
 
@@ -758,7 +758,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
     glPixelStorei(GL_UNPACK_ROW_LENGTH, rowLength);
     glPixelStorei(GL_UNPACK_ALIGNMENT, unpackAlign);
 
-    NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@ sending Texture", pluginID);
+    //NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@ sending Texture", pluginID);
     
     renderTextureBitmap = nil;
 
@@ -766,7 +766,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
         unitySendMessage:@"Texture"
         data:@""];
 
-    NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@ sent Texture", pluginID);
+    //NSLog(@"CUnityJSPlugin: renderUpdateOpenGLCore: pluginID: %@ sent Texture", pluginID);
 #endif
 
 }
@@ -774,19 +774,19 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
 
 - (void)renderUpdateOpenGLES20
 {
-    NSLog(@"CUnityJSPlugin: renderUpdateOpenGLES20: pluginID: %@", pluginID);
+    //NSLog(@"CUnityJSPlugin: renderUpdateOpenGLES20: pluginID: %@", pluginID);
 }
 
 
 - (void)renderUpdateOpenGLES30
 {
-    NSLog(@"CUnityJSPlugin: renderUpdateOpenGLES30: pluginID: %@", pluginID);
+    //NSLog(@"CUnityJSPlugin: renderUpdateOpenGLES30: pluginID: %@", pluginID);
 }
 
 
 - (void)renderUpdateMetal
 {
-    NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@", pluginID);
+    //NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@", pluginID);
 
 #if TARGET_OS_OSX
 
@@ -819,7 +819,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
         ((samplesPerPixel == 3) ||
          (samplesPerPixel == 4))) {
 
-        NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@ initializing image samplesPerPixel: %d w: %d h: %d", pluginID, samplesPerPixel, (int)[renderTextureBitmap pixelsWide], (int)[renderTextureBitmap pixelsHigh]);
+        //NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@ initializing image samplesPerPixel: %d w: %d h: %d", pluginID, samplesPerPixel, (int)[renderTextureBitmap pixelsWide], (int)[renderTextureBitmap pixelsHigh]);
 
         glTexSubImage2D(
             GL_TEXTURE_2D,
@@ -832,7 +832,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
             GL_UNSIGNED_BYTE,
             [renderTextureBitmap bitmapData]);
 
-        NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@ initialized image", pluginID);
+        //NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@ initialized image", pluginID);
 
     }
 
@@ -841,7 +841,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
     glPixelStorei(GL_UNPACK_ROW_LENGTH, rowLength);
     glPixelStorei(GL_UNPACK_ALIGNMENT, unpackAlign);
 
-    NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@ sending CallOnTexture", pluginID);
+    //NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@ sending CallOnTexture", pluginID);
     
     renderTextureBitmap = nil;
 
@@ -849,7 +849,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
         unitySendMessage:@"Texture"
         data:@""];
 
-    NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@ sent CallOnTexture", pluginID);
+    //NSLog(@"CUnityJSPlugin: renderUpdateMetal: pluginID: %@ sent CallOnTexture", pluginID);
 
 #endif
 
@@ -1137,7 +1137,7 @@ static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(
       didReceiveScriptMessage:(WKScriptMessage *)message
 {
     // Log the message received
-    NSLog(@"CUnityJSPlugin: userContentController didReceiveScriptMessage: Received event message body %@ frameInfo %@ name %@ webView %@", message.body, message.frameInfo, message.name, message.webView);
+    //NSLog(@"CUnityJSPlugin: userContentController didReceiveScriptMessage: Received event message body %@ frameInfo %@ name %@ webView %@", message.body, message.frameInfo, message.name, message.webView);
 
     if ([message.name isEqualToString:@"log"]) {
         [self
@@ -1186,7 +1186,7 @@ void _CUnityJSPlugin_Destroy(void *instance)
     CUnityJSPlugin *webViewPlugin = (__bridge_transfer CUnityJSPlugin *)instance;
 
     NSString *pluginID = [webViewPlugin getPluginID];
-    NSLog(@"CUnityJSPlugin: _CUnityJSPlugin_Destroy: webViewPlugin: %@ pluginID %@", webViewPlugin, pluginID);
+    //NSLog(@"CUnityJSPlugin: _CUnityJSPlugin_Destroy: webViewPlugin: %@ pluginID %@", webViewPlugin, pluginID);
     [plugins removeObjectForKey:pluginID];
 
     webViewPlugin = nil;

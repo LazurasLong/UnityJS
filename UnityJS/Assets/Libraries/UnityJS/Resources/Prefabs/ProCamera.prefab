@@ -105,8 +105,10 @@ MonoBehaviour:
   pitch: 0
   moveSpeed: 3
   rotateSpeed: 3
-  positionMin: {x: -100, y: 0, z: -100}
-  positionMax: {x: 100, y: 20, z: 100}
+  zoomSpeed: 1
+  panSpeed: 1
+  positionMin: {x: -1000, y: 0, z: -1000}
+  positionMax: {x: 1000, y: 200, z: 1000}
   pitchMin: -90
   pitchMax: 90
   initialized: 0
@@ -114,6 +116,7 @@ MonoBehaviour:
   initialPosition: {x: 0, y: 0, z: 0}
   initialRotation: {x: 0, y: 0, z: 0, w: 0}
   initialEulers: {x: 0, y: 0, z: 0}
+  zoomDeltaRotated: {x: 0, y: 0, z: 0}
 --- !u!124 &124417470967892828
 Behaviour:
   m_ObjectHideFlags: 1

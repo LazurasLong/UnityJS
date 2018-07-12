@@ -8,22 +8,10 @@
 // Error Handler
 
 
-function StackTrace()
-{ 
-    function st2(f)
-    {
-        if (!f) return [];
-        return st2(f.caller).concat([f.toString().split('(')[0].substring(9) + '(' + f.arguments.join(',') + ')']);
-    }
-    return st2(arguments.callee.caller);
-}
-
-
 window.onerror = function(message, source, line, column, error) {
     window.onerror = null;
-    //var stackTrace = '\n' + StackTrace().join('\n');
-    var stackTrace = '[TODO]';
-    console.log("!!!!!!!!!!!!!!!! WINDOW.ONERROR", "MESSAGE", message, "LINE", line, "COLUMN", column, "SOURCE", source, "STACKTRACE", stackTrace);
+    console.log("!!!!!!!!!!!!!!!! WINDOW.ONERROR", "MESSAGE", message, "LINE", line, "COLUMN", column, "SOURCE", source);
+    console.trace();
 };
 
 
@@ -31,15 +19,9 @@ window.onerror = function(message, source, line, column, error) {
 // Globals
 
 
-globals.sheets = {};
-globals.ranges = {};
 globals.useApp = false;
-
-globals.worldSheetName = 'world';
-
 globals.appURL = 'https://script.google.com/macros/s/AKfycbx6yinuIWLYE21Sd7UuEDxiJE3443gZutmhBhXVNo8Kk8lwAMc/exec';
-
-globals.spreadsheetID = '1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w';
+globals.spreadsheetID = "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w";
 
 globals.sheetRefs = {
     "world": [
@@ -110,6 +92,10 @@ globals.sheetRefs = {
         "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
         335200639
     ],
+    "bows_connection": [
+        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
+        131405460
+    ],
     "blobs": [
         "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
         412054745
@@ -117,8 +103,24 @@ globals.sheetRefs = {
     "jsonsters": [
         "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
         131799685
+    ],
+    "pies": [
+        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
+        886810830
+    ],
+    "places": [
+        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
+        663766555
+    ],
+    "connections": [
+        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
+        1921573503
     ]
 };
+
+
+globals.sheets = {};
+globals.ranges = {};
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -134,7 +136,7 @@ function CreateObjects()
 
 function TrackKeyEvent(results)
 {
-    console.log("game.js: TrackKeyEvent: results: " + JSON.stringify(results));
+    //console.log("game.js: TrackKeyEvent: results: " + JSON.stringify(results));
 
     switch (results.keyCode) {
 
@@ -209,12 +211,12 @@ function LoadObjects()
 
         //console.log("sheets", globals.sheets);
 
-        if (!globals.sheets[globals.worldSheetName]) {
-            console.log("game.js: LoadObjects: Finished loading sheets, but world was not loaded!");
+        if (!globals.sheets[globals.configuration]) {
+            console.log("game.js: LoadObjects: Finished loading sheets, but configuration sheet '" + globals.configuration + "' was not loaded!");
             return;
         }
 
-        var scope = SheetToScope(globals.sheets, globals.ranges, globals.worldSheetName);
+        var scope = SheetToScope(globals.sheets, globals.ranges, globals.configuration);
         globals.scope = scope;
 
         var error = scope.error;
@@ -226,7 +228,7 @@ function LoadObjects()
             console.log("game.js: LoadObjects: LoadSheetsSuccess: Loaded world but it was null.", "scope:", scope);
         } else {
             globals.world = world;
-            console.log("game.js: LoadObjects: LoadSheetsSuccess: Loaded world:", world, "scope:", scope);
+            //console.log("game.js: LoadObjects: LoadSheetsSuccess: Loaded world:", world, "scope:", scope);
             CreateLoadedObjects();
         }
 
@@ -247,12 +249,14 @@ function LoadObjects()
 
 function CreateLoadedObjects()
 {
-    console.log("game.js: CreateLoadedObjects");
+    //console.log("game.js: CreateLoadedObjects");
 
     CreateTemplatedObjects();
     CreateMap();
     CreateBlobs();
     CreateJsonsters();
+    CreatePies();
+    CreatePlaces();
     CreateTests();
     CreatePrivate();
 }
@@ -275,7 +279,8 @@ function CreateTemplatedObjects()
 
         var name = templatedObjectNames[nameIndex];
         var template = templates[name];
-        console.log("game.js: CreateTemplatedObjects:", name, template, "nameIndex", nameIndex, "nameCount", nameCount);
+
+        //console.log("game.js: CreateTemplatedObjects:", name, template, "nameIndex", nameIndex, "nameCount", nameCount);
 
         globals[name] = CreatePrefab(template);
     }
@@ -391,13 +396,13 @@ function CreateMap()
                                     if (obj.onDragMove) obj.onDragMove(obj, result);
                                 }
                             },
-                            DragEnd: {
+                            DragStop: {
                                 query: {
                                     position: "transform/localPosition"
                                 },
                                 handler: function(obj, result) {
-                                    //console.log("DragEnd on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
-                                    if (obj.onDragEnd) obj.onDragEnd(obj, result);
+                                    //console.log("DragStop on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
+                                    if (obj.onDragStop) obj.onDragStop(obj, result);
                                 }
                             }
                         },
@@ -870,6 +875,221 @@ function CreateJsonsters()
 
     if (!world.createJsonsters) {
         return;
+    }
+
+}
+
+
+function CreatePies()
+{
+    var world = globals.world;
+
+    if (!world.createPies) {
+        return;
+    }
+
+}
+
+
+function CreatePlaces()
+{
+    var world = globals.world;
+
+    if (!world.createPlaces) {
+        return;
+    }
+
+    var places = world.places;
+    var connections = world.connections;
+    var placeObjectsByName = world.placeObjectsByName = {};
+    var placeObjectsByID = world.placeObjectsByID = {};
+    world.draggingPlace = null;
+    world.draggingPlaceKissed = {};
+
+    for (var placeIndex = 0, placeCount = places.length; placeIndex < placeCount; placeIndex++) {
+
+        var place = places[placeIndex];
+
+        var anchorObject =  CreatePrefab({
+            "prefab": "Prefabs/Anchor",
+            "update": {
+                "transform/localPosition": place.position,
+                dragTracking: true,
+                "component:Rigidbody/drag": 10,
+                "component:Rigidbody/isKinematic": true
+            },
+            interests: {
+                DragStart: {
+                    handler: function(obj, result) {
+                        world.draggingPlace = obj.placeObject;
+                        world.draggingPlaceKissed = {};
+                        //console.log("game.js: Place Anchor: DragStart", obj.id);
+                    }
+                },
+                DragStop: {
+                    handler: function(obj, result) {
+                        world.draggingPlace = null;
+                        //console.log("game.js: Place Anchor: DragStop", obj.id);
+                        QueryObject(obj.placeObject, {
+                                position: 'transform/position'
+                            }, function(result) {
+                                //console.log("Moving anchor " + obj.id + " to " + result.position.x + " " + result.position.y + " " + result.position.z);
+                                UpdateObject(obj, {
+                                    "transform/position": result.position
+                                });
+                            });
+                    }
+                }
+            }
+        });
+
+        var placeSpring = 100;
+        var placeDamper = 10;
+        var placeDrag = 10;
+
+        var placeObject = CreatePrefab({
+            "prefab": "Prefabs/Place",
+            "obj": {
+                connections: []
+            },
+            "update": {
+                "transform/localPosition": place.position,
+                "transform/localScale": place.size,
+                "component:Collider/sharedMaterial": "PhysicMaterials/HighFrictionLowBounce",
+                "component:Rigidbody/isKinematic": false,
+                "component:Rigidbody/drag": placeDrag,
+                "component:Rigidbody/constraints": "FreezePositionY,FreezeRotationX,FreezeRotationY,FreezeRotationZ",
+                "component:SpringJoint/spring": placeSpring,
+                "component:SpringJoint/damper": placeDamper,
+                "component:SpringJoint/autoConfigureConnectedAnchor": false,
+                "component:SpringJoint/enableCollision": true,
+                "component:SpringJoint/connectedBody!": "object:" + anchorObject.id + "/component:Rigidbody",
+                "component:TrackerProxy/target!": "object:" + anchorObject.id,
+                "tiles/index:0/textureScale": {
+                    "x": place.size.x * place.topTextureZoom,
+                    "y": place.size.z * place.topTextureZoom
+                },
+                "tiles/index:0/component:MeshRenderer/material": place.topMaterial,
+                "tiles/index:1/textureScale": {
+                    "x": place.size.x * place.bottomTextureZoom,
+                    "y": place.size.z * place.bottomTextureZoom
+                },
+                "tiles/index:1/component:MeshRenderer/material": place.bottomMaterial,
+                "tiles/index:2/textureScale": {
+                    "x": place.size.x * place.sideTextureZoom,
+                    "y": place.size.y * place.sideTextureZoom
+                },
+                "tiles/index:2/component:MeshRenderer/material": place.sideMaterial,
+                "tiles/index:3/textureScale": {
+                    "x": place.size.x * place.sideTextureZoom,
+                    "y": place.size.y * place.sideTextureZoom
+                },
+                "tiles/index:3/component:MeshRenderer/material": place.sideMaterial,
+                "tiles/index:4/textureScale": {
+                    "x": place.size.z * place.sideTextureZoom,
+                    "y": place.size.y * place.sideTextureZoom
+                },
+                "tiles/index:4/component:MeshRenderer/material": place.sideMaterial,
+                "tiles/index:5/textureScale": {
+                    "x": place.size.z * place.sideTextureZoom,
+                    "y": place.size.y * place.sideTextureZoom
+                },
+                "tiles/index:5/component:MeshRenderer/material": place.sideMaterial
+            },
+            interests: {
+                CollisionEnter: {
+                    query: {
+                        collisionGameObjectName: 'collision/gameObject/name',
+                        collisionObjectID: 'collision/gameObject/component:BridgeObject?/id',
+                        collisionImpulse: 'collision/impulse',
+                        collisionRelativeVelocity: 'collision/relativeVelocity'
+                    },
+                    handler: function(obj, result) {
+                        // Ignore if not another place.
+                        //console.log("game.js: Place: CollisionEnter", obj.id, JSON.stringify(result));
+                        var collisionPlace = world.placeObjectsByID[result.collisionObjectID];
+                        if ((!collisionPlace) ||
+                             (world.draggingPlace != obj)) {
+                            return;
+                        }
+                        world.draggingPlaceKissed[result.collisionObjectID] = true;
+                        //console.log("KISS", obj.id, result.collisionObjectID, JSON.stringify(world.draggingPlaceKissed), JSON.stringify(result));
+                        var foundConnection = null;
+                        for (var i = 0, n = obj.connections.length; i < n; i++) {
+                            var connection = obj.connections[i];
+                            if ((connection.placeFrom == collisionPlace) ||
+                                (connection.placeTo == collisionPlace)) {
+                                foundConnection = connection;
+                                break;
+                            }
+                        }
+                        if (foundConnection == null) {
+                            var newConnection = CreateRainbow('connection', obj, collisionPlace);
+                            newConnection.placeFrom = obj;
+                            newConnection.placeTo = collisionPlace;
+                            obj.connections.push(newConnection);
+                            collisionPlace.connections.push(newConnection);
+                            //console.log("CREATING CONNECTION", newConnection, newConnection.placeFrom.id, newConnection.placeTo.id);
+                        } else {
+                            //console.log("DESTROYING CONNECTION", foundConnection, foundConnection.placeFrom, foundConnection.placeTo);
+                            //console.log(foundConnection.placeFrom.id, foundConnection.placeTo.id);
+                            i = foundConnection.placeTo.connections.indexOf(foundConnection);
+                            if (i < 0) {
+                                console.log("MISSING", foundConnection);
+                            } else {
+                                foundConnection.placeTo.connections.splice(i, 1);
+                            }
+                            i = foundConnection.placeFrom.connections.indexOf(foundConnection);
+                            if (i < 0) {
+                                console.log("MISSING", foundConnection);
+                            } else {
+                                foundConnection.placeFrom.connections.splice(i, 1);
+                            }
+                            DestroyObject(foundConnection);
+                        }
+                    }
+                },
+                CollisionExit: {
+                    query: {
+                        collisionGameObjectName: 'collision/gameObject/name',
+                        collisionObjectID: 'collision/gameObject/component:BridgeObject?/id',
+                        collisionImpulse: 'collision/impulse',
+                        collisionRelativeVelocity: 'collision/relativeVelocity'
+                    },
+                    handler: function(obj, result) {
+                        // Ignore if not another place.
+                        //console.log("game.js: Place: CollisionExit", obj.id, JSON.stringify(result));
+                        var collisionPlace = world.placeObjectsByID[result.collisionObjectID];
+                        if ((!collisionPlace) ||
+                            (world.draggingPlace != obj)) {
+                            return;
+                        }
+                        delete world.draggingPlaceKissed[result.collisionObjectID];
+                        //console.log("UNKISS", obj.id, result.collisionObjectID, JSON.stringify(world.draggingPlaceKissed), JSON.stringify(result));
+                    }
+                }
+            }
+        });
+
+        anchorObject.placeObject = placeObject;
+        placeObject.anchorObject = anchorObject;
+
+        placeObject.place = place;
+        placeObjectsByName[place.name] = placeObject;
+        placeObjectsByID[placeObject.id] = placeObject;
+
+    }
+
+    for (var connectionIndex = 0, connectionCount = connections.length; connectionIndex < connectionCount; connectionIndex++) {
+        var connection = connections[connectionIndex];
+        var placeFrom = placeObjectsByName[connection.from];
+        var placeTo = placeObjectsByName[connection.to];
+        var connectionObject = CreateRainbow('connection', placeFrom, placeTo);
+
+        connectionObject.placeFrom = placeFrom;
+        connectionObject.placeTo = placeTo;
+        placeFrom.connections.push(connectionObject);
+        placeTo.connections.push(connectionObject);
     }
 
 }

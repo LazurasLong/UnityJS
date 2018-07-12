@@ -9,12 +9,6 @@
 *.pyc
 *.pyo
 
-# Universal crap. I resisted the temptation of ignoring "*.old", 
-# because my spidey senses tell me that might come back to
-# bite us, but I'm pretty sure we can ignore "*.tmp".
-
-*.tmp
-
 # To explicitly ignore a file anywhere in the tree, just give it 
 # a suffix of ".ignore".
 

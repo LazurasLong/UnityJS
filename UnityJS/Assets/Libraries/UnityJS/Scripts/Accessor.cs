@@ -1056,22 +1056,18 @@ public class Accessor {
 
     public bool Get_Component(ref object result)
     {
-        Component component = (Component)obj;
+        Component component = obj as Component;
+        GameObject go = 
+            (component == null)
+                ? (obj as GameObject)
+                : component.gameObject;
 
-#if false
-        Component[] components = component.gameObject.GetComponents(typeof(Component));
-        Debug.Log("Accessor: Get_Component: found " + components.Length + " components...");
-        foreach (Component c in components) {
-            Debug.Log("Accessor: Get_Component: c: " + c + " " + c.GetType());
-        }
-#endif
-
-        if (component == null) {
-            Debug.LogError("Accessor: Get_Component: Not Component subclass! obj: " + obj + " str: " + str);
+        if (go == null) {
+            Debug.LogError("Accessor: Get_Component: obj was not a Component or GameObject. obj: " + obj);
             return false;
         }
 
-        //Debug.Log("Accessor: Get_Component obj: " + obj + " component: " + component);
+        //Debug.Log("Accessor: Get_Component obj: " + obj + " component: " + component + " go: " + go);
 
         System.Type componentType = FindTypeInLoadedAssemblies(str);
 
@@ -1087,7 +1083,7 @@ public class Accessor {
             return false;
         }
 
-        Component otherComponent = component.gameObject.GetComponent(componentType);
+        Component otherComponent = go.GetComponent(componentType);
 
         //Debug.Log("Accessor: Get_Component: component: " + component + " Type: " + ((otherComponent == null) ? "null" : ("" + otherComponent.GetType())));
 
@@ -1401,7 +1397,7 @@ public class Accessor {
         //Debug.Log("Accessor: Set_Method: type: " + type);
 
         MethodInfo methodInfo = 
-            type.GetMethod(str, BindingFlags.Public | BindingFlags.Static);
+            type.GetMethod(str, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
 
         if (methodInfo == null) {
             methodInfo =
@@ -1420,7 +1416,10 @@ public class Accessor {
         //}
 
         List<object> parameters = new List<object>();
-        parameters.Add(obj);
+
+        if (methodInfo.IsStatic) {
+            parameters.Add(obj);
+        }
 
         JArray paramArray = value as JArray;
         if (paramArray == null) {
@@ -1428,15 +1427,17 @@ public class Accessor {
             return false;
         }
 
-        if (paramArray.Count != parameterInfos.Length - 1) {
-            Debug.LogError("Accessor: Set_Method: parameters should be an array of length " + (parameterInfos.Length - 1) + ": " + value);
+        var staticStart = methodInfo.IsStatic ? 1 : 0;
+        int expectedParams = parameterInfos.Length - staticStart;
+        if (paramArray.Count != expectedParams) {
+            Debug.LogError("Accessor: Set_Method: parameters should be an array of length " + expectedParams + ": " + value);
             return false;
         }
 
-        for (int i = 1, n = parameterInfos.Length; i < n; i++) {
+        for (int i = staticStart, n = parameterInfos.Length; i < n; i++) {
             ParameterInfo parameterInfo = parameterInfos[i];
             Type parameterType = parameterInfo.ParameterType;
-            JToken jsParameter = paramArray[i - 1];
+            JToken jsParameter = paramArray[i - staticStart];
             object val = null;
             //Debug.Log("Accessor: Set_Method: about to convert to type jsParameter: " + jsParameter + " parameterType: " + parameterType);
             bool success = Bridge.bridge.ConvertToType(jsParameter, parameterType, ref val);
@@ -1448,8 +1449,8 @@ public class Accessor {
             parameters.Add(val);
         }
 
-        object result = 
-            methodInfo.Invoke(obj, parameters.ToArray());
+        //object result = 
+        methodInfo.Invoke(obj, parameters.ToArray());
 
         //Debug.Log("Accessor: Set_Method: Invoked str: " + str + " on obj: " + obj + " result: " + result);
 

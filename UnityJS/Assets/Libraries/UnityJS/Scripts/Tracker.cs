@@ -54,10 +54,30 @@ public class Tracker : BridgeObject {
     public Vector3 dragScreenDistance;
     public Vector3 dragPlaneDistance;
     public float rotateAmount;
+    public bool collisionTracking = true;
+    public bool collisionEntered = false;
+    public float collisionEnteredTime = 0.0f;
+    public bool collisionEnteredChanged = false;
+    public Collision collision;
 
 
     ////////////////////////////////////////////////////////////////////////
     // Instance Methods
+
+
+     public bool IsPointerOverUIObject()
+     {
+         PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+         eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+         List<RaycastResult> results = new List<RaycastResult>();
+         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+#if false
+         foreach (RaycastResult result in results) {
+             Debug.Log("Tracker: IsPointerOverUIObject: " + result);
+         }
+#endif
+         return results.Count > 0;
+     }
 
 
     public Vector3 NearestPointOnLine(Vector3 linePnt, Vector3 lineDir, Vector3 pnt)
@@ -211,7 +231,10 @@ public class Tracker : BridgeObject {
     public virtual void SetMouseEntered(bool mouseEntered0)
     {
         //Debug.Log("Tracker: SetMouseEntered: mouseEntered0: " + mouseEntered0, this);
-        mouseEntered = mouseEntered0;
+        if (mouseEntered != mouseEntered0) {
+            mouseEnteredChanged = true;
+            mouseEntered = mouseEntered0;
+        }
     }
 
 
@@ -266,7 +289,10 @@ public class Tracker : BridgeObject {
     public virtual void SetMouseDown(bool mouseDown0)
     {
         //Debug.Log("Tracker: SetMouseDown: mouseDown0: " + mouseDown0, this);
-        mouseDown = mouseDown0;
+        if (mouseDown != mouseDown0) {
+            mouseDownChanged = true;
+            mouseDown = mouseDown0;
+        }
 
         if (dragTracking) {
             if (mouseDown) {
@@ -413,19 +439,62 @@ public class Tracker : BridgeObject {
     }
 
 
-     public bool IsPointerOverUIObject()
-     {
-         PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-         eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-         List<RaycastResult> results = new List<RaycastResult>();
-         EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-#if false
-         foreach (RaycastResult result in results) {
-             Debug.Log("Tracker: IsPointerOverUIObject: " + result);
-         }
-#endif
-         return results.Count > 0;
-     }
+    public virtual void SetCollisionEntered(bool collisionEntered0)
+    {
+        //Debug.Log("Tracker: SetCollisionEntered: collisionEntered0: " + collisionEntered0, this);
+        if (collisionEntered != collisionEntered0) {
+            collisionEnteredChanged = true;
+            collisionEntered = collisionEntered0;
+        }
+    }
 
+
+    public virtual void OnCollisionEnter(Collision other)
+    {
+        if (!collisionTracking) {
+            return;
+        }
+
+        collision = other;
+
+        //Debug.Log("Tracker: OnCollisionEnter", this);
+
+        SetCollisionEntered(true);
+
+        collisionEnteredTime = Time.time;
+
+        HandleCollisionEnter();
+    }
+
+
+    public virtual void HandleCollisionEnter()
+    {
+        //Debug.Log("Tracker: HandleCollisionEnter", this);
+        SendEventName("CollisionEnter");
+    }
+    
+
+    public virtual void OnCollisionExit(Collision other)
+    {
+        if (!collisionTracking) {
+            return;
+        }
+
+        collision = other;
+
+        //Debug.Log("Tracker: OnCollisionExit", this);
+
+        SetCollisionEntered(false);
+
+        HandleCollisionExit();
+    }
+
+
+    public virtual void HandleCollisionExit()
+    {
+        //Debug.Log("Tracker: HandleCollisionExit", this);
+        SendEventName("CollisionExit");
+    }
+    
 
 }

@@ -43,7 +43,7 @@ public class KeyboardTracker : Tracker {
         if (tracking && keyEventTracking) {
             keyEvent = Event.current;
             if (keyEvent.isKey) {
-                Debug.Log("KeyboardTracker: OnGUI: Detected keyCode: " + keyEvent.keyCode + " keyEvent: " + keyEvent);
+                //Debug.Log("KeyboardTracker: OnGUI: Detected keyCode: " + keyEvent.keyCode + " keyEvent: " + keyEvent);
                 SendEventName("KeyEvent");
             }
         }

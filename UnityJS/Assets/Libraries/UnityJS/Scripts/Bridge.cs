@@ -43,6 +43,7 @@ public class Bridge : MonoBehaviour {
     public Dictionary<object, string> objectToID = new Dictionary<object, string>();
     public Dictionary<string, TextureChannelDelegate> textureChannels = new Dictionary<string, TextureChannelDelegate>();
     public string url = "bridge.html";
+    public string spreadsheetID = "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w";
     public string configuration = "world";
     public bool startedJS = false;
     public BridgeTransport transport;
@@ -246,7 +247,7 @@ public class Bridge : MonoBehaviour {
         //Debug.Log("Bridge: HandleTransportStarted");
 
         string js =
-            "StartBridge(\"" + transport.driver + "\", \"" + configuration + "\");";
+            "StartBridge(\"" + transport.driver + "\", \"" + spreadsheetID + "\", \"" + configuration + "\");";
         //Debug.Log("Bridge: HandleTransportStarted: EvaluateJS: " + js);
 
         transport.EvaluateJS(js);

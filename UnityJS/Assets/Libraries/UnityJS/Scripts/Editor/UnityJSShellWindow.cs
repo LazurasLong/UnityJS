@@ -16,11 +16,13 @@ using UnityEditor;
 
 public class UnityJSShellWindow : EditorWindow {
 
+
     static class Styles {
 
-        public static readonly GUIStyle textAreaStyle;
 
+        public static readonly GUIStyle textAreaStyle;
         static Texture2D _backgroundTexture;
+
 
         public static Texture2D backgroundTexture
         {
@@ -34,10 +36,12 @@ public class UnityJSShellWindow : EditorWindow {
             }
         }
 
+
         static Styles()
         {
             textAreaStyle = new GUIStyle(EditorStyles.textArea);
             textAreaStyle.padding = new RectOffset();
+            textAreaStyle.fontSize = 20;
 
             var style = textAreaStyle.focused;
             style.background = backgroundTexture;
@@ -51,7 +55,9 @@ public class UnityJSShellWindow : EditorWindow {
             textAreaStyle.onNormal = style;
         }
 
+
     }
+
 
     [MenuItem("Window/UnityJS Shell #%u")]
     static void CreateWindow()
@@ -59,18 +65,10 @@ public class UnityJSShellWindow : EditorWindow {
         GetWindow<UnityJSShellWindow>("UnityJSShell");
     }
 
-    const string ConsoleTextAreaControlName = "ConsoleTextArea";
-    const string CommandName = "> ";
 
-    string text
-    {
-        get {
-            return textEditor.text;
-        }
-        set {
-            textEditor.text = value;
-        }
-    }
+    const string ConsoleTextAreaControlName = "ConsoleTextArea";
+
+    const string CommandName = "> ";
 
     [SerializeField]
     Vector2 scrollPos = Vector2.zero;
@@ -82,12 +80,12 @@ public class UnityJSShellWindow : EditorWindow {
     List<string> inputHistory = new List<string>();
 
     bool requestMoveToCursorToEnd;
+
     bool requestFocusOnTextArea;
 
     bool requestRevertNewLine;
 
     string input = "";
-    string lastWord = "";
 
     Vector2 lastCursorPos;
 
@@ -95,11 +93,24 @@ public class UnityJSShellWindow : EditorWindow {
 
     string savedInput;
 
+
+    string text
+    {
+        get {
+            return textEditor.text;
+        }
+        set {
+            textEditor.text = value;
+        }
+    }
+
+
     void Awake()
     {
         ClearText();
         requestFocusOnTextArea = true;
     }
+
 
     void ClearText()
     {
@@ -108,19 +119,26 @@ public class UnityJSShellWindow : EditorWindow {
         }
     }
 
+
     void OnEnable()
     {
         ScheduleMoveCursorToEnd();
     }
+
 
     void OnInspectorUpdate()
     {
         Repaint();
     }
 
+
     void OnGUI()
     {
-        textEditor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
+        textEditor =
+            (TextEditor)GUIUtility.GetStateObject(
+                typeof(TextEditor), 
+                GUIUtility.keyboardControl);
+
         if (text == "") {
             AppendStartCommand();
             ScheduleMoveCursorToEnd();
@@ -132,23 +150,30 @@ public class UnityJSShellWindow : EditorWindow {
         DrawAll();
     }
 
+
     void HandleHistory()
     {
         var current = Event.current;
         if (current.type == EventType.KeyDown) {
+
             var changed = false;
+
             if (current.keyCode == KeyCode.DownArrow) {
+                Debug.Log("DownArrow");
                 positionInHistory++;
                 changed = true;
                 current.Use();
             }
+
             if (current.keyCode == KeyCode.UpArrow) {
+                Debug.Log("UpArrow");
                 positionInHistory--;
                 changed = true;
                 current.Use();
             }
 
             if (changed) {
+
                 if (savedInput == null) {
                     savedInput = input;
                 }
@@ -162,9 +187,13 @@ public class UnityJSShellWindow : EditorWindow {
                 } else {
                     ReplaceCurrentCommand(inputHistory[positionInHistory]);
                 }
+
             }
+
         }
+
     }
+
 
     void ReplaceCurrentCommand(string replacement)
     {
@@ -173,25 +202,31 @@ public class UnityJSShellWindow : EditorWindow {
         textEditor.MoveTextEnd();
     }
 
+
     string GetInput()
     {
-        var commandStartIndex = text.LastIndexOf(CommandName, StringComparison.Ordinal);
-        if (commandStartIndex != -1)
-        {
+        var commandStartIndex = 
+            text.LastIndexOf(CommandName, StringComparison.Ordinal);
+
+        if (commandStartIndex != -1) {
             commandStartIndex += CommandName.Length;
             return text.Substring(commandStartIndex);
         }
+
         return null;
     }
+
 
     void HandleRequests()
     {
         var current = Event.current;
-        if (requestMoveToCursorToEnd && current.type == EventType.Repaint) {
+        if (requestMoveToCursorToEnd && 
+            (current.type == EventType.Repaint)) {
             textEditor.MoveTextEnd();
             requestMoveToCursorToEnd = false;
             Repaint();
-        } else if (focusedWindow == this && requestFocusOnTextArea) {
+        } else if (requestFocusOnTextArea &&
+                   (focusedWindow == this)) {
             GUI.FocusControl(ConsoleTextAreaControlName);
             requestFocusOnTextArea = false;
             Repaint();
@@ -199,7 +234,9 @@ public class UnityJSShellWindow : EditorWindow {
 
         var cursorPos = textEditor.graphicalCursorPos;
 
-        if (current.type == EventType.Repaint && cursorPos.y > lastCursorPos.y && requestRevertNewLine) {
+        if (requestRevertNewLine &&
+            (current.type == EventType.Repaint) &&
+            (cursorPos.y > lastCursorPos.y)) {
             textEditor.Backspace();
             textEditor.MoveTextEnd();
             Repaint();
@@ -209,12 +246,17 @@ public class UnityJSShellWindow : EditorWindow {
         lastCursorPos = cursorPos;
     }
 
+
     void EnsureNotAboutToTypeAtInvalidPosition()
     {
         var current = Event.current;
 
-        if (current.isKey && !current.command && !current.control) {
-            var lastIndexCommand = text.LastIndexOf(CommandName, StringComparison.Ordinal) + CommandName.Length;
+        if (current.isKey && 
+            !current.command && 
+            !current.control) {
+
+            var lastIndexCommand = 
+                text.LastIndexOf(CommandName, StringComparison.Ordinal) + CommandName.Length;
 
             var cursorIndex = textEditor.cursorIndex;
             if (current.keyCode == KeyCode.Backspace) {
@@ -228,9 +270,11 @@ public class UnityJSShellWindow : EditorWindow {
         }
     }
 
+
     void DrawAll()
     {
         GUI.DrawTexture(new Rect(0, 0, maxSize.x, maxSize.y), Styles.backgroundTexture, ScaleMode.StretchToFill);
+
         EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
         {
             GUILayout.FlexibleSpace();
@@ -252,6 +296,7 @@ public class UnityJSShellWindow : EditorWindow {
         rect.y += 34;
     }
 
+
     void DrawConsole()
     {
         var current = Event.current;
@@ -259,8 +304,11 @@ public class UnityJSShellWindow : EditorWindow {
         if (current.type == EventType.KeyDown) {
             ScrollDown();
 
-            if (current.keyCode == KeyCode.Return && !current.shift) {
+            if ((current.keyCode == KeyCode.Return) &&
+                !current.shift) {
+
                 textEditor.MoveTextEnd();
+
                 try {
                     var result = Evaluate(input);
                     Append(result);
@@ -281,16 +329,19 @@ public class UnityJSShellWindow : EditorWindow {
         GUILayout.TextArea(text, Styles.textAreaStyle, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
     }
 
+
     string Evaluate(string input)
     {
         Debug.Log("UnityJSShellWindow: Evaluate: input: " + input);
         return "TODO";
     }
 
+
     void ScrollDown()
     {
         scrollPos.y = float.MaxValue;
     }
+
 
     void AppendStartCommand()
     {
@@ -298,11 +349,13 @@ public class UnityJSShellWindow : EditorWindow {
         ScheduleMoveCursorToEnd();
     }
 
+
     void ScheduleMoveCursorToEnd()
     {
         requestMoveToCursorToEnd = true;
-        ScrollDown();
+                ScrollDown();
     }
+
 
     void Append(object result)
     {

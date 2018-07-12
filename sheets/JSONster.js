@@ -18,7 +18,7 @@ function onOpen()
   var ss = SpreadsheetApp.getActiveSpreadsheet();
 
   ss.addMenu("JSONster", [
-    {name: 'Spreadsheet To JSON', functionName: 'SpreadsheetToJSON'},
+    {name: 'Format Spreadsheet as JSON', functionName: 'FormatSpreadsheetAsJSON'},
     {name: 'Clear Formatting', functionName: 'ClearFormatting'},
     {name: 'Clear Groups', functionName: 'ClearGroups'}
   ]);
@@ -126,7 +126,7 @@ var gDefaultSheetName = "world";
 //var gDefaultSheetName = "test";
 
 
-function SpreadsheetToJSON(sheetName, isSingleSheet)
+function FormatSpreadsheetAsJSON(sheetName, isSingleSheet)
 {
   if (!sheetName) {
     //sheetName = gDefaultSheetName;
@@ -150,31 +150,29 @@ function SpreadsheetToJSON(sheetName, isSingleSheet)
   
   console.log("SpreadsheetToJSON: result: " + ((scope == null) ? "NULL" : JSON.stringify(scope.value)));
   
-  RenderToSheet(sheets, ranges, scope);
+  FormatScope(sheets, ranges, scope);
 }
 
 
-function RenderToSheet(sheets, ranges, scope)
+function FormatScope(sheets, ranges, scope)
 {
-  var sheetName = scope.sheetName;
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spreadsheet.getSheetByName(sheetName);
-  var maxRows = sheet.getMaxRows();
-  var maxColumns = sheet.getMaxColumns();
-  var fullRange = sheet.getRange(1, 1, maxRows, maxColumns);
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(scope.sheetName);
+  var fullRange = sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns());
 
-  ClearGroups(fullRange);
-  ClearFormatting(fullRange);
+  ClearGroups(sheet, fullRange);
+  ClearFormatting(sheet, fullRange);
 
   RenderScope(sheet, scope);
 }
 
 
-function ClearGroups(fullRange)
+function ClearGroups(sheet, fullRange)
 {
   if (!sheet) {
-    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = spreadsheet.getActiveSheet();
+    sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  }
+
+  if (!fullRange) {
     fullRange = sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns());
   }
 
@@ -184,11 +182,13 @@ function ClearGroups(fullRange)
 }
 
 
-function ClearFormatting(fullRange)
+function ClearFormatting(sheet, fullRange)
 {
   if (!sheet) {
-    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = spreadsheet.getActiveSheet();
+    sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  }
+
+  if (!fullRange) {
     fullRange = sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns());
   }
 
@@ -296,7 +296,8 @@ function RenderObjectKey(sheet, dataRange, row, column, rows, columns, keyRow, k
   range.setFontFamily(gObjectKeyFontFamily);
   var color =
     gObjectKeyBackgroundColors[
-      (index & 1) | ((column & 1) << 1)]
+      (index & 1) |
+      ((column & 1) << 1)];
   range.setBackground(color);
 }
 
@@ -310,7 +311,8 @@ function RenderArrayIndex(sheet, dataRange, row, column, rows, columns, index)
   var range = sheet.getRange(row + 1, column, rows, columns + 1);
   var color =
     gArrayIndexBackgroundColors[
-      (index & 1) | ((column & 1) << 1)]
+      (index & 1) | 
+      ((column & 1) << 1)];
   range.setBackground(color);
 }
 
@@ -339,17 +341,25 @@ var gValueHorizontalAlignment = 'left';
 
 function RenderValue(sheet, dataRange, row, column, rows, columns)
 {
-  if ((rows == 1) && (columns == 1)) {
-    var range = sheet.getRange(row + 1, column + 1);
+  if ((rows > 0) && (columns > 0)) {
+    var range = sheet.getRange(row + 1, column + 1, rows, columns);
     range.setFontFamily(gValueFontFamily);
     range.setHorizontalAlignment(gValueHorizontalAlignment);
   }
 }
 
 
+var gParamColor = '#000000';
+var gParamFontFamily = 'Arial';
+var gParamHorizontalAlignment = 'left';
+
 function RenderParams(sheet, dataRange, row, column, rows, columns)
 {
-  
+  if ((rows > 0) && (columns > 0)) {
+    var range = sheet.getRange(row + 1, column + 1, rows, columns);
+    range.setFontFamily(gParamFontFamily);
+    range.setHorizontalAlignment(gParamHorizontalAlignment);
+  }
 }
 
 
@@ -503,6 +513,7 @@ function SheetToScope(sheets, ranges, sheetName, isSingleSheet)
 function LoadJSONFromSheet(sheets, ranges, scope)
 {
     var i;
+    var n;
     var key;
     var index;
     var unindented;
@@ -571,7 +582,9 @@ function LoadJSONFromSheet(sheets, ranges, scope)
                 : scope.rowValues.length;
         for (var col = column; col < end; col++) {
             var comment = rowValues[col];
-            if (comment) {
+            // Zero is not a comment!
+            if ((comment !== "") &&
+                (comment !== null)) {
                 scope.comments.push([row, col, comment]);
             }
         }
@@ -617,11 +630,119 @@ function LoadJSONFromSheet(sheets, ranges, scope)
             scope.value = GetColumnString(scope.valueColumn).toLowerCase() == "true";
             return null; // success
 
+        case "booleans":
+            if (!scope.isSingleCell) {
+                FindComments(scope.currentRow, scope.valueColumn + 1);
+            }
+            scope.value = GetColumnString(scope.valueColumn).toLowerCase() == "true";
+            if (scope.isSingleCell) {
+                scope.error = "Type booleans can't be used as a single cell.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
+                return scope; // error
+            }
+            scope.gotParams = true;
+            scope.paramsRow = scope.currentRow;
+            scope.paramsColumn = scope.valueColumn;
+            scope.paramsRows = 1;
+            scope.paramsColumns = 1;
+            n = GetColumnNumber(scope.valueColumn);
+            scope.valueColumn++;
+            scope.valueColumns = n;
+            scope.value = [];
+            for (i = 0; i < n; i++) {
+                scope.value.push(GetColumnString(scope.valueColumn + i).toLowerCase() == "true");
+            }
+            return null; // success
+
         case "string":
             if (!scope.isSingleCell) {
                 FindComments(scope.currentRow, scope.valueColumn + 1);
             }
             scope.value = GetColumnString(scope.valueColumn, true);
+            return null; // success
+
+        case "strings":
+            if (scope.isSingleCell) {
+                scope.error = "Type strings can't be used as a single cell.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
+                return scope; // error
+            }
+            scope.gotParams = true;
+            scope.paramsRow = scope.currentRow;
+            scope.paramsColumn = scope.valueColumn;
+            scope.paramsRows = 1;
+            scope.paramsColumns = 1;
+            n = GetColumnNumber(scope.valueColumn);
+            scope.valueColumn++;
+            scope.valueColumns = n;
+            scope.value = [];
+            for (i = 0; i < n; i++) {
+                scope.value.push(GetColumnString(scope.valueColumn + i, true));
+            }
+            return null; // success
+
+        case "number":
+        case "float":
+            if (!scope.isSingleCell) {
+                FindComments(scope.currentRow, scope.valueColumn + 1);
+            }
+            scope.value = GetColumnNumber(scope.valueColumn);
+            return null; // success
+
+        case "numbers":
+        case "floats":
+            if (scope.isSingleCell) {
+                scope.error = "Type numbers can't be used as a single cell.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
+                return scope; // error
+            }
+            scope.gotParams = true;
+            scope.paramsRow = scope.currentRow;
+            scope.paramsColumn = scope.valueColumn;
+            scope.paramsRows = 1;
+            scope.paramsColumns = 1;
+            n = GetColumnNumber(scope.valueColumn);
+            scope.valueColumn++;
+            scope.valueColumns = n;
+            scope.value = [];
+            for (i = 0; i < n; i++) {
+                scope.value.push(GetColumnNumber(scope.valueColumn + i));
+            }
+            return null; // success
+
+        case "integer":
+            if (!scope.isSingleCell) {
+                FindComments(scope.currentRow, scope.valueColumn + 1);
+            }
+            scope.value = Math.floor(GetColumnNumber(scope.valueColumn));
+            return null; // success
+
+        case "integers":
+            if (scope.isSingleCell) {
+                scope.error = "Type integers can't be used as a single cell.";
+                scope.errorSheetName = scope.sheetName;
+                scope.errorRow = scope.currentRow;
+                scope.errorColumn = scope.currentColumn;
+                return scope; // error
+            }
+            scope.gotParams = true;
+            scope.paramsRow = scope.currentRow;
+            scope.paramsColumn = scope.valueColumn;
+            scope.paramsRows = 1;
+            scope.paramsColumns = 1;
+            n = GetColumnNumber(scope.valueColumn);
+            scope.valueColumn++;
+            scope.valueColumns = n;
+            scope.value = [];
+            for (i = 0; i < n; i++) {
+                scope.value.push(Math.floor(GetColumnNumber(scope.valueColumn + i)));
+            }
             return null; // success
 
         case "json":
@@ -634,21 +755,6 @@ function LoadJSONFromSheet(sheets, ranges, scope)
             } catch (e) {
                 console.log("JSON PARSING ERROR", e, scope.value);
             }
-            return null; // success
-
-        case "number":
-        case "float":
-            if (!scope.isSingleCell) {
-                FindComments(scope.currentRow, scope.valueColumn + 1);
-            }
-            scope.value = GetColumnNumber(scope.valueColumn);
-            return null; // success
-
-        case "integer":
-            if (!scope.isSingleCell) {
-                FindComments(scope.currentRow, scope.valueColumn + 1);
-            }
-            scope.value = Math.floor(GetColumnNumber(scope.valueColumn));
             return null; // success
 
         case "object":

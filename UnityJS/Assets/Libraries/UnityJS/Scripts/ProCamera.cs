@@ -23,6 +23,8 @@ public class ProCamera : BridgeObject {
     public float pitch;
     public float moveSpeed = 3.0f;
     public float rotateSpeed = 3.0f;
+    public float zoomSpeed = 1.0f;
+    public float panSpeed = 1.0f;
     public Vector3 positionMin = new Vector3(-100.0f, 0.0f, -100.0f);
     public Vector3 positionMax = new Vector3(100.0f, 20.0f, 100.0f);
     public float pitchMin = -90f;
@@ -32,7 +34,7 @@ public class ProCamera : BridgeObject {
     public Vector3 initialPosition;
     public Quaternion initialRotation;
     public Vector3 initialEulers;
-
+    public Vector3 zoomDeltaRotated;
 
     ////////////////////////////////////////////////////////////////////////
     // Instance Methods
@@ -68,6 +70,7 @@ public class ProCamera : BridgeObject {
         Vector3 moveDelta = Vector3.zero;
         float yawDelta = 0.0f;
         float pitchDelta = 0.0f;
+        float zoomDelta = 0.0f;
 
         if (Input.GetKey("w")) {
             moveDelta.z += moveSpeed;
@@ -99,15 +102,23 @@ public class ProCamera : BridgeObject {
         if (Input.GetKey("f")) {
             pitchDelta += rotateSpeed;
         }
+        if (Input.mouseScrollDelta.x != 0) {
+            yawDelta += Input.mouseScrollDelta.x * panSpeed;
+        }
+        if (Input.mouseScrollDelta.y != 0) {
+            zoomDelta += Input.mouseScrollDelta.y * zoomSpeed;
+        }
 
         if ((yawDelta != 0.0f) || 
             (pitchDelta != 0.0f)) {
-            //pitch = Mathf.Clamp(pitch + pitchDelta, pitchMin, pitchMax);
             pitch = pitch + pitchDelta;
+            //pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
             yaw = yaw + yawDelta;
             transform.rotation = 
                 Quaternion.Euler(0.0f, yaw, 0.0f) *
                 Quaternion.Euler(pitch, 0.0f, 0.0f);
+            forward = 
+                transform.rotation * Vector3.forward;
         }
 
         if (moveDelta != Vector3.zero) {
@@ -125,6 +136,26 @@ public class ProCamera : BridgeObject {
 */
             transform.position = pos;
         }
+
+
+        if (zoomDelta != 0.0f) {
+            zoomDeltaRotated =
+                transform.rotation *
+                (Vector3.forward * zoomDelta * zoomSpeed);
+
+            Vector3 pos =
+                transform.position + zoomDeltaRotated;
+/*
+            pos = 
+                new Vector3(
+                    Mathf.Clamp(pos.x, positionMin.x, positionMax.x),
+                    Mathf.Clamp(pos.y, positionMin.y, positionMax.y),
+                    Mathf.Clamp(pos.z, positionMin.z, positionMax.z));
+*/
+            transform.position = pos;
+
+        }
+
     }
 
     

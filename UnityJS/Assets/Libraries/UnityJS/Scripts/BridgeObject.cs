@@ -317,7 +317,7 @@ public class BridgeObject : MonoBehaviour {
                     JObject update = interest["update"] as JObject;
                     if (update != null) {
 
-                        Debug.Log("BridgeObject: SendEventName: event interest update: " + update);
+                        //Debug.Log("BridgeObject: SendEventName: event interest update: " + update);
 
                         LoadUpdate(update);
                     }
@@ -325,7 +325,7 @@ public class BridgeObject : MonoBehaviour {
                     JArray events = interest["events"] as JArray;
                     if (events != null) {
 
-                        Debug.Log("BridgeObject: SendEventName: event interest events: " + events);
+                        //Debug.Log("BridgeObject: SendEventName: event interest events: " + events);
 
                         HandleEvents(events);
                     }
@@ -333,7 +333,7 @@ public class BridgeObject : MonoBehaviour {
                     doNotSend = interest.GetBoolean("doNotSend");
 
                     if (doNotSend) {
-                        Debug.Log("BridgeObject: SendEventName: doNotSend: interest: " + interest);
+                        //Debug.Log("BridgeObject: SendEventName: doNotSend: interest: " + interest);
                     }
 
                     if (!doNotSend) {

@@ -124,9 +124,11 @@ public class ProText : BridgeObject {
 
                 cam = GetTrackCamera();
 
-                transform.rotation =
-                    extraRotation *
-                    cam.transform.rotation;
+                if (cam != null) {
+                    transform.rotation =
+                        extraRotation *
+                        cam.transform.rotation;
+                }
 
                 break;
 
@@ -136,18 +138,22 @@ public class ProText : BridgeObject {
 
                 cam = GetTrackCamera();
 
-                float distance = (transform.position - cam.transform.position).magnitude;
-                float goalDX = transform.position.x - cam.transform.position.x;
-                float goalDZ = transform.position.z - cam.transform.position.z;
+                if (cam != null) {
 
-                float goalDirection =
-                    (distance <= cameraDistanceMin)
-                        ? cam.transform.rotation.eulerAngles.y
-                        : (Mathf.Atan2(goalDX, goalDZ) *
-                           Mathf.Rad2Deg);
+                    float distance = (transform.position - cam.transform.position).magnitude;
+                    float goalDX = transform.position.x - cam.transform.position.x;
+                    float goalDZ = transform.position.z - cam.transform.position.z;
 
-                transform.rotation =
-                    Quaternion.Euler(0.0f, goalDirection, 0.0f);
+                    float goalDirection =
+                        (distance <= cameraDistanceMin)
+                            ? cam.transform.rotation.eulerAngles.y
+                            : (Mathf.Atan2(goalDX, goalDZ) *
+                               Mathf.Rad2Deg);
+
+                    transform.rotation =
+                        Quaternion.Euler(0.0f, goalDirection, 0.0f);
+
+                }
 
                 break;
 

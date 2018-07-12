@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: LiberationSans SDF - Metalic Green
-  m_Shader: {fileID: 4800000, guid: dca26082f9cb439469295791d9f76fe5, type: 3}
+  m_Name: LiberationSans SDF - ProText
+  m_Shader: {fileID: 4800000, guid: 8e6b9842dbb1a5a4887378afab854e63, type: 3}
   m_ShaderKeywords: BEVEL_ON OUTLINE_ON UNDERLAY_ON
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0

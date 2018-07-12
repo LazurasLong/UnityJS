@@ -207,7 +207,7 @@ public class LeanTweenBridge : BridgeObject {
                     return;
                 }
 
-                Debug.Log("LeanTweenBridge: AnimateData: targetPath: " + targetPath + " goTarget: " + goTarget);
+                //Debug.Log("LeanTweenBridge: AnimateData: targetPath: " + targetPath + " goTarget: " + goTarget);
                 target = goTarget;
             }
 
@@ -272,7 +272,7 @@ public class LeanTweenBridge : BridgeObject {
 
                         Vector3 position = Vector3.zero;
                         if (!Bridge.bridge.ConvertToType<Vector3>(data["position"], ref position)) {
-                            Debug.Log("LeanTweenBridge: AnimateData: position must be a Vector3. data: " + data);
+                            Debug.LogError("LeanTweenBridge: AnimateData: position must be a Vector3. data: " + data);
                             return;
                         }
 
@@ -288,7 +288,7 @@ public class LeanTweenBridge : BridgeObject {
 
                             case "moveSpline":
                             case "moveSplineLocal":
-                                Debug.Log("LeanTweenBridge: AnimateData: position not supported for " + command + ". data: " + data);
+                                Debug.LogError("LeanTweenBridge: AnimateData: position not supported for " + command + ". data: " + data);
                                 return;
 
                         }
@@ -330,7 +330,7 @@ public class LeanTweenBridge : BridgeObject {
                             case "moveLocal":
                             case "moveSpline":
                             case "moveSplineLocal":
-                                Debug.Log("LeanTweenBridge: AnimateData: transform not supported for " + command + ". data: " + data);
+                                Debug.LogError("LeanTweenBridge: AnimateData: transform not supported for " + command + ". data: " + data);
                                 return;
 
                         }
@@ -339,7 +339,7 @@ public class LeanTweenBridge : BridgeObject {
 
                         Vector3[] path = null;
                         if (!Bridge.bridge.ConvertToType<Vector3[]>(data["path"], ref path)) {
-                            Debug.Log("LeanTweenBridge: AnimateData: path must be an Vector3[]. data: " + data);
+                            Debug.LogError("LeanTweenBridge: AnimateData: path must be an Vector3[]. data: " + data);
                             return;
                         }
 
@@ -367,7 +367,7 @@ public class LeanTweenBridge : BridgeObject {
 
                         LTSpline spline = null;
                         if (!Bridge.bridge.ConvertToType<LTSpline>(data["spline"], ref spline)) {
-                            Debug.Log("LeanTweenBridge: AnimateData: spline must be a LTSpline. data: " + data);
+                            Debug.LogError("LeanTweenBridge: AnimateData: spline must be a LTSpline. data: " + data);
                             return;
                         }
 
@@ -380,13 +380,13 @@ public class LeanTweenBridge : BridgeObject {
                             case "move":
                             case "moveLocal":
                             case "moveSplineLocal":
-                                Debug.Log("LeanTweenBridge: AnimateData: spline not supported for " + command + ". data: " + data);
+                                Debug.LogError("LeanTweenBridge: AnimateData: spline not supported for " + command + ". data: " + data);
                                 break;
 
                         }
 
                     } else {
-                        Debug.Log("LeanTweenBridge: AnimateData: command: " + command + " should contain position, transform, path or spline. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: command: " + command + " should contain position, transform, path or spline. data: " + data);
                         return;
                     }
 
@@ -399,7 +399,7 @@ public class LeanTweenBridge : BridgeObject {
                     // TODO: handle RectTransform instead of GameObject
 
                     if (!data.ContainsKey("to")) {
-                        Debug.Log("LeanTweenBridge: AnimateData: missing to parameter. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: missing to parameter. data: " + data);
                         return;
                     }
 
@@ -426,18 +426,18 @@ public class LeanTweenBridge : BridgeObject {
                 case "rotate":
                 case "rotateLocal":
 
-                    Debug.Log("LeanTweenBridge: AnimateData: TODO: command: " + command + " data: " + data);
+                    //Debug.Log("LeanTweenBridge: AnimateData: TODO: command: " + command + " data: " + data);
 
                     // TODO: handle RectTransform instead of GameObject
 
                     if (!data.ContainsKey("to")) {
-                        Debug.Log("LeanTweenBridge: AnimateData: missing to. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: missing to. data: " + data);
                         return;
                     }
 
                     Vector3 rotateTo = Vector3.zero;
                     if (!Bridge.bridge.ConvertToType<Vector3>(data["to"], ref rotateTo)) {
-                        Debug.Log("LeanTweenBridge: AnimateData: to must be an Vector3. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: to must be an Vector3. data: " + data);
                         return;
                     }
 
@@ -459,12 +459,12 @@ public class LeanTweenBridge : BridgeObject {
                 case "rotateY":
                 case "rotateZ":
 
-                    Debug.Log("LeanTweenBridge: AnimateData: TODO: command: " + command + " data: " + data);
+                    //Debug.Log("LeanTweenBridge: AnimateData: TODO: command: " + command + " data: " + data);
 
                     // TODO: handle RectTransform instead of GameObject
 
                     if (!data.ContainsKey("to")) {
-                        Debug.Log("LeanTweenBridge: AnimateData: missing to. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: missing to. data: " + data);
                         return;
                     }
 
@@ -496,18 +496,18 @@ public class LeanTweenBridge : BridgeObject {
                     // TODO: handle RectTransform instead of GameObject
 
                     if (!data.ContainsKey("axis")) {
-                        Debug.Log("LeanTweenBridge: AnimateData: missing axis. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: missing axis. data: " + data);
                         return;
                     }
 
                     if (!data.ContainsKey("to")) {
-                        Debug.Log("LeanTweenBridge: AnimateData: missing to. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: missing to. data: " + data);
                         return;
                     }
 
                     Vector3 rotateAroundAxis = Vector3.zero;
                     if (!Bridge.bridge.ConvertToType<Vector3>(data["axis"], ref rotateAroundAxis)) {
-                        Debug.Log("LeanTweenBridge: AnimateData: to must be an Vector3. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: to must be an Vector3. data: " + data);
                         return;
                     }
 
@@ -534,13 +534,13 @@ public class LeanTweenBridge : BridgeObject {
                     // TODO: handle RectTransform instead of GameObject
 
                     if (!data.ContainsKey("to")) {
-                        Debug.Log("LeanTweenBridge: AnimateData: missing to. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: missing to. data: " + data);
                         return;
                     }
 
                     Vector3 to = Vector3.zero;
                     if (!Bridge.bridge.ConvertToType<Vector3>(data["to"], ref to)) {
-                        Debug.Log("LeanTweenBridge: AnimateData: to must be a Vector3. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: to must be a Vector3. data: " + data);
                         return;
                     }
 
@@ -555,7 +555,7 @@ public class LeanTweenBridge : BridgeObject {
                     //Debug.Log("LeanTweenBridge: AnimateData: command: " + command + " data: " + data);
 
                     if (!data.ContainsKey("to")) {
-                        Debug.Log("LeanTweenBridge: AnimateData: missing to. data: " + data);
+                        Debug.LogError("LeanTweenBridge: AnimateData: missing to. data: " + data);
                         return;
                     }
 
@@ -692,7 +692,7 @@ public class LeanTweenBridge : BridgeObject {
         }
 
         JObject data = (JObject)ev["data"];
-        Debug.Log("LeanTweenBridge: HandleEvent: eventName: " + eventName, this);
+        //Debug.Log("LeanTweenBridge: HandleEvent: eventName: " + eventName, this);
 
         switch (eventName) {
 

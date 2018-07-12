@@ -126,6 +126,32 @@ public class BridgeJsonConverter : JsonConverter {
     public static Dictionary<System.Type, ConvertToDelegate> convertToObjectMap =
         new Dictionary<System.Type, ConvertToDelegate>() {
 
+            { typeof(Enum), // value
+                delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
+                    if (reader.TokenType == JsonToken.Null) {
+                        result = Vector2.zero;
+                        return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.String) {
+                        Debug.LogError("BridgeJsonConverter: convertToObjectMap: Enum: expected string: " + reader.TokenType);
+                        return false;
+                    }
+
+                    string enumString = (string)JValue.Load(reader);
+
+                    result =
+                        Enum.Parse(
+                            objectType, 
+                            enumString);
+
+                    Debug.Log("BridgeJsonConverter: convertToObjectMap: Enum: enumString: " + enumString + " result: " + result);
+
+                    return true;
+                }
+            },
+
+
             { typeof(Vector2), // struct
                 delegate(JsonReader reader, System.Type objectType, ref object result, JsonSerializer serializer) {
                     if (reader.TokenType == JsonToken.Null) {

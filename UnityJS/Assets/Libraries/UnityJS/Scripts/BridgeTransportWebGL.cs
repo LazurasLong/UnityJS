@@ -22,27 +22,27 @@ public class BridgeTransportWebGL : BridgeTransport
 
 
     [DllImport(PLUGIN_DLL)]
-    public static extern string _ReceiveJSToUnityEvents();
+    public static extern void _UnityJS_HandleAwake();
 
 
     [DllImport(PLUGIN_DLL)]
-    public static extern void _SendUnityToJSEvents(string evListString);
+    public static extern void _UnityJS_HandleDestroy();
 
 
     [DllImport(PLUGIN_DLL)]
-    public static extern void _DistributeJSEvents();
+    public static extern void _UnityJS_EvaluateJS(string js);
 
 
     [DllImport(PLUGIN_DLL)]
-    public static extern void _HandleAwake();
+    public static extern string _UnityJS_ReceiveJSToUnityEvents();
 
 
     [DllImport(PLUGIN_DLL)]
-    public static extern void _HandleDestroy();
+    public static extern void _UnityJS_SendUnityToJSEvents(string evListString);
 
 
     [DllImport(PLUGIN_DLL)]
-    public static extern void _EvaluateJS(string js);
+    public static extern void _UnityJS_DistributeJSEvents();
 
 
     public override void HandleInit()
@@ -55,25 +55,37 @@ public class BridgeTransportWebGL : BridgeTransport
     }
 
 
+    public override void HandleAwake()
+    {
+        //Debug.Log("BridgeTransportWebGL: HandleAwake: this: " + this + " bridge: " + bridge);
+        _UnityJS_HandleAwake();
+    }
+
+
+    public override void HandleDestroy()
+    {
+        //Debug.Log("BridgeTransportWebGL: HandleDestroy: this: " + this + " bridge: " + bridge);
+        _UnityJS_HandleDestroy();
+    }
+
+
     public override void SendJSToUnityEvents(string evListString)
     {
         Debug.LogError("BridgeTransportWebGL: SendJSToUnityEvents: should not be called!");
-
-        jsToUnityEventQueue.Add(evListString);
     }
 
 
     public override string ReceiveJSToUnityEvents()
     {
-        return _ReceiveJSToUnityEvents();
+        return _UnityJS_ReceiveJSToUnityEvents();
     }
     
 
     public override void SendUnityToJSEvents(string evListString)
     {
-        Debug.Log("BridgeTransportWebGL: SendUnityToJSEvents: evListString: " + evListString);
+        //Debug.Log("BridgeTransportWebGL: SendUnityToJSEvents: evListString: " + evListString);
 
-        _SendUnityToJSEvents(evListString);
+        _UnityJS_SendUnityToJSEvents(evListString);
     }
 
 
@@ -86,14 +98,14 @@ public class BridgeTransportWebGL : BridgeTransport
 
     public override void DistributeJSEvents()
     {
-        _DistributeJSEvents();
+        _UnityJS_DistributeJSEvents();
     }
     
 
     public override void EvaluateJS(string js)
     {
-        Debug.Log("BridgeTransportWebGL: EvaluateJS: js: " + js);
-        _EvaluateJS(js);
+        //Debug.Log("BridgeTransportWebGL: EvaluateJS: js: " + js);
+        _UnityJS_EvaluateJS(js);
     }
 
 

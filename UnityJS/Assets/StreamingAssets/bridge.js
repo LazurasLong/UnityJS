@@ -11,6 +11,7 @@
 
 var globals = {
     driver: "None",
+    spreadsheetID: "",
     configuration: "world",
     nextID: 0,
     objects: {},
@@ -37,9 +38,9 @@ var globals = {
 ////////////////////////////////////////////////////////////////////////
 
 
-function StartBridge(driver, configuration)
+function StartBridge(driver, spreadsheetID, configuration)
 {
-    console.log("bridge.js: StartBridge: begin driver " + driver + " configuration: " + configuration);
+    console.log("bridge.js: StartBridge: begin driver " + driver + " spreadsheetID: " + spreadsheetID + " configuration: " + configuration);
 
     if (globals.startedUnity) {
         console.log("bridge.js: StartBridge: called again but ignored");
@@ -47,6 +48,7 @@ function StartBridge(driver, configuration)
     }
 
     globals.driver = driver || "Unknown";
+    globals.spreadsheetID = spreadsheetID || "";
     globals.configuration = configuration || "world";
 
     SendEvent({
@@ -58,7 +60,7 @@ function StartBridge(driver, configuration)
 
     CreateObjects();
 
-    console.log("bridge.js: StartBridge: end");
+    //console.log("bridge.js: StartBridge: end");
 }
 
 
@@ -92,10 +94,11 @@ function Dump(obj)
 function CreatePrefab(template)
 {
     if (template == null) {
-        var foo = 0;
+        console.log("bridge.js: CreatePrefab: template is null");
+        return null;
     }
 
-    console.log("bridge.js: CreatePrefab: template:", JSON.stringify(template, null, 4));
+    //console.log("bridge.js: CreatePrefab: template:", JSON.stringify(template, null, 4));
 
     // prefab, component, obj, update, interests, preEvents, postEvents
 
@@ -159,6 +162,11 @@ function CreatePrefab(template)
 
 function DestroyObject(obj)
 {
+    if (obj == null) {
+        console.log("bridge.js: DestroyObject: obj is null", JSON.stringify(query));
+        return;
+    }
+
     SendEvent({
         event: 'Destroy',
         id: obj.id
@@ -168,6 +176,11 @@ function DestroyObject(obj)
 
 function UpdateObject(obj, data)
 {
+    if (obj == null) {
+        console.log("bridge.js: UpdateObject: obj is null", "data", JSON.stringify(data));
+        return;
+    }
+
     SendEvent({
         event: 'Update',
         id: obj.id,
@@ -178,7 +191,12 @@ function UpdateObject(obj, data)
 
 function AnimateObject(obj, data)
 {
-    console.log("bridge.js: AnimateObject: data:", JSON.stringify(data, null, 4));
+    if (obj == null) {
+        console.log("bridge.js: AnimateObject: obj is null", "data", JSON.stringify(data));
+        return;
+    }
+
+    //console.log("bridge.js: AnimateObject: data:", JSON.stringify(data, null, 4));
 
     SendEvent({
         event: 'Animate',
@@ -190,6 +208,11 @@ function AnimateObject(obj, data)
 
 function QueryObject(obj, query, callback)
 {
+    if (obj == null) {
+        console.log("bridge.js: QueryObject: obj is null", "query", JSON.stringify(query), "callback", callback);
+        return;
+    }
+
     var callbackID = callback && MakeCallbackID(obj, callback, true);
     var data = {
         query: query,
@@ -206,6 +229,11 @@ function QueryObject(obj, query, callback)
 
 function UpdateInterests(obj, data)
 {
+    if (obj == null) {
+        console.log("bridge.js: UpdateInterests: obj is null", "data", data);
+        return;
+    }
+
     SendEvent({
         event: 'UpdateInterests',
         id: obj.id,
@@ -337,7 +365,7 @@ function DistributeEvent(ev)
 
         case "StartedUnity":
 
-            console.log("bridge.js: DistributeEvent: StartedUnity:", ev);
+            //console.log("bridge.js: DistributeEvent: StartedUnity:", ev);
 
             //StartBridge();
 
@@ -345,7 +373,7 @@ function DistributeEvent(ev)
 
         case "Callback":
 
-            console.log("bridge.js: DistributeEvent: InvokeCallback:", id, data);
+            //console.log("bridge.js: DistributeEvent: InvokeCallback:", id, data);
 
             InvokeCallback(id, data);
 
@@ -387,7 +415,7 @@ function DistributeEvent(ev)
 
 function EvaluateJS(js)
 {
-    console.log("bridge.js: EvaluateJS: js:", js);
+    //console.log("bridge.js: EvaluateJS: js:", js);
 
     try {
         eval(js);
@@ -472,7 +500,7 @@ function SendEventList(evListString)
 
         // WebGL Runtime
 
-        window.bridge._SendJSToUnityEvents(
+        window.bridge._UnityJS_SendJSToUnityEvents(
             evListString);
 
     }
@@ -823,53 +851,76 @@ function CreatePieTracker()
 
         }
 
-        var update = {};
+        TrackPieGridText();
+    }
 
+
+    function TrackPieGridText()
+    {
         var slices = globals.pieTracker.pie.slices;
         var sliceCount = slices.length;
         var hilitePrefix = "<size=200%><b>";
         var lolitePrefix = "<size=50%>";
         var normalPrefix = "";
 
-        function label(i) {
+        function GetItemLabel(item)
+        {
+            return (
+                item &&
+                (item.getLabel
+                    ? item.getLabel(item, globals.pieTracker.data)
+                    : item.label));
+        }
+
+        function GetSliceLabel(slice)
+        {
+            return (
+                slice &&
+                (slice.getLabel
+                    ? slice.getLabel(slice, globals.pieTracker.data)
+                    : slice.label));
+        }
+
+        function GetLabel(i) {
             var slice = slices[i];
             if (!slice) {
                 return "";
             }
 
-            var sliceLabel =
-                slice.getLabel
-                    ? slice.getLabel(slice, globals.pieTracker.data)
-                    : slice.label;
+            var sliceSelected =
+                slice == globals.pieTracker.slice;
+
+            var items =
+                (slice.items &&
+                 slice.items.length > 0)
+                    ? slice.items
+                    : null;
+
+            var firstItem =
+                (items &&
+                 slice.items[0]);
+
+             var selectedItem =
+                 sliceSelected &&
+                 items &&
+                 (globals.pieTracker.itemIndex >= 0) &&
+                 slice.items[Math.min(globals.pieTracker.itemIndex, slice.items.length - 1)];
+
+            var itemLabel = GetItemLabel(selectedItem || firstItem);
+            var sliceLabel = GetSliceLabel(slice);
+            var label = itemLabel || sliceLabel || "";
 
             // Not selecting any slice, so show each slice label unmodified.
             if (!globals.pieTracker.slice) {
-                return normalPrefix + (sliceLabel || "");
+                return normalPrefix + label;
             }
 
             // Selecting a slice, so highlight the selected slice and lowlight the other slices.
             // For the selected slice, show the item label instead of the slice label, if defined.
-            if (slice == globals.pieTracker.slice) {
-
-                var item =
-                    (slice.items &&
-                     (globals.pieTracker.itemIndex >= 0) &&
-                     slice.items[Math.min(globals.pieTracker.itemIndex, slice.items.length - 1)]) ||
-                    null;
-
-                if (item) {
-                    var itemLabel =
-                        item.getLabel
-                            ? item.getLabel(item)
-                            : item.label;
-                    return hilitePrefix + (itemLabel || sliceLabel || "");
-                }
-
-                return hilitePrefix + (sliceLabel || "");
-
+            if (sliceSelected) {
+                return hilitePrefix + label;
             } else {
-
-                return lolitePrefix + (sliceLabel || "");
+                return lolitePrefix + label;
 
             }
 
@@ -883,9 +934,9 @@ function CreatePieTracker()
              globals.pieTracker.pie.title);
 
         SetGridText(
-            label(7), label(0), label(1),
-            label(6), title,    label(2),
-            label(5), label(4), label(3));
+            GetLabel(7), GetLabel(0), GetLabel(1),
+            GetLabel(6), title,       GetLabel(2),
+            GetLabel(5), GetLabel(4), GetLabel(3));
 
     }
 
@@ -927,60 +978,92 @@ function CreatePieTracker()
                     },
                     slices: [
                         {
-                            label: "N",
-                            onselect: function(pie, obj) {
-                                if (!obj) return;
-                                console.log("pie Compass N", obj);
-                            }
+                            items: [
+                                {
+                                    label: "N",
+                                    onselect: function(pie, obj) {
+                                        if (!obj) return;
+                                        console.log("pie Compass N", obj);
+                                    }
+                                }
+                            ]
                         },
                         {
-                            label: "NE",
-                            onselect: function(pie, obj) {
-                                if (!obj) return;
-                                console.log("pie Compass NE", obj);
-                            }
+                            items: [
+                                {
+                                    label: "NE",
+                                    onselect: function(pie, obj) {
+                                        if (!obj) return;
+                                        console.log("pie Compass NE", obj);
+                                    }
+                                }
+                            ]
                         },
                         {
-                            label: "E",
-                            onselect: function(pie, obj) {
-                                if (!obj) return;
-                                console.log("pie Compass E", obj);
-                            }
+                            items: [
+                                {
+                                    label: "E",
+                                    onselect: function(pie, obj) {
+                                        if (!obj) return;
+                                        console.log("pie Compass E", obj);
+                                    }
+                                }
+                            ]
                         },
                         {
-                            label: "SE",
-                            onselect: function(pie, obj) {
-                                if (!obj) return;
-                                console.log("pie Compass SE", obj);
-                            }
+                            items: [
+                                {
+                                    label: "SE",
+                                    onselect: function(pie, obj) {
+                                        if (!obj) return;
+                                        console.log("pie Compass SE", obj);
+                                    }
+                                }
+                            ]
                         },
                         {
-                            label: "S",
-                            onselect: function(pie, obj) {
-                                if (!obj) return;
-                                console.log("pie Compass S", obj);
-                            }
+                            items: [
+                                {
+                                    label: "S",
+                                    onselect: function(pie, obj) {
+                                        if (!obj) return;
+                                        console.log("pie Compass S", obj);
+                                    }
+                                }
+                            ]
                         },
                         {
-                            label: "SW",
-                            onselect: function(pie, obj) {
-                                if (!obj) return;
-                                console.log("pie Compass SW", obj);
-                            }
+                            items: [
+                                {
+                                    label: "SW",
+                                    onselect: function(pie, obj) {
+                                        if (!obj) return;
+                                        console.log("pie Compass SW", obj);
+                                    }
+                                }
+                            ]
                         },
                         {
-                            label: "W",
-                            onselect: function(pie, obj) {
-                                if (!obj) return;
-                                console.log("pie Compass W", obj);
-                            }
+                            items: [
+                                {
+                                    label: "W",
+                                    onselect: function(pie, obj) {
+                                        if (!obj) return;
+                                        console.log("pie Compass W", obj);
+                                    }
+                                }
+                            ]
                         },
                         {
-                            label: "NW",
-                            onselect: function(pie, obj) {
-                                if (!obj) return;
-                                console.log("pie Compass NW", obj);
-                            }
+                            items: [
+                                {
+                                    label: "NW",
+                                    onselect: function(pie, obj) {
+                                        if (!obj) return;
+                                        console.log("pie Compass NW", obj);
+                                    }
+                                }
+                            ]
                         }
                     ]
                 }
@@ -1143,13 +1226,13 @@ function CreatePieTracker()
 
 function TrackInputString(inputString)
 {
-    console.log("TrackInputString: inputString: " + inputString);
+    //console.log("TrackInputString: inputString: " + inputString);
 }
 
 
 function TrackKeyEvent(results)
 {
-    console.log("TrackKeyEvent: keyEvent: " + JSON.stringify(results));
+    //console.log("TrackKeyEvent: keyEvent: " + JSON.stringify(results));
 }
 
 
