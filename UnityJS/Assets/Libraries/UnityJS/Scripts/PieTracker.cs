@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 
 
 public class PieTracker : Tracker {
@@ -48,6 +51,8 @@ public class PieTracker : Tracker {
     public Vector3 cameraRotationEulerAngles = Vector3.zero;
 
     public Camera pieCamera = null;
+
+    public JObject pie;
 
 
     public void Awake()

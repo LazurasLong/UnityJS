@@ -30,6 +30,7 @@ public class Tracker : BridgeObject {
     public bool mouseTrackingPosition = true;
     public Vector2 screenSize = Vector2.zero;
     public Vector3 mousePosition = Vector3.zero;
+    public Vector2 screenPosition = Vector2.zero;
     public Vector3 mousePositionToCameraOffset;
     public bool mouseTrackingRaycast = true;
     public float mouseRayMaxDistance = Mathf.Infinity;
@@ -99,7 +100,14 @@ public class Tracker : BridgeObject {
         }
 
         mousePosition = Input.mousePosition;
-        screenSize = new Vector2(Screen.width, Screen.height);
+        screenSize = 
+            new Vector2(
+                Screen.width, 
+                Screen.height);
+        screenPosition = 
+            new Vector2(
+                mousePosition.x - (screenSize.x * 0.5f),
+                mousePosition.y - (screenSize.y * 0.5f));
 
         if (Camera.main == null) {
             return;
