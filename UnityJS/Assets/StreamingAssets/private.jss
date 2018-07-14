@@ -556,7 +556,8 @@ function CreatePrivate()
                                 yearIndex: yearIndex,
                                 yearInfo: yearInfo,
                                 unitSize: unit.size,
-                                unitScale: unit.scale
+                                unitScale: unit.scale,
+                                pieID: 'edit'
                             },
                             update: {
                                 'dragTracking': true,
@@ -790,7 +791,6 @@ function CreatePrivate()
         }
 
         var f = todo.shift();
-        console.log("private.js: DoNext: calling f:", f);
 
         f();
 

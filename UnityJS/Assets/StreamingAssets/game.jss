@@ -255,276 +255,268 @@ function CreatePieTracker()
     var pieTracker = null;
 
 
+    function CallHandler()
+    {
+        var handler = arguments[0];
+        if (!handler) {
+            return;
+        }
+
+        var args = [];
+        var argCount = arguments.length; 
+        for (var i = 1; i < argCount; i++) {
+            args.push(arguments[i]);
+        }
+
+        //console.log("CALLHANDLER", handler, args);
+
+        switch (typeof(handler)) {
+            case "function":
+                handler.apply(null, args);
+                break;
+            case "string":
+                var f = SearchDefault(handler, pieTracker.pie, pieTracker.target, pieTracker, null);
+                if (f) {
+                    f.apply(null, args);
+                } else {
+                    console.log("game.js: PieTracker: CallHandler: target:", pieTracker.target, "missing handler:", handler);
+                }
+                break;
+            case "object":
+                if (Array.isArray(handler)) {
+                    for (var i = 0, n = handler.length; i < n; i++) {
+                        handler.id = pieTracker.target.id;
+                        SendEvent(handler[i]);
+                    }
+                } else {
+                    console.log("game.js: PieTracker: CallHandler: unexpected handler type:", handler);
+                    handler.id = pieTracker.target.id;
+                    SendEvent(handler);
+                }
+                break;
+            default:
+                console.log("game.js: PieTracker: CallHandler: unexpected handler type:", handler);
+                break;
+        }
+    }
+
+
     function HandleStartPie(pie, target)
     {
         var handler = SearchDefault('onstartpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleStopPie(pie, target)
     {
         var handler = SearchDefault('onstoppie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleConstructPie(pie, target)
     {
         var handler = SearchDefault('onconstructpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleDeconstructPie(pie, target)
     {
         var handler = SearchDefault('ondeconstructpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleLayoutPie(pie, target)
     {
         var handler = SearchDefault('onlayoutpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleShowPie(pie, target)
     {
         var handler = SearchDefault('onshowpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleHidePie(pie, target)
     {
         var handler = SearchDefault('onhidepie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleCancelPie(pie, target)
     {
         var handler = SearchDefault('oncancelpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleSelectCenterPie(pie, target)
     {
         var handler = SearchDefault('onselectcenterpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleSelectPie(pie, target)
     {
         var handler = SearchDefault('onselectpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
     function HandleSelectEmptySlice(sliceIndex, pie, target)
     {
         var handler = SearchDefault('onselectpie', pie, target, null);
-        if (handler) {
-            handler(sliceIndex, pie, target);
-        }
+        CallHandler(handler, sliceIndex, pie, target);
     }
 
 
     function HandleSelectSlice(slice, pie, target)
     {
         var handler = SearchDefault('onselectslice', slice, pie, target, null);
-        if (handler) {
-            handler(slice, pie, target);
-        }
+        CallHandler(handler, slice, pie, target);
     }
 
     function HandleSelectEmptyItem(itemIndex, slice, pie, target)
     {
         var handler = SearchDefault('onselectemptyitem', slice, pie, target, null);
-        if (handler) {
-            handler(itemIndex, slice, pie, target);
-        }
+        CallHandler(handler, itemIndex, slice, pie, target);
     }
 
     function HandleSelectItem(item, slice, pie, target)
     {
         var handler = SearchDefault('onselectitem', item, slice, pie, target, null);
-        if (handler) {
-            handler(item, slice, pie, target);
-        }
+        CallHandler(handler, item, slice, pie, target);
     }
 
     function HandleTrackPie(pie, target)
     {
         var handler = SearchDefault('ontrackpie', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
 
     function HandleEnterPieCenter(pie, target)
     {
-        console.log("HandleEnterPieCenter");
+        //console.log("HandleEnterPieCenter");
         var handler = SearchDefault('onenterpiecenter', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
 
     function HandleTrackPieCenter(pie, target)
     {
         var handler = SearchDefault('ontrackpiecenter', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
 
     function HandleExitPieCenter(pie, target)
     {
-        console.log("HandleExitPieCenter");
+        //console.log("HandleExitPieCenter");
         var handler = SearchDefault('onexitpiecenter', pie, target, null);
-        if (handler) {
-            handler(pie, target);
-        }
+        CallHandler(handler, pie, target);
     }
 
 
     function HandleEnterEmptySlice(sliceIndex, pie, target)
     {
-        console.log("HandleEnterEmptySlice", sliceIndex);
+        //console.log("HandleEnterEmptySlice", sliceIndex);
         var handler = SearchDefault('onenteremptyslice', pie, target, null);
-        if (handler) {
-            handler(sliceIndex, pie, target);
-        }
+        CallHandler(handler, sliceIndex, pie, target);
     }
 
 
     function HandleTrackEmptySlice(sliceIndex, pie, target)
     {
         var handler = SearchDefault('ontrackemptyslice', pie, target, null);
-        if (handler) {
-            handler(sliceIndex, pie, target);
-        }
+        CallHandler(handler, sliceIndex, pie, target);
     }
 
 
     function HandleExitEmptySlice(sliceIndex, pie, target)
     {
-        console.log("HandleExitEmptySlice", sliceIndex);
+        //console.log("HandleExitEmptySlice", sliceIndex);
         var handler = SearchDefault('onexitemptyslice', pie, target, null);
-        if (handler) {
-            handler(sliceIndex, pie, target);
-        }
+        CallHandler(handler, sliceIndex, pie, target);
     }
 
 
     function HandleEnterSlice(slice, pie, target)
     {
-        console.log("HandleEnterSlice", slice, slice.items[0].label, slice.items[0].labelObject.id);
+        //console.log("HandleEnterSlice", slice, slice.items[0].label, slice.items[0].labelObject.id);
         var handler = SearchDefault('onenterslice', slice, pie, target, null);
-        if (handler) {
-            handler(slice, pie, target);
-        }
+        CallHandler(handler, slice, pie, target);
     }
 
 
     function HandleTrackSlice(slice, pie, target)
     {
         var handler = SearchDefault('ontrackslice', slice, pie, target, null);
-        if (handler) {
-            handler(slice, pie, target);
-        }
+        CallHandler(handler, slice, pie, target);
     }
 
 
     function HandleExitSlice(slice, pie, target)
     {
-        console.log("HandleExitSlice", slice, slice.items[0].label, slice.items[0].labelObject.id);
+        //console.log("HandleExitSlice", slice, slice.items[0].label, slice.items[0].labelObject.id);
         var handler = SearchDefault('onexitslice', slice, pie, target, null);
-        if (handler) {
-            handler(slice, pie, target);
-        }
+        CallHandler(handler, slice, pie, target);
     }
 
 
     function HandleEnterEmptyItem(itemIndex, slice, pie, target)
     {
-        console.log("HandleEnterEmptyItem", itemIndex);
+        //console.log("HandleEnterEmptyItem", itemIndex);
         var handler = SearchDefault('onenteritem', slice, pie, target, null);
-        if (handler) {
-            handler(itemIndex, slice, pie, target);
-        }
+        CallHandler(handler, itemIndex, slice, pie, target);
     }
 
 
     function HandleTrackEmptyItem(itemIndex, slice, pie, target)
     {
         var handler = SearchDefault('ontrackemptyitem', slice, pie, target, null);
-        if (handler) {
-            handler(itemIndex, slice, pie, target);
-        }
+        CallHandler(handler, itemIndex, slice, pie, target);
     }
 
 
     function HandleExitEmptyItem(itemIndex, slice, pie, target)
     {
-        console.log("HandleExitEmptyItem", itemIndex);
+        //console.log("HandleExitEmptyItem", itemIndex);
         var handler = SearchDefault('onexititem', slice, pie, target, null);
-        if (handler) {
-            handler(itemIndex, slice, pie, target);
-        }
+        CallHandler(handler, itemIndex, slice, pie, target);
     }
 
 
     function HandleEnterItem(item, slice, pie, target)
     {
-        console.log("HandleEnterItem", item.label, item.labelObject.id);
-        UpdateObject(item.labelObject, {
-            'textMesh/text': '<b>' + item.label + '</b>'
-        });
-        var handler = SearchDefault('onenteritem', item, slice, pie, target, null);
-        if (handler) {
-            handler(item, slice, pie, target);
+        //console.log("HandleEnterItem", item.label, item.labelObject.id);
+        if (item.labelObject) {
+            UpdateObject(item.labelObject, {
+                'textMesh/text': '<b>' + item.label + '</b>'
+            });
         }
+        var handler = SearchDefault('onenteritem', item, slice, pie, target, null);
+        CallHandler(handler, item, slice, pie, target);
     }
 
 
     function HandleTrackItem(item, slice, pie, target)
     {
         var handler = SearchDefault('ontrackitem', item, slice, pie, target, null);
-        if (handler) {
-            handler(item, slice, pie, target);
-        }
+        CallHandler(handler, item, slice, pie, target);
     }
 
 
     function HandleExitItem(item, slice, pie, target)
     {
-        console.log("HandleExitItem", item.label, item.labelObject.id);
-        UpdateObject(item.labelObject, {
-            'textMesh/text': item.label
-        });
-        var handler = SearchDefault('onexititem', item, slice, pie, target, null);
-        if (handler) {
-            handler(item, slice, pie, target);
+        //console.log("HandleExitItem", item.label, item.labelObject.id);
+        if (item.labelObject == null) {
         }
+        if (item.labelObject) {
+            UpdateObject(item.labelObject, {
+                'textMesh/text': item.label
+            });
+        }
+        var handler = SearchDefault('onexititem', item, slice, pie, target, null);
+        CallHandler(handler, item, slice, pie, target);
     }
 
 
@@ -571,7 +563,7 @@ function CreatePieTracker()
 
     function StopPie()
     {
-        console.log("StopPie", "pieTracker.tracking", pieTracker.tracking, "pieTracker.pie" , pieTracker.pie);
+        //console.log("StopPie", "pieTracker.tracking", pieTracker.tracking, "pieTracker.pie" , pieTracker.pie);
 
         var pinnable = SearchDefault('pinnable', pie, pieTracker, true);
         if (pinnable && 
@@ -595,15 +587,15 @@ function CreatePieTracker()
             return;
         }
 
+        var nextPieID = null;
+
         HandleStopPie(pie, target);
 
         if (pieTracker.sliceIndex < 0) {
 
             HandleSelectCenterPie(pie, target);
 
-            if (pie.centerPieID) {
-                StartPie(pieTracker.mousePosition, pie.centerPieID, pieTracker.target, true);
-            }
+            nextPieID = pie.centerPieID;
 
         } else {
 
@@ -622,9 +614,7 @@ function CreatePieTracker()
                 if (item) {
                     HandleSelectItem(item, slice, pie, target);
 
-                    if (item.pieID) {
-                        StartPie(pieTracker.mousePosition, item.pieID, pieTracker.target, true);
-                    }
+                    nextPieID = item.pieID;
 
                 }
 
@@ -632,7 +622,12 @@ function CreatePieTracker()
 
         }
 
-        TrackPie(position, 0.0, 0.0, -1, -1, true);
+        TrackPie(pieTracker.mousePosition, 0.0, 0.0, -1, -1, true);
+
+        if (nextPieID) {
+            StartPie(pieTracker.mousePosition, nextPieID, pieTracker.target, true);
+        }
+
     }
 
 
@@ -914,12 +909,12 @@ function CreatePieTracker()
             return;
         }
 
-
         var lastSliceIndex = 
             pieTracker.sliceIndex;
 
         var lastSlice = 
-            (pieTracker.sliceIndex >= 0)
+            (pie.slices && 
+             (pieTracker.sliceIndex >= 0))
                 ? pie.slices[lastSliceIndex]
                 : null;
 
@@ -928,17 +923,20 @@ function CreatePieTracker()
 
         var lastItem = 
             (lastSlice && 
-             (lastItemIndex >= 0))
+             lastSlice.items &&
+              (lastItemIndex >= 0))
                 ? lastSlice.items[Math.min(lastItemIndex, lastSlice.items.length - 1)]
                 : null;
 
         var nextSlice = 
-            (nextSliceIndex >= 0)
+            ((nextSliceIndex >= 0) &&
+             pie.slices)
                 ? pie.slices[nextSliceIndex]
                 : null;
 
         var nextItem =
             (nextSlice &&
+             nextSlice.items &&
              (nextItemIndex >= 0))
                 ? nextSlice.items[Math.min(nextItemIndex, nextSlice.items.length - 1)]
                 : null;
@@ -949,8 +947,6 @@ function CreatePieTracker()
         var changedItem = 
             changedSlice || 
             (lastItemIndex != nextItemIndex);
-
-        console.log("changedSlice", changedSlice, lastSliceIndex, lastSlice, nextSliceIndex, nextSlice, "changedItem", changedItem, lastItemIndex, lastItem, nextItemIndex, nextItem);
 
         if (changedSlice) {
 
@@ -1081,34 +1077,38 @@ function CreatePieTracker()
             itemLabelFontSize: 22,
             itemLabelFontColor: { r: 1.0, g: 1.0, b: 0.5 },
             itemLabelDistance: 75,
+            Info: function(item, slice, pie, target) {
+                console.log("Info", target);
+            },
+            Destroy: function(item, slice, pie, target) {
+                console.log("Delete", target);
+                DestroyObject(target);
+            },
             pies: {
 
                 'Compass': {
                     label: 'Compass',
-                    onselectcenter: function(pie, obj) {
+                    onselectcenterpie: function(pie, target) {
                     },
                     slices: [
                         {
                             items: [
                                 {
                                     label: "North",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass N", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass North", item, slice, pie, target);
                                     }
                                 },
                                 {
                                     label: "Norther",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass N", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass Norther", item, slice, pie, target);
                                     }
                                 },
                                 {
                                     label: "Northest",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass N", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass Northest", item, slice, pie, target);
                                     }
                                 }
                             ]
@@ -1117,9 +1117,8 @@ function CreatePieTracker()
                             items: [
                                 {
                                     label: "NorthEast",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass NE", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass NorthEast", item, slice, pie, target);
                                     }
                                 }
                             ]
@@ -1128,9 +1127,8 @@ function CreatePieTracker()
                             items: [
                                 {
                                     label: "East",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass E", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass East", item, slice, pie, target);
                                     }
                                 }
                             ]
@@ -1139,9 +1137,8 @@ function CreatePieTracker()
                             items: [
                                 {
                                     label: "SouthEast",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass SE", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass SouthEast", item, slice, pie, target);
                                     }
                                 }
                             ]
@@ -1150,23 +1147,20 @@ function CreatePieTracker()
                             items: [
                                 {
                                     label: "South",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass S", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass South", item, slice, pie, target);
                                     }
                                 },
                                 {
                                     label: "Souther",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass S", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass Souther", item, slice, pie, target);
                                     }
                                 },
                                 {
                                     label: "Southest",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass S", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass Southest", item, slice, pie, target);
                                     }
                                 }
                             ]
@@ -1175,9 +1169,8 @@ function CreatePieTracker()
                             items: [
                                 {
                                     label: "SouthWest",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass SW", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass SouthWest", item, slice, pie, target);
                                     }
                                 }
                             ]
@@ -1186,9 +1179,8 @@ function CreatePieTracker()
                             items: [
                                 {
                                     label: "West",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass W", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass West", item, slice, pie, target);
                                     }
                                 }
                             ]
@@ -1197,9 +1189,8 @@ function CreatePieTracker()
                             items: [
                                 {
                                     label: "NorthWest",
-                                    onselect: function(pie, obj) {
-                                        if (!obj) return;
-                                        console.log("pie Compass NW", obj);
+                                    onselectitem: function(item, slice, pie, target) {
+                                        console.log("pie Compass NorthWest", item, slice, pie, target);
                                     }
                                 }
                             ]
@@ -1229,7 +1220,7 @@ function CreatePieTracker()
                     pieTracker.screenSize = results.screenSize;
 
                     if (pieTracker.tracking) {
-                        console.log("PieTracker: MouseButtonDown: already tracking pie so ignoring. updating pieTracker.mousePosition from", pieTracker.mousePosition, "to", results.mousePosition);
+                        //console.log("PieTracker: MouseButtonDown: already tracking pie so ignoring. updating pieTracker.mousePosition from", pieTracker.mousePosition, "to", results.mousePosition);
                         pieTracker.mousePosition = results.mousePosition;
                         return;
                     }
@@ -1241,6 +1232,8 @@ function CreatePieTracker()
 
                     var pieID = 
                         target && target.pieID;
+
+                    //console.log("game.js: PieTracker: MouseButtonDown:", "mouseRaycastHitBridgeObjectID", results.mouseRaycastHitBridgeObjectID, "target:", target, (target ? target.id : ""), "pieID", pieID);
 
                     if (pieID) {
                         StartPie(results.mousePosition, pieID, target, false);
@@ -2074,9 +2067,8 @@ function CreatePies()
     var world = globals.world;
 
     if (globals.pieTracker) {
-        Object.assign(globals.pieTracker, world.pies);
+        Object.assign(globals.pieTracker.pies, world.pies);
     }
-
 }
 
 
