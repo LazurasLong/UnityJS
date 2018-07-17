@@ -401,7 +401,8 @@ function DrawToCanvas(params, drawer, success, error)
         d3.select('body')
             .append('canvas')
             .attr('width', width)
-            .attr('height', height);
+            .attr('height', height)
+            .attr('style', 'display: none');
     var canvasNode =
         canvas.node();
     var context =
