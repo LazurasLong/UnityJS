@@ -90,14 +90,17 @@ function CreatePrivate()
     var z = 0;
     var lastBaseObject = null;
 
-    globals.cuboid.pieID = 'Compass';
+    globals.cuboid.pieID = 'main';
     globals.yearObjects = [];
 
     UpdateObject(globals.proCamera, {
         'component:ProCamera/moveSpeed': tuning.proCameraMoveSpeed,
-        'component:ProCamera/rotateSpeed': tuning.proCameraRotateSpeed,
-        'component:ProCamera/zoomSpeed': tuning.proCameraZoomSpeed,
-        'component:ProCamera/panSpeed': tuning.proCameraPanSpeed
+        'component:ProCamera/yawSpeed': tuning.proCameraYawSpeed,
+        'component:ProCamera/pitchSpeed': tuning.proCameraPitchSpeed,
+        'component:ProCamera/orbitYawSpeed': tuning.proCameraOrbitYawSpeed,
+        'component:ProCamera/orbitPitchSpeed': tuning.proCameraOrbitPitchSpeed,
+        'component:ProCamera/wheelZoomSpeed': tuning.proCameraWheelZoomSpeed,
+        'component:ProCamera/wheelPanSpeed': tuning.proCameraWheelPanSpeed
     });
 
     var todo = [];
@@ -278,8 +281,6 @@ function CreatePrivate()
 
         anchorObject.baseObject = baseObject;
 
-        var labelObject = null;
-
         var baseSpecs = [];
 
         if (!yearInfo) {
@@ -310,7 +311,7 @@ function CreatePrivate()
 
         } else {
 
-            // Calculate the number of models for this unit.
+            // Calculate the number of models for this year.
 
             var modelCount = yearInfo.models.length;
             while ((modelCount > 1) &&
@@ -363,6 +364,7 @@ function CreatePrivate()
                     obj: {
                         anchorObject: anchorObject,
                         baseObject: baseObject,
+                        name: '' + year,
                         year: year,
                         yearIndex: yearIndex,
                         yearInfo: yearInfo,
@@ -400,7 +402,7 @@ function CreatePrivate()
 
                 if (tuning.yearLabels) {
 
-                    labelObject = CreatePrefab({
+                    yearObject.labelObject = CreatePrefab({
                         prefab: "Prefabs/ProText",
                         update: {
                             'textMesh/text': '' + year,
@@ -411,8 +413,6 @@ function CreatePrivate()
                             trackRotation: 'TransformYaw'
                         }
                     });
-
-                    yearObject.labelObject = labelObject;
 
                 }
 
@@ -430,7 +430,7 @@ function CreatePrivate()
                         }
                         nonZeroUnits.push({
                             obj: null,
-                            label: unitLabels[unitIndex],
+                            name: unitLabels[unitIndex],
                             index: unitIndex,
                             parent: null,
                             children: [],
@@ -441,7 +441,7 @@ function CreatePrivate()
                     // Use the year as the root.
                     var rootUnit = {
                         obj: yearObject,
-                        label: '' + year,
+                        name: '' + year,
                         parent: null,
                         children: [],
                         value: 0,
@@ -449,6 +449,8 @@ function CreatePrivate()
                         depth: 0,
                         position: {x: x, y: y, z: z}
                     };
+                    yearObject.rootUnit = rootUnit;
+
                     var parentStack = [
                         rootUnit
                     ];
@@ -458,9 +460,9 @@ function CreatePrivate()
                     for (unitIndex = 0; unitIndex < nonZeroUnitCount; unitIndex++) {
                         var unit = nonZeroUnits[unitIndex];
 
-                        var unitLabel = unit.label;
-                        for (var indent = 0, labelLength = unitLabel.length; indent < labelLength; indent++) {
-                            if (unitLabel[indent] != ' ') {
+                        var unitName = unit.name;
+                        for (var indent = 0, nameLength = unitName.length; indent < nameLength; indent++) {
+                            if (unitName[indent] != ' ') {
                                 break;
                             }
                         }
@@ -502,6 +504,7 @@ function CreatePrivate()
                         while (!parentUnit.obj) {
                             parentUnit = parentUnit.parent;
                         }
+
 
                         unit.ang = 
                             unitIndex * 
@@ -557,7 +560,7 @@ function CreatePrivate()
                                 yearInfo: yearInfo,
                                 unitSize: unit.size,
                                 unitScale: unit.scale,
-                                pieID: 'edit'
+                                pieID: 'unit'
                             },
                             update: {
                                 'dragTracking': true,
@@ -592,7 +595,36 @@ function CreatePrivate()
                                 }
                             ],
                             interests: {
-                            }});
+                                MouseEnter: {
+                                    handler: function(unit, results) {
+                                        //console.log("HandleEnterUnit", unit, results, Object.keys(unit.unit));
+                                        var u = unit.unit;
+                                        var a = [];
+                                        a.unshift(('' + u.name).trim() + ': $' + u.value);
+                                        u = u.parent;
+                                        while (u) {
+                                            a.unshift(('' + u.name).trim());
+                                            u = u.parent;
+                                        }
+                                        a.unshift(unit.yearObject.yearInfo.name);
+                                        var text = "";
+                                        for (var i = 0, n = a.length; i < n; i++) {
+                                            for (var j = 0; j < i; j++) {
+                                                text += '  ';
+                                            }
+                                            text += a[i] + "\n";
+                                        }
+                                        ShowPopupText(text, 'object:' + unit.id + '/transform');
+                                    }
+                                },
+                                MouseExit: {
+                                    handler: function(unit, results) {
+                                        //console.log("HandleExitUnit", unit, results);
+                                        //HidePopupText();
+                                    }
+                                }
+                            }
+                        });
 
                         unit.obj = unitObject;
 
@@ -630,14 +662,14 @@ function CreatePrivate()
                         }
 
                         if (tuning.unitArrows) {
-                            CreateRainbow(tuning.unitArrowRainbowType, yearObject, unit.obj);
+                            unitObject.unitArrow = CreateRainbow(tuning.unitArrowRainbowType, yearObject, unit.obj);
                         }
 
                         if (tuning.unitLabels) {
-                            var label = CreatePrefab({
+                            unitObject.labelObject = CreatePrefab({
                                 prefab: "Prefabs/ProText",
                                 update: {
-                                    'textMesh/text': unit.label.trim(),
+                                    'textMesh/text': unit.name.trim(),
                                     'textMesh/fontSize': tuning.unitLabelFontSize,
                                     trackPosition: 'Transform',
                                     'transformPosition!': 'object:' + unit.obj.id + '/transform',
@@ -803,4 +835,205 @@ function CreatePrivate()
 }
 
 
+ function ShowPopupText(text, xform)
+ {
+    if (!globals.popupText) {
+        globals.popupText = CreatePrefab({
+            prefab: 'Prefabs/OverlayText',
+            update: {
+                'textMesh/fontSize': 24,
+                'textMesh/color': { r: 0.5, g: 1, b: 1 },
+                'textMesh/alignment': 'Left',
+                'component:RectTransform/pivot': { x: 0, y: 1 },
+                'screenOffset': { x: 0, y: 0 }
+            },
+            postEvents: [
+                {
+                    event: 'SetParent',
+                    data: {
+                        path: 'object:' + globals.textOverlays.id + '/overlay'
+                    }
+                }
+            ]
+        });
+            
+     }
+
+     UpdateObject(globals.popupText, {
+        'textMesh/text': text,
+        'trackPosition': 'Transform',
+        'transformPosition!': xform,
+        'gameObject/method:SetActive': [true]
+     });
+ }
+
+
+function HidePopupText()
+{
+    if (!globals.popupText) {
+        return;
+    }
+
+    UpdateObject(globals.popupText, {
+        'trackPosition': 'Hidden'
+    });
+
+}
+
+
+function DrawBackground_Unit_Bubbles(canvas, context, params, success, error)
+{
+    var pieTracker = globals.pieTracker;
+    var pie = params.pie;
+    var target = params.target;
+    var width = params.width;
+    var height = params.height;
+    var cx = width * 0.5;
+    var cy = height * 0.5;
+    var unitObject = target;
+    var unit = unitObject.unit;
+    var unitName = (unit.name + '').trim();
+
+    //console.log("DrawBackground_Unit: target", target, "width", width, "height", height, "cx", cx, "cy", cy, "unitName", unitName, "unit keys", Object.keys(unit), "unitObject keys", Object.keys(unitObject));
+
+    var yearObject = unitObject.yearObject;
+    //console.log("DrawBackground_Unit: yearObject", yearObject, Object.keys(yearObject));
+
+    var rootUnit = yearObject.rootUnit;
+    //console.log("DrawBackground_Unit: rootUnit", rootUnit, Object.keys(rootUnit));
+
+    var margin = 50;
+    var padding = 10;
+    var pack = d3.pack()
+        .size([width - (2 * margin), height - (2 * margin)])
+        .padding(padding);
+
+    //console.log("DrawBackground_Unit: pack", pack);
+
+    var root = d3.hierarchy(rootUnit)
+      .sum(function(d) { return d.size; })
+      .sort(function(a, b) { return b.value - a.value; });
+
+    //console.log("DrawBackground_Unit: root", root, Object.keys(root));
+
+    pack(root);
+
+    var gradient = context.createRadialGradient(cx, cy, 0, cx, cy, cx);
+    var r = (cx - margin) / cx;
+    gradient.addColorStop(0, '#00000080');
+    gradient.addColorStop(r, '#00000080');
+    gradient.addColorStop(1, '#00000000');
+    context.arc(cx, cy, cx, 0, Math.PI * 2.0);
+    context.fillStyle = gradient;
+    context.fill();
+
+    var descendants = root.descendants();
+
+    for (var i = 0, n = descendants.length; i < n; i++) {
+        var node = descendants[i];
+        var label = ('' + node.data.name).trim();
+        var selected = label == unitName;
+        var hasChildren = node.children && node.children.length;
+
+        if (selected) {
+
+            context.beginPath();
+            context.arc(margin + node.x, margin + node.y, node.r, 0, Math.PI * 2);
+            context.fillStyle = '#ffff0080';
+            context.fill();
+
+            context.beginPath();
+            context.arc(margin + node.x, margin + node.y, node.r, 0, Math.PI * 2);
+            context.strokeStyle = '#0000ffff';
+            context.lineWidth = 4;
+            context.stroke();
+
+            var labelPosition = {
+                x: (node.x + margin) - cx,
+                y: (height - (node.y + margin)) - cy + node.r
+            };
+            UpdateObject(pie.labelObject, {
+                'component:RectTransform/anchoredPosition': labelPosition,
+                'component:RectTransform/pivot': { x: 0.5, y: 0.0 },
+                'textMesh/text': label + ":\n$" + node.data.value,
+                'textMesh/color': { r: 1, g: 1, b: 1 }
+            });
+
+        } else {
+
+            context.beginPath();
+            context.arc(margin + node.x, margin + node.y, node.r, 0, Math.PI * 2);
+            if (hasChildren) {
+                context.strokeStyle = '#a0a0a0ff';
+                context.lineWidth = 1;
+                context.stroke();
+            } else {
+                context.fillStyle = '#ffffff40';
+                context.fill();
+            }
+
+        }
+
+    }
+
+
+    success();
+}
+
+
+function DrawBackground_Unit_Info(canvas, context, params, success, error)
+{
+    var pieTracker = globals.pieTracker;
+    var pie = params.pie;
+    var target = params.target;
+    var width = params.width;
+    var height = params.height;
+    var cx = width * 0.5;
+    var cy = height * 0.5;
+    var unitObject = target;
+    var unit = unitObject.unit;
+    var unitName = (unit.name + '').trim();
+
+    //console.log("DrawBackground_Unit: target", target, "width", width, "height", height, "cx", cx, "cy", cy, "unitName", unitName, "unit keys", Object.keys(unit), "unitObject keys", Object.keys(unitObject));
+
+    var yearObject = unitObject.yearObject;
+    //console.log("DrawBackground_Unit: yearObject", yearObject, Object.keys(yearObject));
+
+    var rootUnit = yearObject.rootUnit;
+    //console.log("DrawBackground_Unit: rootUnit", rootUnit, Object.keys(rootUnit));
+
+    var margin = 50;
+    var gradient = context.createRadialGradient(cx, cy, 0, cx, cy, cx);
+    var r = (cx - margin) / cx;
+    gradient.addColorStop(0, '#00000080');
+    gradient.addColorStop(r, '#00000080');
+    gradient.addColorStop(1, '#00000000');
+    context.arc(cx, cy, cx, 0, Math.PI * 2.0);
+    context.fillStyle = gradient;
+    context.fill();
+
+    var u = unitObject.unit;
+    var a = [];
+    a.unshift(('' + u.name).trim() + ':\n$' + u.value);
+    u = u.parent;
+    while (u) {
+        a.unshift(('' + u.name).trim());
+        u = u.parent;
+    }
+    a.unshift(unitObject.yearObject.yearInfo.name);
+    var text = "";
+    for (var i = 0, n = a.length; i < n; i++) {
+        text += a[i] + "\n";
+    }
+
+    UpdateObject(pie.labelObject, {
+        'textMesh/text': text,
+        'textMesh/color': { r: 1, g: 1, b: 1 }
+    });
+
+    success();
+}
+
+
 ////////////////////////////////////////////////////////////////////////
+

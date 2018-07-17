@@ -473,7 +473,7 @@ public class Accessor {
             string path = (string)jsonValue;
             //Debug.Log("Accessor: SetProperty: excited: jsonValue: " + jsonValue + " path: " + path);
             if (string.IsNullOrEmpty(path)) {
-                Debug.LogError("Accessor: SetProperty: excited: value should be a string");
+                Debug.LogError("Accessor: SetProperty: excited: value should be a string.");
                 return false;
             }
 

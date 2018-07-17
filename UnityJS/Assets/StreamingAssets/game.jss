@@ -103,7 +103,7 @@ Object.assign(globals.sheetRefs, {
         "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
         131799685
     ],
-    "pies": [
+    "pie": [
         "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
         886810830
     ],
@@ -213,6 +213,25 @@ function CreateBrowserRenderer()
     var browserRenderer = null;
 
 
+    function HandleIframeLoaded(ev)
+    {
+    }
+
+
+    var url = 'https://beta.observablehq.com/@mbostock/d3-bubble-chart';
+    var width = 1024;
+    var height = 1024;
+    var iframe = globals.iframe = document.createElement('iframe');
+    iframe.src = url;
+    iframe.width = width;
+    iframe.height = height;
+    iframe.style.border = 0;
+    iframe.style.margin = 0;
+    iframe.style.padding = 0;
+    iframe.addEventListener('load', HandleIframeLoaded);
+    document.body.appendChild(iframe);
+
+
     function Render(results)
     {
         browserRenderer.renderQueue.push(results);
@@ -245,6 +264,172 @@ function CreateBrowserRenderer()
         }
     });
 
+
+}
+
+
+function DrawBackground_Pie(canvas, context, params, success, error)
+{
+    var pieTracker = globals.pieTracker;
+    var pie = params.pie;
+    var target = params.target;
+    var width = params.width;
+    var height = params.height;
+    var cx = width * 0.5;
+    var cy = height * 0.5;
+    var initialDirection = SearchDefault('initialDirection', pie, pieTracker, 90);
+    var clockwise = SearchDefault('clockwise', pie, pieTracker, true);
+    var inactiveDistance = SearchDefault('inactiveDistance', pie, pieTracker, 10);
+    var itemDistance = SearchDefault('itemDistance', pie, pieTracker, 50);
+    var drawBackgroundGradient = SearchDefault('drawBackgroundGradient', pie, pieTracker, true);
+    var backgroundGradientInnerRadius = SearchDefault('backgroundGradientInnerRadius', pie, pieTracker, 50);
+    var backgroundGradientOuterRadius = SearchDefault('backgroundGradientOuterRadius', pie, pieTracker, 250);
+    var drawInactiveCircle = SearchDefault('drawInactiveCircle', pie, pieTracker, true);
+    var drawSlices = SearchDefault('drawSlices', pie, pieTracker, true);
+    var sliceLength = SearchDefault('sliceLength', pie, pieTracker, 10);
+    var sliceLengthSelected = SearchDefault('sliceLengthSelected', pie, pieTracker, 100);
+
+    context.clearRect(0, 0, width, height);
+
+    var slices = pie.slices;
+    var sliceCount = slices ? slices.length : 0;
+    var clockwiseSign = clockwise ? 1 : -1;
+    var halfTurn = sliceCount ? (clockwiseSign * (Math.PI / sliceCount)) : 0;
+    var turn = 2 * halfTurn;
+    var direction = initialDirection * (Math.PI / 180.0);
+    var selectedSliceIndex = pieTracker.sliceIndex;
+    var selectedDirection = 
+        clockwise
+            ? Math.PI + (direction + (turn * selectedSliceIndex))
+            : Math.PI - (direction + (turn * selectedSliceIndex));
+
+    if (drawBackgroundGradient) {
+        var gradient = context.createRadialGradient(cx, cy, 0, cx, cy, backgroundGradientOuterRadius);
+        var r = inactiveDistance / backgroundGradientOuterRadius;
+        gradient.addColorStop(0, '#ffffff20');
+        gradient.addColorStop(r, '#ffffff20');
+        gradient.addColorStop(r + 0.001, '#000000A0');
+        gradient.addColorStop(1, '#00000000');
+        if (selectedSliceIndex == -1) {
+            context.arc(cx, cy, backgroundGradientOuterRadius, 0, Math.PI * 2.0);
+        } else {
+            context.beginPath();
+            context.moveTo(cx, cy);
+            context.arc(
+                cx,
+                cy,
+                backgroundGradientOuterRadius,
+                selectedDirection - halfTurn,
+                selectedDirection + halfTurn,
+                clockwise);
+            context.lineTo(cx, cy);
+            context.closePath();
+        }
+        context.fillStyle = gradient;
+        context.fill();
+    }
+
+    if (drawInactiveCircle) {
+        context.beginPath();
+        if (selectedSliceIndex == -1) {
+            context.arc(
+                cx,
+                cy,
+                inactiveDistance,
+                0,
+                Math.PI * 2.0);
+        } else {
+            context.arc(
+                cx,
+                cy,
+                inactiveDistance,
+                selectedDirection - halfTurn,
+                selectedDirection + halfTurn,
+                clockwise);
+        }
+        context.strokeStyle = 'black';
+        context.lineWidth = 2;
+        context.stroke();
+    }
+
+    if (!sliceCount) {
+        success();
+        return;
+    }
+
+    for (var sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++) {
+        var slice = slices[sliceIndex];
+
+        if (drawSlices) {
+            var selected = sliceIndex == selectedSliceIndex;
+            var previousIndex = (sliceIndex + sliceCount + (clockwise ? -1 : 1)) % sliceCount;
+            var previousSelected = previousIndex == selectedSliceIndex;
+            var longSlice = selected || previousSelected;
+            if ((selectedSliceIndex == -1) ||
+                longSlice) {
+                var length =
+                    longSlice
+                        ? sliceLengthSelected
+                        : sliceLength;
+                var dx = -Math.cos(direction - halfTurn);
+                var dy = -Math.sin(direction - halfTurn);
+                context.beginPath();
+                context.moveTo(
+                    cx + (dx * inactiveDistance),
+                    cy + (dy * inactiveDistance));
+                context.lineTo(
+                    cx + (dx * (inactiveDistance + length)),
+                    cy + (dy * (inactiveDistance + length)));
+                context.strokeStyle = 'black';
+                context.lineWidth = 1;
+                context.stroke();
+            }
+        }
+
+        direction += turn;
+    }
+
+    success();
+}
+
+
+function DrawToCanvas(params, drawer, success, error)
+{
+    var width = params.width;
+    var height = params.height;
+    var canvas = 
+        d3.select('body')
+            .append('canvas')
+            .attr('width', width)
+            .attr('height', height);
+    var canvasNode =
+        canvas.node();
+    var context =
+        canvasNode.getContext('2d');
+
+    drawer(
+        canvas,
+        context,
+        params,
+        function() {
+            canvasNode.toBlob(function(blob) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var data = e.target.result;
+                    success(data, params.width, params.height, params);
+                    canvasNode.parentNode.removeChild(canvasNode);
+                };
+                reader.onerror = reader.onabort = function(e) {
+                    error(params);
+                    canvasNode.parentNode.removeChild(canvasNode);
+                };
+                reader.readAsDataURL(blob);
+            });
+        }, 
+        function() {
+            canvasNode.parentNode.removeChild(canvasNode);
+            error(params);
+        });
 
 }
 
@@ -307,11 +492,13 @@ function CreatePieTracker()
         CallHandler(handler, pie, target);
     }
 
+
     function HandleStopPie(pie, target)
     {
         var handler = SearchDefault('onstoppie', pie, target, null);
         CallHandler(handler, pie, target);
     }
+
 
     function HandleConstructPie(pie, target)
     {
@@ -319,11 +506,13 @@ function CreatePieTracker()
         CallHandler(handler, pie, target);
     }
 
+
     function HandleDeconstructPie(pie, target)
     {
         var handler = SearchDefault('ondeconstructpie', pie, target, null);
         CallHandler(handler, pie, target);
     }
+
 
     function HandleLayoutPie(pie, target)
     {
@@ -331,11 +520,13 @@ function CreatePieTracker()
         CallHandler(handler, pie, target);
     }
 
+
     function HandleShowPie(pie, target)
     {
         var handler = SearchDefault('onshowpie', pie, target, null);
         CallHandler(handler, pie, target);
     }
+
 
     function HandleHidePie(pie, target)
     {
@@ -343,11 +534,13 @@ function CreatePieTracker()
         CallHandler(handler, pie, target);
     }
 
+
     function HandleCancelPie(pie, target)
     {
         var handler = SearchDefault('oncancelpie', pie, target, null);
         CallHandler(handler, pie, target);
     }
+
 
     function HandleSelectCenterPie(pie, target)
     {
@@ -355,11 +548,13 @@ function CreatePieTracker()
         CallHandler(handler, pie, target);
     }
 
+
     function HandleSelectPie(pie, target)
     {
         var handler = SearchDefault('onselectpie', pie, target, null);
         CallHandler(handler, pie, target);
     }
+
 
     function HandleSelectEmptySlice(sliceIndex, pie, target)
     {
@@ -374,17 +569,20 @@ function CreatePieTracker()
         CallHandler(handler, slice, pie, target);
     }
 
+
     function HandleSelectEmptyItem(itemIndex, slice, pie, target)
     {
         var handler = SearchDefault('onselectemptyitem', slice, pie, target, null);
         CallHandler(handler, itemIndex, slice, pie, target);
     }
 
+
     function HandleSelectItem(item, slice, pie, target)
     {
         var handler = SearchDefault('onselectitem', item, slice, pie, target, null);
         CallHandler(handler, item, slice, pie, target);
     }
+
 
     function HandleTrackPie(pie, target)
     {
@@ -490,7 +688,7 @@ function CreatePieTracker()
         //console.log("HandleEnterItem", item.label, item.labelObject.id);
         if (item.labelObject) {
             UpdateObject(item.labelObject, {
-                'textMesh/text': '<b>' + item.label + '</b>'
+                'textMesh/text': '<b><size=150%>' + item.label
             });
         }
         var handler = SearchDefault('onenteritem', item, slice, pie, target, null);
@@ -533,24 +731,32 @@ function CreatePieTracker()
             return;
         }
 
+        //pie.clockwise = false;
+
         pieTracker.tracking = true;
         pieTracker.pinned = pinned;
         pieTracker.target = target;
         pieTracker.slices = pie.slices ? pie.slices.length : 0;
+        pieTracker.piePosition = position;
 
         UpdateInterests(pieTracker, {
             MousePositionChanged: true
         });
+
+        var initialDirection = SearchDefault('initialDirection', pie, pieTracker, true);
+        var clockwise = SearchDefault('clockwise', pie, pieTracker, true);
+        var inactiveDistance = SearchDefault('inactiveDistance', pie, pieTracker, true);
+        var itemDistance = SearchDefault('itemDistance', pie, pieTracker, true);
 
         UpdateObject(pieTracker, {
             trackingMousePosition: true,
             mousePositionChanged: true,
             mousePositionStart: position,
             slices: pieTracker.slices,
-            initialDirection: pieTracker.initialDirection,
-            clockwise: pieTracker.clockwise,
-            inactiveDistance: pieTracker.inactiveDistance,
-            itemDistance: pieTracker.itemDistance
+            initialDirection: initialDirection,
+            clockwise: clockwise,
+            inactiveDistance: inactiveDistance,
+            itemDistance: itemDistance
         });
 
         TrackPie(position, 0.0, 0.0, -1, -1, true);
@@ -666,8 +872,8 @@ function CreatePieTracker()
                     'textMesh/text': pie.label,
                     'textMesh/fontSize': SearchDefault('pieLabelFontSize', pie, pieTracker, 24),
                     'textMesh/color': SearchDefault('pieLabelFontColor', pie, pieTracker, { r: 0.5, g: 0.5,b: 1.0 }),
-                    'textMesh/alignment': SearchDefault('pieLabelAlignment', pie, pieTracker, 'Center'),
-                    'textMesh/anchor': SearchDefault('pieLabelAnchor', pie, pieTracker, 'Center')
+                    'textMesh/alignment': SearchDefault('pieLabelAlignment', pie, pieTracker, 'Center')//,
+                    //'textMesh/anchor': SearchDefault('pieLabelAnchor', pie, pieTracker, 'Center')
                 },
                 postEvents: [
                     {
@@ -702,8 +908,8 @@ function CreatePieTracker()
                                     'textMesh/text': item.label,
                                     'textMesh/fontSize': SearchDefault('itemLabelFontSize', item, slice, pie, pieTracker, 24),
                                     'textMesh/color': SearchDefault('itemLabelFontColor', item, slice, pie, pieTracker, { r: 0.5, g: 0.5, b: 1.0 }),
-                                    'textMesh/alignment': SearchDefault('itemLabelAlignment', item, slice, pie, pieTracker, 'Center'),
-                                    'textMesh/anchor': SearchDefault('itemLabelAnchor', item, slice, pie, pieTracker, 'Center')
+                                    'textMesh/alignment': SearchDefault('itemLabelAlignment', item, slice, pie, pieTracker, 'Center')//,
+                                    //'textMesh/anchor': SearchDefault('itemLabelAnchor', item, slice, pie, pieTracker, 'Center')
                                 },
                                 postEvents: [
                                     {
@@ -786,15 +992,16 @@ function CreatePieTracker()
         var maxDistance = 0;
 
         var slices = pie.slices;
-        if (slices) {
+        if (slices && slices.length) {
             var sliceCount = slices.length;
-            var turn = (2 * Math.PI) / sliceCount;
+            var clockwiseSign = clockwise ? -1 : 1;
+            var turn = sliceCount ? (clockwiseSign * 2.0 * Math.PI / sliceCount) : 0;
             var sliceDirection = initialDirection * (Math.PI / 180.0);
             for (var sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++, sliceDirection += turn) {
                 var slice = slices[sliceIndex];
                 var items = slice.items;
                 if (items) {
-                    var sliceDX = -Math.cos(sliceDirection);
+                    var sliceDX = Math.cos(sliceDirection);
                     var sliceDY = Math.sin(sliceDirection);
                     var vertical = Math.abs(sliceDX) < 0.001;
                     var pivot = {
@@ -814,9 +1021,11 @@ function CreatePieTracker()
                         var item = items[itemIndex];
                         //console.log("LayoutPie: itemIndex: " + itemIndex + " item:", JSON.stringify(item));
                         if (item.labelObject) {
-                            var anchor = {
-                                x: sliceDX * (itemLabelDistance + (itemDistance * itemIndex)),
-                                y: sliceDY * (itemLabelDistance + (itemDistance * itemIndex))
+                            var itemLabelPosition = SearchDefault('itemLabelPosition', item, slice, pie, pieTracker, null);
+                            var itemLabelOffset = SearchDefault('itemLabelOffset', item, slice, pie, pieTracker, { x: 0, y: 0 });
+                            var anchor = itemLabelPosition || {
+                                x: itemLabelOffset.x + (sliceDX * (itemLabelDistance + (itemDistance * itemIndex))),
+                                y: itemLabelOffset.y + (sliceDY * (itemLabelDistance + (itemDistance * itemIndex)))
                             };
                             UpdateObject(item.labelObject, {
                                 'component:RectTransform/anchoredPosition': anchor,
@@ -829,10 +1038,7 @@ function CreatePieTracker()
         }
 
         if (pie.labelObject) {
-            var labelPosition = {
-                x: 0,
-                y: 0
-            };
+            var labelPosition = SearchDefault('pieLabelPosition', pie, pieTracker, { x: 0, y: 0 });
             UpdateObject(pie.labelObject, {
                 'component:RectTransform/anchoredPosition': labelPosition
             });
@@ -914,7 +1120,7 @@ function CreatePieTracker()
 
         var lastSlice = 
             (pie.slices && 
-             (pieTracker.sliceIndex >= 0))
+             (lastSliceIndex >= 0))
                 ? pie.slices[lastSliceIndex]
                 : null;
 
@@ -947,6 +1153,14 @@ function CreatePieTracker()
         var changedItem = 
             changedSlice || 
             (lastItemIndex != nextItemIndex);
+
+        pieTracker.mousePosition = position;
+        pieTracker.distance = distance;
+        pieTracker.direction = direction;
+        pieTracker.sliceIndex = nextSliceIndex;
+        pieTracker.itemIndex = nextItemIndex;
+        pieTracker.slice = nextSlice;
+        pieTracker.item = nextItem;
 
         if (changedSlice) {
 
@@ -1007,14 +1221,6 @@ function CreatePieTracker()
 
         }
 
-        pieTracker.mousePosition = position;
-        pieTracker.distance = distance;
-        pieTracker.direction = direction;
-        pieTracker.sliceIndex = nextSliceIndex;
-        pieTracker.itemIndex = nextItemIndex;
-        pieTracker.slice = nextSlice;
-        pieTracker.item = nextItem;
-
         HandleTrackPie(pie, target);
 
         if (nextSliceIndex < 0) {
@@ -1048,12 +1254,20 @@ function CreatePieTracker()
             pinned: false,
             pinnable: true,
             target: null,
-            id: 'Compass',
+            id: 'main',
             slices: 8,
             initialDirection: 90,
             clockwise: true,
             inactiveDistance: 50,
             itemDistance: 50,
+            drawBackground: 'DrawBackground_Pie',
+            drawBackgroundGradient: true,
+            backgroundGradientInnerRadius: 50,
+            backgroundGradientOuterRadius: 250,
+            drawInactiveCircle: true,
+            drawSlices: true,
+            sliceLength: 10,
+            sliceLengthSelected: 100,
             startMousePosition: null,
             startCameraPosition: null,
             startCameraRotation: null,
@@ -1084,41 +1298,42 @@ function CreatePieTracker()
                 console.log("Delete", target);
                 DestroyObject(target);
             },
+            Fix: function(item, slice, pie, target) {
+                UpdateObject(target, {
+                    'component:Rigidbody/isKinematic': true
+                });
+            },
+            Free: function(item, slice, pie, target) {
+                UpdateObject(target, {
+                    'component:Rigidbody/isKinematic': false
+                });
+            },
             pies: {
 
-                'Compass': {
-                    label: 'Compass',
-                    onselectcenterpie: function(pie, target) {
-                    },
+                'navigate': {
+                    label: 'Navigate',
                     slices: [
                         {
                             items: [
                                 {
-                                    label: "North",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass North", item, slice, pie, target);
-                                    }
-                                },
-                                {
-                                    label: "Norther",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass Norther", item, slice, pie, target);
-                                    }
-                                },
-                                {
-                                    label: "Northest",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass Northest", item, slice, pie, target);
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            items: [
-                                {
-                                    label: "NorthEast",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass NorthEast", item, slice, pie, target);
+                                    label: "Approach",
+                                    onenteritem: function(item, slice, pie, target) {
+                                        console.log("Approach ENTER", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            wheelZoomVelocity: (globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.wheelZoomScale
+                                        });
+                                    },
+                                    ontrackitem: function(item, slice, pie, target) {
+                                        console.log("Approach TRACK", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            wheelZoomVelocity: (globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.wheelZoomScale
+                                        });
+                                    },
+                                    onexititem: function(item, slice, pie, target) {
+                                        console.log("Approach EXIT", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            wheelZoomVelocity: 0
+                                        });
                                     }
                                 }
                             ]
@@ -1126,9 +1341,24 @@ function CreatePieTracker()
                         {
                             items: [
                                 {
-                                    label: "East",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass East", item, slice, pie, target);
+                                    label: "Turn =>",
+                                    onenteritem: function(item, slice, pie, target) {
+                                        console.log("Turn => ENTER", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            yawVelocity: (globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.yawScale
+                                        });
+                                    },
+                                    ontrackitem: function(item, slice, pie, target) {
+                                        console.log("Turn => TRACK", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            yawVelocity: (globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.yawScale
+                                        });
+                                    },
+                                    onexititem: function(item, slice, pie, target) {
+                                        console.log("Turn => EXIT", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            yawVelocity: 0
+                                        });
                                     }
                                 }
                             ]
@@ -1136,9 +1366,24 @@ function CreatePieTracker()
                         {
                             items: [
                                 {
-                                    label: "SouthEast",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass SouthEast", item, slice, pie, target);
+                                    label: "Retreat",
+                                    onenteritem: function(item, slice, pie, target) {
+                                        console.log("Retreat ENTER", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            wheelZoomVelocity: -(globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.wheelZoomScale
+                                        });
+                                    },
+                                    ontrackitem: function(item, slice, pie, target) {
+                                        console.log("Retreat TRACK", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            wheelZoomVelocity: -(globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.wheelZoomScale
+                                        });
+                                    },
+                                    onexititem: function(item, slice, pie, target) {
+                                        console.log("Retreat EXIT", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            wheelZoomVelocity: 0
+                                        });
                                     }
                                 }
                             ]
@@ -1146,51 +1391,24 @@ function CreatePieTracker()
                         {
                             items: [
                                 {
-                                    label: "South",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass South", item, slice, pie, target);
-                                    }
-                                },
-                                {
-                                    label: "Souther",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass Souther", item, slice, pie, target);
-                                    }
-                                },
-                                {
-                                    label: "Southest",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass Southest", item, slice, pie, target);
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            items: [
-                                {
-                                    label: "SouthWest",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass SouthWest", item, slice, pie, target);
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            items: [
-                                {
-                                    label: "West",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass West", item, slice, pie, target);
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            items: [
-                                {
-                                    label: "NorthWest",
-                                    onselectitem: function(item, slice, pie, target) {
-                                        console.log("pie Compass NorthWest", item, slice, pie, target);
+                                    label: "<= Turn",
+                                    onenteritem: function(item, slice, pie, target) {
+                                        console.log("<= Turn ENTER", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            yawVelocity: -(globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.yawScale
+                                        });
+                                    },
+                                    ontrackitem: function(item, slice, pie, target) {
+                                        console.log("<= Turn TRACK", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            yawVelocity: -(globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.yawScale
+                                        });
+                                    },
+                                    onexititem: function(item, slice, pie, target) {
+                                        console.log("<= Turn EXIT", globals.pieTracker.distance);
+                                        UpdateObject(globals.proCamera, {
+                                            yawVelocity: 0
+                                        });
                                     }
                                 }
                             ]
@@ -1212,12 +1430,14 @@ function CreatePieTracker()
                     screenSize: "screenSize",
                     mousePosition: "mousePosition",
                     mouseRaycastResult: "mouseRaycastResult",
+                    mouseRaycastHitPoint: "mouseRaycastHit/point",
                     mouseRaycastHitBridgeObjectID: "mouseRaycastHitBridgeObjectID?"
                 },
                 handler: function (obj, results) {
-                    //console.log("PieTracker: MouseButtonDown: results:", results, "pieTracker.tracking:", pieTracker.tracking);
+                    //console.log("PieTracker: MouseButtonDown: results:", JSON.stringify(results), "pieTracker.tracking:", pieTracker.tracking);
 
                     pieTracker.screenSize = results.screenSize;
+                    pieTracker.mouseRaycastHitPoint = results.mouseRaycastHitPoint;
 
                     if (pieTracker.tracking) {
                         //console.log("PieTracker: MouseButtonDown: already tracking pie so ignoring. updating pieTracker.mousePosition from", pieTracker.mousePosition, "to", results.mousePosition);
@@ -1330,6 +1550,39 @@ function CreatePieTracker()
     });
 
 
+}
+
+
+function DrawPieBackground(pie, target)
+{
+    //console.log("game.js: DrawPieBackground: pie:", pie);
+    var pieTracker = globals.pieTracker;
+
+    var drawBackgroundName = SearchDefault('drawBackground', pie, pieTracker, 'DrawBackground_Pie');
+    var drawBackground = eval(drawBackgroundName);
+    var params = {
+        width: 512, 
+        height: 512, 
+        pie: pie,
+        target: target
+    };
+    DrawToCanvas(params,
+        drawBackground,
+        function(data, width, height, params) {
+            //console.log("pie DrawToCanvas success", data.length, data);
+            UpdateObject(pie.groupObject, {
+                'component:RectTransform/sizeDelta': { x: width, y: height },
+                'component:UnityEngine.UI.RawImage/texture': {
+                    type: 'datauri',
+                    uri: data,
+                    width: width,
+                    height: height
+                }
+            });
+        },
+        function(params) {
+            console.log("pie DrawToCanvas error");
+        });
 }
 
 
@@ -2067,8 +2320,17 @@ function CreatePies()
     var world = globals.world;
 
     if (globals.pieTracker) {
-        Object.assign(globals.pieTracker.pies, world.pies);
+        Object.assign(globals.pieTracker.pies, world.pie.pies);
     }
+
+    for (var id in globals.pieTracker.pies) {
+        var pie = globals.pieTracker.pies[id];
+        pie.onshowpie = function(pie, target) { DrawPieBackground(pie, target); };
+        pie.onenterpiecenter = function(pie, target) { DrawPieBackground(pie, target); };
+        pie.onenteremptyslice = function(sliceIndex, pie, target) { DrawPieBackground(pie, target); };
+        pie.onenterslice = function(slice, pie, target) { DrawPieBackground(pie, target); };
+    }
+
 }
 
 

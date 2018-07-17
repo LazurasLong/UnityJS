@@ -22,6 +22,10 @@ public class Tracker : BridgeObject {
     public bool mouseEntered = false;
     public float mouseEnteredTime = 0.0f;
     public bool mouseEnteredChanged = false;
+    public bool triggerTracking = false;
+    public bool triggerEntered = false;
+    public float triggerEnteredTime = 0.0f;
+    public bool triggerEnteredChanged = false;
     public bool mouseDown = false;
     public float mouseDownTime = 0.0f;
     public bool mouseDownChanged = false;
@@ -295,6 +299,64 @@ public class Tracker : BridgeObject {
     {
         //Debug.Log("Tracker: HandleMouseExit", this);
         SendEventName("MouseExit");
+    }
+    
+
+    public virtual void SetTriggerEntered(bool triggerEntered0)
+    {
+        //Debug.Log("Tracker: SetTriggerEntered: triggerEntered0: " + triggerEntered0, this);
+        if (triggerEntered != triggerEntered0) {
+            triggerEnteredChanged = true;
+            triggerEntered = triggerEntered0;
+        }
+    }
+
+
+    public virtual void OnTriggerEnter()
+    {
+        if (!triggerTracking) {
+            return;
+        }
+
+        //Debug.Log("Tracker: OnTriggerEnter", this);
+
+        TrackMousePosition();
+
+        SetTriggerEntered(true);
+
+        triggerEnteredTime = Time.time;
+
+        HandleTriggerEnter();
+    }
+
+
+    public virtual void HandleTriggerEnter()
+    {
+        //Debug.Log("Tracker: HandleTriggerEnter", this);
+        SendEventName("TriggerEnter");
+    }
+    
+
+    public virtual void OnTriggerExit()
+    {
+        if (!triggerTracking) {
+            return;
+        }
+
+        //Debug.Log("Tracker: OnTriggerExit", this);
+
+        TrackMousePosition();
+
+        SetTriggerEntered(false);
+
+        HandleTriggerExit();
+    }
+
+
+    public virtual void HandleTriggerExit()
+    {
+        //Debug.Log("Tracker: HandleTriggerExit", this);
+        SendEventName("TriggerExit");
     }
     
 

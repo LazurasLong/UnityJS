@@ -133,7 +133,7 @@ function SearchDefault()
     }
 
     // Didn't find it, so return the default.
-    return arguments[argumentCount];
+    return arguments[argumentCount - 1];
 
 }
 

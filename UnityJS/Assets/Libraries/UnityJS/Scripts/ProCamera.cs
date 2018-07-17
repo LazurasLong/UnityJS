@@ -21,10 +21,20 @@ public class ProCamera : BridgeObject {
     public Camera proCamera;
     public float yaw;
     public float pitch;
-    public float moveSpeed = 3.0f;
-    public float rotateSpeed = 3.0f;
-    public float zoomSpeed = 1.0f;
-    public float panSpeed = 1.0f;
+    public float moveSpeed = 60.0f;
+    public float yawSpeed = 60.0f;
+    public float pitchSpeed = 60.0f;
+    public float orbitYawSpeed = 60.0f;
+    public float orbitPitchSpeed = 60.0f;
+    public float wheelZoomSpeed = 30.0f;
+    public float wheelPanSpeed = -30.0f;
+    public Vector3 moveVelocity = Vector3.zero;
+    public float yawVelocity = 0.0f;
+    public float pitchVelocity = 0.0f;
+    public float orbitYawVelocity = 0.0f;
+    public float orbitPitchVelocity = 0.0f;
+    public float wheelZoomVelocity = 0.0f;
+    public float wheelPanVelocity = 0.0f;
     public Vector3 positionMin = new Vector3(-100.0f, 0.0f, -100.0f);
     public Vector3 positionMax = new Vector3(100.0f, 20.0f, 100.0f);
     public float pitchMin = -90f;
@@ -35,6 +45,8 @@ public class ProCamera : BridgeObject {
     public Quaternion initialRotation;
     public Vector3 initialEulers;
     public Vector3 zoomDeltaRotated;
+    public Vector3 orbitLocation;
+
 
     ////////////////////////////////////////////////////////////////////////
     // Instance Methods
@@ -67,47 +79,59 @@ public class ProCamera : BridgeObject {
 
         }
 
-        Vector3 moveDelta = Vector3.zero;
-        float yawDelta = 0.0f;
-        float pitchDelta = 0.0f;
-        float zoomDelta = 0.0f;
+        float deltaTime = Time.deltaTime;
+        Vector3 moveDelta = moveVelocity * deltaTime;
+        float yawDelta = yawVelocity * deltaTime;
+        float pitchDelta = pitchVelocity * deltaTime;
+        float orbitYawDelta = orbitYawVelocity * deltaTime;
+        float orbitPitchDelta = orbitPitchVelocity * deltaTime;
+        float wheelZoomDelta = wheelZoomVelocity * deltaTime;
+        float wheelPanDelta = wheelPanVelocity * deltaTime;
 
         if (Input.GetKey("w")) {
-            moveDelta.z += moveSpeed;
+            moveDelta.z += moveSpeed * deltaTime;
         }
         if (Input.GetKey("s")) {
-            moveDelta.z -= moveSpeed;
+            moveDelta.z -= moveSpeed * deltaTime;
         }
         if (Input.GetKey("a")) {
-            moveDelta.x -= moveSpeed;
+            moveDelta.x -= moveSpeed * deltaTime;
         }
         if (Input.GetKey("d")) {
-            moveDelta.x += moveSpeed;
+            moveDelta.x += moveSpeed * deltaTime;
         }
         if (Input.GetKey("z")) {
-            moveDelta.y -= moveSpeed;
+            moveDelta.y -= moveSpeed * deltaTime;
         }
         if (Input.GetKey("x")) {
-            moveDelta.y += moveSpeed;
+            moveDelta.y += moveSpeed * deltaTime;
         }
         if (Input.GetKey("q")) {
-            yawDelta -= rotateSpeed;
+            yawDelta -= yawSpeed * deltaTime;
         }
         if (Input.GetKey("e")) {
-            yawDelta += rotateSpeed;
+            yawDelta += yawSpeed * deltaTime;
         }
         if (Input.GetKey("r")) {
-            pitchDelta -= rotateSpeed;
+            pitchDelta -= pitchSpeed * deltaTime;
         }
         if (Input.GetKey("f")) {
-            pitchDelta += rotateSpeed;
+            pitchDelta += pitchSpeed * deltaTime;
         }
-        if (Input.mouseScrollDelta.x != 0) {
-            yawDelta += Input.mouseScrollDelta.x * panSpeed;
+        if (Input.GetKey("i")) {
+            orbitYawDelta += orbitYawSpeed * deltaTime;
         }
-        if (Input.mouseScrollDelta.y != 0) {
-            zoomDelta += Input.mouseScrollDelta.y * zoomSpeed;
+        if (Input.GetKey("m")) {
+            orbitYawDelta -= orbitYawSpeed * deltaTime;
         }
+        if (Input.GetKey("j")) {
+            orbitPitchDelta += orbitPitchSpeed * deltaTime;
+        }
+        if (Input.GetKey("k")) {
+            orbitPitchDelta -= orbitPitchSpeed * deltaTime;
+        }
+        wheelZoomDelta += Input.mouseScrollDelta.y * wheelZoomSpeed * deltaTime;
+        wheelPanDelta += Input.mouseScrollDelta.x * wheelPanSpeed * deltaTime;
 
         if ((yawDelta != 0.0f) || 
             (pitchDelta != 0.0f)) {
@@ -138,10 +162,10 @@ public class ProCamera : BridgeObject {
         }
 
 
-        if (zoomDelta != 0.0f) {
+        if (wheelZoomDelta != 0.0f) {
             zoomDeltaRotated =
                 transform.rotation *
-                (Vector3.forward * zoomDelta * zoomSpeed);
+                (Vector3.forward * wheelZoomDelta * wheelZoomSpeed);
 
             Vector3 pos =
                 transform.position + zoomDeltaRotated;

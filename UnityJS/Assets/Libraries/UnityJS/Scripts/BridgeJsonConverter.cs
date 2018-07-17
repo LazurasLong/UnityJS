@@ -778,18 +778,60 @@ public class BridgeJsonConverter : JsonConverter {
                         return true;
                     }
 
-                    if (reader.TokenType != JsonToken.String) {
+                    if (reader.TokenType == JsonToken.String) {
+
+                        string resourcePath = (string)JValue.Load(reader);
+                        //Debug.Log("BridgeJsonConverter: convertToObjectMap: Texture: resourcePath: " + resourcePath);
+
+                        Texture resource = (Texture)Resources.Load(resourcePath);
+                        //Debug.Log("BridgeJsonConverter: convertToObjectMap: Texture: resource: " + resource, resource);
+
+                        result = resource;
+                        return true;
+
+                    }
+
+                    JObject obj = JObject.Load(reader);
+
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Texture: obj: " + obj);
+
+                    if (obj == null) {
                         return false;
                     }
 
-                    string resourcePath = (string)JValue.Load(reader);
-                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Texture: resourcePath: " + resourcePath);
+                    string type = obj.GetString("type");
 
-                    Texture resource = (Texture)Resources.Load(resourcePath);
-                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Texture: resource: " + resource, resource);
+                    if (type == null) {
+                        return false;
+                    }
 
-                    result = resource;
-                    return true;
+                    switch (type) {
+
+                        case "datauri":
+                            string uri = obj.GetString("uri");
+                            string dataImagePNGBase64Prefix = "data:image/png;base64,";
+                            if (uri.StartsWith(dataImagePNGBase64Prefix)) {
+                                string base64 = uri.Substring(dataImagePNGBase64Prefix.Length);
+                                byte[] bytes = System.Convert.FromBase64String(base64);
+                                Texture2D texture = new Texture2D(1, 1);
+                                texture.LoadImage(bytes);
+                                result = texture;
+                                return true;
+                            } else {
+                                return false;
+                            }
+
+                        case "resource":
+                            string resourcePath = obj.GetString("path");
+                            Texture resource = (Texture)Resources.Load(resourcePath);
+                            result = resource;
+                            return true;
+
+                        default:
+                            return false;
+
+                    }
+
                 }
             },
 

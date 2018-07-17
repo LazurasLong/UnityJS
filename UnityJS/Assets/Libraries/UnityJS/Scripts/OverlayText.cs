@@ -30,7 +30,9 @@ public class OverlayText : BridgeObject {
     public TextMeshProUGUI textMesh;
     public TrackPosition trackPosition = TrackPosition.Passive;
     public Vector2 screenPosition;
+    public Vector2 screenOffset;
     public Vector3 worldPosition;
+    public Vector3 worldOffset;
     public Transform transformPosition;
 
 
@@ -70,8 +72,10 @@ public class OverlayText : BridgeObject {
                  goto case TrackPosition.World;
 
             case TrackPosition.World:
+                Vector3 pos = 
+                    worldPosition + worldOffset;
                 screenPosition =
-                    Camera.main.WorldToScreenPoint(worldPosition);
+                    Camera.main.WorldToScreenPoint(pos);
                 goto case TrackPosition.Screen;
 
             case TrackPosition.Screen:
@@ -87,7 +91,9 @@ public class OverlayText : BridgeObject {
 
         if (active && trackScreen) {
             RectTransform rt = gameObject.GetComponent<RectTransform>();
-            rt.anchoredPosition = screenPosition;
+            rt.anchoredPosition = 
+                screenPosition + screenOffset +
+                new Vector2(-0.5f * Screen.width, -0.5f * Screen.height);
         }
 
     }
