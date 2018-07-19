@@ -821,6 +821,15 @@ public class BridgeJsonConverter : JsonConverter {
                                 return false;
                             }
 
+                        case "sharedtexture":
+                            int id = obj.GetInteger("id");
+                            Texture2D sharedTexture = Bridge.bridge.GetSharedTexture(id);
+                            result = sharedTexture;
+                            if (result == null) {
+                                return false;
+                            }
+                            return true;
+
                         case "resource":
                             string resourcePath = obj.GetString("path");
                             Texture resource = (Texture)Resources.Load(resourcePath);

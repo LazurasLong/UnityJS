@@ -186,4 +186,17 @@ public class BridgeTransport : MonoBehaviour
     }
 
 
+    public virtual bool HasSharedTextures()
+    {
+        return false;
+    }
+
+
+    public virtual Texture2D GetSharedTexture(int id)
+    {
+        Debug.LogError("BridgeTransport: TODO: GetSharedTexture: id: " + id);
+        return null;
+    }
+
+
 }

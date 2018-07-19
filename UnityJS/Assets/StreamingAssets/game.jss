@@ -218,24 +218,10 @@ function CreateBrowserRenderer()
     }
 
 
-    var url = 'https://beta.observablehq.com/@mbostock/d3-bubble-chart';
-    var width = 1024;
-    var height = 1024;
-    var iframe = globals.iframe = document.createElement('iframe');
-    iframe.src = url;
-    iframe.width = width;
-    iframe.height = height;
-    iframe.style.border = 0;
-    iframe.style.margin = 0;
-    iframe.style.padding = 0;
-    iframe.addEventListener('load', HandleIframeLoaded);
-    document.body.appendChild(iframe);
-
-
     function Render(results)
     {
         browserRenderer.renderQueue.push(results);
-        HandleRender();
+        HandleRendering();
     }
 
 
@@ -257,7 +243,7 @@ function CreateBrowserRenderer()
         interests: {
             Render: {
                 handler: function (obj, results) {
-                    console.log("BrowserRenderer: Render: obj:", obj, "results:", results);
+                    //console.log("game.js: BrowserRenderer: Render: obj:", obj, "results:", results);
                     Render(results);
                 }
             }
@@ -413,23 +399,54 @@ function DrawToCanvas(params, drawer, success, error)
         context,
         params,
         function() {
-            canvasNode.toBlob(function(blob) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var data = e.target.result;
-                    success(data, params.width, params.height, params);
+            var texture = null;
+            switch (globals.driver) {
+
+                case "WebGL":
+                    var id = params.pie.backgroundSharedTextureID;
+                    if (!id) {
+                        params.pie.backgroundSharedTextureID = id = 
+                            window.bridge._UnityJS_AllocateTexture(params.width, params.height);
+                        //console.log("game.js: DrawToCanvas: WebGL: AllocateTexture: width: " + params.width + " height: " + params.height + " id: " + id);
+                    }
+                    var imageData =
+                        context.getImageData(0, 0, params.width, params.height);
+                    window.bridge._UnityJS_UpdateTexture(id, imageData);
+                    texture = {
+                        type: 'sharedtexture',
+                        id: id
+                    };
+                    success(texture, params);
                     canvasNode.parentNode.removeChild(canvasNode);
-                };
-                reader.onerror = reader.onabort = function(e) {
-                    error(params);
-                    canvasNode.parentNode.removeChild(canvasNode);
-                };
-                reader.readAsDataURL(blob);
-            });
+                    break;
+
+                default:
+                    canvasNode.toBlob(function(blob) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            var data = e.target.result;
+                            var texture = {
+                                type: 'datauri',
+                                uri: data,
+                                width: width,
+                                height: height
+                            };
+                            success(texture, params.width, params.height, params);
+                            canvasNode.parentNode.removeChild(canvasNode);
+                        };
+                        reader.onerror = reader.onabort = function(e) {
+                            error(params);
+                            canvasNode.parentNode.removeChild(canvasNode);
+                        };
+                        reader.readAsDataURL(blob);
+                    });
+                    break;
+
+            }
         }, 
         function() {
-            canvasNode.parentNode.removeChild(canvasNode);
             error(params);
+            canvasNode.parentNode.removeChild(canvasNode);
         });
 
 }
@@ -1567,18 +1584,17 @@ function DrawPieBackground(pie, target)
         pie: pie,
         target: target
     };
+
     DrawToCanvas(params,
         drawBackground,
-        function(data, width, height, params) {
-            //console.log("pie DrawToCanvas success", data.length, data);
+        function(texture, params) {
+            //console.log("pie DrawToCanvas success", texture);
             UpdateObject(pie.groupObject, {
-                'component:RectTransform/sizeDelta': { x: width, y: height },
-                'component:UnityEngine.UI.RawImage/texture': {
-                    type: 'datauri',
-                    uri: data,
-                    width: width,
-                    height: height
-                }
+                'component:RectTransform/sizeDelta': {
+                    x: params.width, 
+                    y: params.height 
+                },
+                'component:UnityEngine.UI.RawImage/texture': texture
             });
         },
         function(params) {

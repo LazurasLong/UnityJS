@@ -9,9 +9,9 @@ mergeInto(LibraryManager.library, {
 
 
     // Called by Unity when awakened.
-    _UnityJS_HandleAwake: function _UnityJS_HandleAwake() 
+    _UnityJS_HandleAwake: function _UnityJS_HandleAwake(allocateTextureCallback, freeTextureCallback, lockTextureCallback, unlockTextureCallback)
     {
-        //console.log("bridge.jslib: _UnityJS_HandleAwake");
+        //console.log("UnityJS.jslib: _UnityJS_HandleAwake: allocateTextureCallback: " + allocateTextureCallback + " freeTextureCallback: " + freeTextureCallback + " lockTextureCallback: " + lockTextureCallback + " unlockTextureCallback: " + unlockTextureCallback);
 
         if (!window.bridge) {
             window.bridge = {};
@@ -31,13 +31,59 @@ mergeInto(LibraryManager.library, {
         }
 
         window.bridge._UnityJS_SendJSToUnityEvents = _UnityJS_SendJSToUnityEvents;
+
+        function _UnityJS_AllocateTexture(width, height)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_AllocateTexture: width: " + width + " height: " + height + " allocateTextureCallback: " + allocateTextureCallback);
+            var result = Runtime.dynCall('iii', allocateTextureCallback, [width, height]);
+            //console.log("UnityJS.jslib: _UnityJS_AllocateTexture: result: " + result);
+            return result;
+        };
+        window.bridge._UnityJS_AllocateTexture = _UnityJS_AllocateTexture;
+
+        function _UnityJS_FreeTexture(id)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_FreeTexture: id: " + id + " freeTextureCallback: " + freeTextureCallback);
+            Runtime.dynCall('vi', freeTextureCallback, [id]);
+        }
+        window.bridge._UnityJS_FreeTexture = _UnityJS_FreeTexture;
+
+        function _UnityJS_LockTexture(id)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_LockTexture: id: " + id + " lockTextureCallback: " + lockTextureCallback);
+            var result = Runtime.dynCall('ii', lockTextureCallback, [id]);
+            //console.log("UnityJS.jslib: _UnityJS_LockTexture: result: " + result);
+            return result;
+        }
+        window.bridge._UnityJS_LockTexture = _UnityJS_LockTexture;
+
+        function _UnityJS_UnlockTexture(id)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_UnlockTexture: id: " + id + " unlockTextureCallback: " + unlockTextureCallback);
+            Runtime.dynCall('vi', unlockTextureCallback, [id]);
+        }
+        window.bridge._UnityJS_UnlockTexture = _UnityJS_UnlockTexture;
+
+        function _UnityJS_UpdateTexture(id, imageData)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_UpdateTexture: id: " + id + " imageData: " + imageData + " width: " + imageData.width + " height: " + imageData.height + " data: " + imageData.data);
+            var pointer = _UnityJS_LockTexture(id);
+            var byteCount = imageData.width * imageData.height * 4;
+            var heapBytes = new Uint8Array(Module.HEAPU8.buffer, pointer, byteCount);
+            //console.log("UnityJS.jslib: _UnityJS_UpdateTexture: pointer: " + pointer + " byteCount: " + byteCount + " buffer: " + buffer + " heapBytes: " + heapBytes);
+            heapBytes.set(imageData.data);
+            _UnityJS_UnlockTexture(id);
+            //console.log("UnityJS.jslib: _UnityJS_UpdateTexture: done");
+        }
+        window.bridge._UnityJS_UpdateTexture = _UnityJS_UpdateTexture;
+
     },
 
 
     // Called by Unity when destroyed.
     _UnityJS_HandleDestroy: function _UnityJS_HandleDestroy()
     {
-        //console.log("bridge.jslib: _UnityJS_HandleDestroy");
+        //console.log("UnityJS.jslib: _UnityJS_HandleDestroy");
     },
 
 
@@ -45,7 +91,7 @@ mergeInto(LibraryManager.library, {
     _UnityJS_EvaluateJS: function _UnityJS_EvaluateJS(jsPointer)
     {
         var js = Pointer_stringify(jsPointer);
-        //console.log("bridge.jslib: _UnityJS_EvaluateJS: js:", js);
+        //console.log("UnityJS.jslib: _UnityJS_EvaluateJS: js:", js);
         window.EvaluateJS(js);
     },
 

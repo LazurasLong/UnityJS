@@ -661,4 +661,10 @@ public class Bridge : MonoBehaviour {
     }
 
 
+    public Texture2D GetSharedTexture(int id)
+    {
+        return transport.GetSharedTexture(id);
+    }
+    
+
 }
