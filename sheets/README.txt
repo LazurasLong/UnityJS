@@ -93,7 +93,11 @@ NOTE: In order for clasp push to work, there may not be any extraneous
 files in the directory, including backups like "JSONster.js~" or
 "README.txt".
 
-NOTE: In the project, the script is named "JSONster.gs", but in the
-directory, it's named "JSONster.js".
+NOTE: In the project, the script is named "sheet.gs", but in the
+directory, it's named "sheet.js". While in Unity's StreamingAssets
+directory, it's named "sheet.jss". Go figure.
+
+NOTE: clasp push will fail if there is a syntax error in the
+JavaScript file.
 
 ----

@@ -32,8 +32,14 @@ public class Tracker : BridgeObject {
     public bool ignoringMouseClick = false;
     public bool isPointerOverUIObject = false;
     public bool mouseTrackingPosition = true;
+    public bool mouseTrackingPositionHover = false;
+    public float mouseTrackingPositionHoverDelay = 0.1f;
+    public bool mouseTrackingPositionHovering = false;
+    public float mouseTrackingPositionHoverMoveTime = -1.0f;
     public Vector2 screenSize = Vector2.zero;
     public Vector3 mousePosition = Vector3.zero;
+    public Vector3 mousePositionLast = Vector3.zero;
+    public bool mousePositionChanged = false;
     public Vector2 screenPosition = Vector2.zero;
     public Vector3 mousePositionToCameraOffset;
     public bool mouseTrackingRaycast = true;
@@ -108,6 +114,8 @@ public class Tracker : BridgeObject {
         }
 
         mousePosition = Input.mousePosition;
+        mousePositionChanged = mousePosition != mousePositionLast;
+
         screenSize = 
             new Vector2(
                 Screen.width, 
@@ -116,6 +124,25 @@ public class Tracker : BridgeObject {
             new Vector2(
                 mousePosition.x - (screenSize.x * 0.5f),
                 mousePosition.y - (screenSize.y * 0.5f));
+
+        if (mouseTrackingPositionHover) {
+            if (mousePositionChanged) {
+                if (mouseTrackingPositionHovering) {
+                    mouseTrackingPositionHovering = false;
+                    mouseTrackingPositionHoverMoveTime = Time.time;
+                    SendEventName("Drift");
+                }
+            } else {
+                if ((Time.time - mouseTrackingPositionHoverMoveTime) >= mouseTrackingPositionHoverDelay) {
+                    if (!mouseTrackingPositionHovering) {
+                        mouseTrackingPositionHovering = true;
+                        SendEventName("Hover");
+                    }
+                }
+            }
+        }
+
+        mousePositionLast = mousePosition;
 
         if (Camera.main == null) {
             return;
@@ -237,9 +264,9 @@ public class Tracker : BridgeObject {
 
                 SendEventName("DragMove");
 
-          }
+            }
 
-       }
+        }
 
     }
 

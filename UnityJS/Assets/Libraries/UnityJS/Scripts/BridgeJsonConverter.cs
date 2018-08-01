@@ -145,7 +145,7 @@ public class BridgeJsonConverter : JsonConverter {
                             objectType, 
                             enumString);
 
-                    Debug.Log("BridgeJsonConverter: convertToObjectMap: Enum: enumString: " + enumString + " result: " + result);
+                    //Debug.Log("BridgeJsonConverter: convertToObjectMap: Enum: enumString: " + enumString + " result: " + result);
 
                     return true;
                 }
@@ -260,6 +260,7 @@ public class BridgeJsonConverter : JsonConverter {
 
                     if (reader.TokenType == JsonToken.String) {
                         string htmlString = (string)JValue.Load(reader);
+
                         //Debug.Log("BridgeJsonConverter: convertToObjectMap: Color: htmlString: " + htmlString);
 
                         if (!ColorUtility.TryParseHtmlString(htmlString, out color)) {
@@ -267,6 +268,9 @@ public class BridgeJsonConverter : JsonConverter {
                             return false;
                         }
 
+                        //Debug.Log("BridgeJsonConverter: convertToObjectMap: Color: result: " + color);
+
+                        result = color;
                         return true;
                     }
 
@@ -733,6 +737,7 @@ public class BridgeJsonConverter : JsonConverter {
                     JObject obj = JObject.Load(reader);
 
                     JToken colorToken = obj["color"];
+
                     Color color =
                         (colorToken == null)
                             ? Color.white
