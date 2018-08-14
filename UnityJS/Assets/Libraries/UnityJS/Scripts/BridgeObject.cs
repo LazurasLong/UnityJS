@@ -184,10 +184,7 @@ public class BridgeObject : MonoBehaviour {
 
                                 GameObject go = component.gameObject;
                                 Transform xform = go.transform;
-                                bool worldPositionStays = 
-                                    data.ContainsKey("worldPositionStays")
-                                        ? data.GetBoolean("worldPositionStays")
-                                        : true;
+                                bool worldPositionStays = data.GetBoolean("worldPositionStays", true);
                                 transform.SetParent(xform, worldPositionStays);
 
                             }
@@ -283,12 +280,6 @@ public class BridgeObject : MonoBehaviour {
 
     }
 
-
-    public void SendEvent(string eventName)
-    {
-        SendEventName(eventName);
-    }
-    
 
     public void SendEventName(string eventName, JObject data = null)
     {

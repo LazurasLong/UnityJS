@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1406315490393318}
+  m_IsPrefabAsset: 1
+--- !u!1 &1406315490393318
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4767926280826892}
+  - component: {fileID: 114835153669077938}
+  m_Layer: 0
+  m_Name: Bundle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4767926280826892
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1406315490393318}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114835153669077938
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1406315490393318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1b1ec0debb4d4ec6b150442174c9d5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 
+  bridge: {fileID: 0}
+  destroyed: 0
+  fromView: {fileID: 0}
+  fromTransform: {fileID: 0}
+  fromTransformAttached: 1
+  fromOffset: {x: 0, y: 0, z: 0}
+  fromLocalOffset: {x: 0, y: 0, z: 0}
+  fromLocalOffsetRotated: {x: 0, y: 0, z: 0}
+  fromPosition: {x: 0, y: 0, z: 0}
+  fromWidth: 0
+  fromHeight: 0
+  fromRotation: 0
+  fromAngle: 0
+  toView: {fileID: 0}
+  toTransform: {fileID: 0}
+  toTransformAttached: 1
+  toOffset: {x: 0, y: 0, z: 0}
+  toLocalOffset: {x: 0, y: 0, z: 0}
+  toLocalOffsetRotated: {x: 0, y: 0, z: 0}
+  toPosition: {x: 0, y: 0, z: 0}
+  toWidth: 0
+  toHeight: 0
+  toRotation: 0
+  toAngle: 0
+  updateWires: 0
+  updateWiresAlways: 0
+  lastChildCount: 0
+  wires: []
+  angle: 0
+  updateWireHeight: 1
+  wireHeight: 40

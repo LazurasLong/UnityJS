@@ -245,7 +245,7 @@ public class BridgeTransportWebView : BridgeTransport
 
     public void HandleResult(string result)
     {
-        //Debug.Log("BridgeTransportWebView: HandleResult: result: " + result, this);
+        //Debug.Log("BridgeTransportWebView: HandleResult: result: " + result.Length + " " + result);
 
         if (bridge == null) {
             return;
@@ -259,7 +259,7 @@ public class BridgeTransportWebView : BridgeTransport
 
     public void HandleError(string message)
     {
-        //Debug.Log("BridgeTransportWebView: HandleError: message: " + message, this);
+        Debug.Log("BridgeTransportWebView: HandleError: message: " + message, this);
     }
 
 
@@ -302,14 +302,14 @@ public class BridgeTransportWebView : BridgeTransport
 
     public override void EvaluateJS(string js)
     {
+        //Debug.Log("BridgeTransportWebView: EvaluateJS: js: " + js.Length + " " + js);
         unityJSPlugin.EvaluateJS(js);
     }
 
 
     public void EvaluateJSReturnResult(string js)
     {
-        //Debug.Log("BridgeTransportWebView: EvaluateJSReturnResult: js: " + js, this);
-
+        //Debug.Log("BridgeTransportWebView: EvaluateJSReturnResult: js: " + js.Length + " " + js);
         unityJSPlugin.EvaluateJSReturnResult(js);
     }
 

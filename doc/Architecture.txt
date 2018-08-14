@@ -416,3 +416,35 @@ Extension Methods
             vectorArray<name>: [{x:0, y:0, z:0, w:0}, ...]
                 Vector4[] value;
                 material.SetVectorArray(name, value);
+
+----
+
+LeanTweenBridge
+
+----
+
+Tracker
+
+----
+
+PieMenuTracker
+
+JavaScript pie JSON API.
+
+----
+
+JavaScript API
+
+CreatePrefab(template)
+
+    template.obj
+    template.prefab
+    template.component
+    template.preEvents
+    template.parent
+    template.worldPositionStays
+    template.update
+    template.interests
+    template.postEvents
+
+----

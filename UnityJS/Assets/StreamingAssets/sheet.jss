@@ -207,8 +207,8 @@ if (gGoogleSheets) {
         var sheetID = sheet.getSheetId();
         var row = range.getRow();
         var column = range.getColumn();
-        var rows = range.getHeight();
-        var columns = range.getWidth();
+        var rows = range.getNumRows();
+        var columns = range.getNumColumns();
 
         result.push(
           [rangeName, sheetName, sheetID, row, column, rows, columns]);
@@ -1515,7 +1515,7 @@ function LoadJSONFromSheet(sheets, ranges, scope)
             }
             var range = ranges[rangeName];
             if (!range) {
-                scope.error = "Undefined range name: " + rangeName;
+                scope.error = "Undefined range name: " + rangeName + " ranges: " + Object.keys(ranges);
                 scope.errorSheetName = scope.sheetName;
                 scope.errorRow = scope.currentRow;
                 scope.errorColumn = scope.valueColumn + 2;

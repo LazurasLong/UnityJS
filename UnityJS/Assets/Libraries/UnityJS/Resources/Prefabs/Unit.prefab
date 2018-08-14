@@ -53,6 +53,7 @@ GameObject:
   - component: {fileID: 4823667512085326}
   - component: {fileID: 54268361172271252}
   - component: {fileID: 145335458014288762}
+  - component: {fileID: 114608806361599482}
   m_Layer: 0
   m_Name: Unit
   m_TagString: Untagged
@@ -116,6 +117,71 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &114608806361599482
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1435727912626782}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 759e9968c5e5f45d7804ffcccec499d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 
+  bridge: {fileID: 0}
+  destroyed: 0
+  mouseTracking: 1
+  mouseEntered: 0
+  mouseEnteredTime: 0
+  mouseEnteredChanged: 0
+  triggerTracking: 0
+  triggerEntered: 0
+  triggerEnteredTime: 0
+  triggerEnteredChanged: 0
+  mouseDown: 0
+  mouseDownTime: 0
+  mouseDownChanged: 0
+  ignoringMouseClick: 0
+  isPointerOverUIObject: 0
+  mouseTrackingPosition: 1
+  mouseTrackingPositionHover: 0
+  mouseTrackingPositionHoverDelay: 0.1
+  mouseTrackingPositionDriftDelay: 0.1
+  mouseTrackingPositionHovering: 0
+  mouseTrackingPositionDriftTime: -1
+  screenSize: {x: 0, y: 0}
+  mousePosition: {x: 0, y: 0, z: 0}
+  mousePositionLast: {x: 0, y: 0, z: 0}
+  mousePositionChanged: 0
+  screenPosition: {x: 0, y: 0}
+  mousePositionToCameraOffset: {x: 0, y: 0, z: 0}
+  mouseTrackingRaycast: 1
+  mouseRayMaxDistance: Infinity
+  mouseRayLayerMask: -5
+  mouseRayQueryTriggerInteraction: 0
+  mouseRaycastResult: 0
+  mouseRaycastHitPointFaceCameraRotation: {x: 0, y: 0, z: 0, w: 0}
+  mouseRaycastHitBridgeObject: {fileID: 0}
+  mouseRaycastHitBridgeObjectID: 
+  mouseRaycastHitColliderBridgeObject: {fileID: 0}
+  mouseRaycastHitColliderBridgeObjectID: 
+  dragTracking: 0
+  dragging: 0
+  draggingSetsIsKinematic: 1
+  draggingLastIsKinematic: 0
+  dragStartDistance: 0
+  dragLastPosition: {x: 0, y: 0, z: 0}
+  dragLastPlanePosition: {x: 0, y: 0, z: 0}
+  dragPlanePosition: {x: 0, y: 0, z: 0}
+  dragLastMousePosition: {x: 0, y: 0, z: 0}
+  dragScreenDistance: {x: 0, y: 0, z: 0}
+  dragPlaneDistance: {x: 0, y: 0, z: 0}
+  rotateAmount: 0
+  collisionTracking: 1
+  collisionEntered: 0
+  collisionEnteredTime: 0
+  collisionEnteredChanged: 0
 --- !u!135 &135075335492985000
 SphereCollider:
   m_ObjectHideFlags: 1

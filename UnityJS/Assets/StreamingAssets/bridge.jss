@@ -147,17 +147,19 @@ function CreatePrefab(template)
 
     //console.log("bridge.js: CreatePrefab: template:", JSON.stringify(template, null, 4));
 
-    // prefab, component, obj, update, interests, preEvents, postEvents
+    // obj, prefab, component, preEvents, parent, worldPositionStays, update, interests, postEvents
 
     var obj = template.obj || {};
     var prefab = template.prefab || null;
     var component = template.component || null;
+    var preEvents = template.preEvents || null;
+    var parent = template.parent || null;
+    var worldPositionStays = template.worldPositionStays;
     var update = template.update || null;
     var interests = template.interests || null;
-    var preEvents = template.preEvents || null;
     var postEvents = template.postEvents || null;
 
-    //console.log("CreatePrefab", "obj", obj, "prefab", prefab, "component", component, "update", update, "interests", JSON.stringify(interests), "length", interests.length, "preEvent", preEvents, "postEvents", postEvents);
+    //console.log("CreatePrefab", "obj", obj, "prefab", prefab, "component", component, "preEvents", preEvents, "parent", parent, "worldPositionStays", worldPositionStays, "update", update, "interests", JSON.stringify(interests), "postEvents", postEvents);
 
     var remoteInterests = {};
     if (interests) {
@@ -179,24 +181,45 @@ function CreatePrefab(template)
     var id = MakeID(prefab || 'GameObject');
 
     obj.id = id;
-    obj.prefab = prefab;
-    obj.component = component;
-    obj.update = update;
     obj.interests = interests;
-    obj.preEvents = preEvents;
-    obj.postEvents = postEvents;
 
     globals.objects[id] = obj;
 
     var data = {
-        id: id,
-        prefab: prefab,
-        component: component,
-        update: update,
-        interests: remoteInterests,
-        preEvents: preEvents,
-        postEvents: postEvents
+        id: id
     };
+
+    if (prefab && prefab.length) {
+        data.prefab = prefab;
+    }
+
+    if (component && component.length) {
+        data.component = component;
+    }
+
+    if (preEvents && preEvents.length) {
+        data.preEvents = preEvents;
+    }
+
+    if (parent && parent.length) {
+        data.parent = parent;
+    }
+
+    if (worldPositionStays !== undefined) {
+        data.worldPositionStays = !!worldPositionStays;
+    }
+
+    if (update && Object.keys(update).length) {
+        data.update = update;
+    }
+
+    if (remoteInterests && Object.keys(remoteInterests).length) {
+        data.interests = remoteInterests;
+    }
+
+    if (postEvents && postEvents.length) {
+        data.postEvents = postEvents;
+    }
 
     SendEvent({
         event: 'Create',
@@ -331,7 +354,7 @@ function SendEvent(ev)
 
     globals.jsToUnityEventCount++;
     globals.jsToUnityEventBytes += evString.length;
-    globals.jsToUnityEventLog += ev.event + " ";
+    //globals.jsToUnityEventLog += ev.event + " ";
 
     switch (globals.driver) {
 
@@ -626,15 +649,8 @@ function CreateOverlayText(update)
     var overlayText = CreatePrefab({
         prefab: 'Prefabs/OverlayText',
         update: update,
-        postEvents: [
-            {
-                event: 'SetParent',
-                data: {
-                    path: 'object:' + globals.textOverlays.id + '/overlay',
-                    worldPositionStays: false
-                }
-            }
-        ]
+        parent: 'object:' + globals.textOverlays.id + '/overlay',
+        worldPositionStays: false
     });
 }
 
@@ -654,31 +670,31 @@ function CreateInterface()
 {
 
     globals.light = CreatePrefab({
-        prefab: 'Prefabs/Light',
         obj: {
             doNotDelete: true
-        }
+        },
+        prefab: 'Prefabs/Light'
     });
 
     globals.camera = CreatePrefab({
-        prefab: 'Prefabs/Camera',
         obj: {
             doNotDelete: true
-        }
+        },
+        prefab: 'Prefabs/Camera'
     });
 
     globals.eventSystem = CreatePrefab({
-        prefab: 'Prefabs/EventSystem',
         obj: {
             doNotDelete: true
-        }
+        },
+        prefab: 'Prefabs/EventSystem'
     });
 
     globals.textOverlays = CreatePrefab({
-        prefab: 'Prefabs/TextOverlays',
         obj: {
             doNotDelete: true
-        }
+        },
+        prefab: 'Prefabs/TextOverlays'
     });
 
 }
@@ -687,19 +703,20 @@ function CreateInterface()
 function CreateCanvas()
 {
     globals.canvas = CreatePrefab({
-        prefab: 'Prefabs/TestCanvas',
         obj: {
             doNotDelete: true
-        }
+        },
+        prefab: 'Prefabs/TestCanvas'
     });
 
     var canvasRef = 'object:' + globals.canvas.id;
 
     globals.buttonEval = CreatePrefab({
-        perfab: 'Prefabs/ToolbarButton',
         obj: {
             doNotDelete: true
         },
+        prefab: 'Prefabs/ToolbarButton',
+        parent: canvasRef + '/transform:Panel/transform:ButtonPanel',
         update: {
             'label/text': 'Eval'
         },
@@ -708,28 +725,21 @@ function CreateCanvas()
                 query: {
                     js: canvasRef + '/transform:Panel/transform:JSField/component:TMPro.TMP_InputField/text'
                 },
-                handler: function(obj, result) {
-                    console.log("Canvas: button: Eval: js: " + result.js);
-                    var result = eval(result.js);
-                    SetOutput("" + result);
+                handler: function(obj, results) {
+                    console.log("Canvas: button: Eval: js: " + results.js);
+                    var result = eval(results.js);
+                    SetOutput("" + results);
                 }
             }
-        },
-        postEvents: [
-            {
-                event: 'SetParent',
-                data: {
-                    'path': canvasRef + '/transform:Panel/transform:ButtonPanel'
-                }
-            }
-        ]
+        }
     });
 
     globals.buttonFoo = CreatePrefab({
-        prefab: 'Prefabs/ToolbarButton',
         obj: {
             doNotDelete: true
         },
+        prefab: 'Prefabs/ToolbarButton',
+        parent: canvasRef + '/transform:Panel/transform:ButtonPanel',
         update: {
             'label/text': 'Foo'
         },
@@ -738,27 +748,20 @@ function CreateCanvas()
                 query: {
                     text: 'object:' + globals.canvas.id + '/transform:Panel/transform:TextField/component:TMPro.TMP_InputField/text'
                 },
-                handler: function(obj, result) {
-                    console.log("Canvas: button: Foo: text: " + result.text);
-                    SetOutput(JSON.stringify(result));
+                handler: function(obj, results) {
+                    console.log("Canvas: button: Foo: text: " + results.text);
+                    SetOutput(JSON.stringify(results));
                 }
             }
-        },
-        postEvents: [
-            {
-                event: 'SetParent',
-                data: {
-                    'path': canvasRef + '/transform:Panel/transform:ButtonPanel'
-                }
-            }
-        ]
+        }
     });
 
     globals.buttonBar = CreatePrefab({
-        prefab: 'Prefabs/ToolbarButton',
         obj: {
             doNotDelete: true
         },
+        prefab: 'Prefabs/ToolbarButton',
+        parent: canvasRef + '/transform:Panel/transform:ButtonPanel',
         update: {
             'label/text': 'Bar'
         },
@@ -767,20 +770,12 @@ function CreateCanvas()
                 query: {
                     text: 'object:' + globals.canvas.id + '/transform:Panel/transform:TextField/component:TMPro.TMP_InputField/text'
                 },
-                handler: function(obj, result) {
-                    console.log("Canvas: button: Bar: text: " + result.text);
-                    SetOutput(JSON.stringify(result));
+                handler: function(obj, results) {
+                    console.log("Canvas: button: Bar: text: " + results.text);
+                    SetOutput(JSON.stringify(results));
                 }
             }
-        },
-        postEvents: [
-            {
-                event: 'SetParent',
-                data: {
-                    'path': canvasRef + '/transform:Panel/transform:ButtonPanel'
-                }
-            }
-        ]
+        }
     });
 
 }

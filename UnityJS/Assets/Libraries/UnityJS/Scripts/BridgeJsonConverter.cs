@@ -159,6 +159,10 @@ public class BridgeJsonConverter : JsonConverter {
                         return true;
                     }
 
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
+                    }
+
                     Vector2 vector2 = Vector2.zero;
 
                     JObject obj = JObject.Load(reader);
@@ -175,6 +179,10 @@ public class BridgeJsonConverter : JsonConverter {
                     if (reader.TokenType == JsonToken.Null) {
                         result = Vector3.zero;
                         return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
                     }
 
                     Vector3 vector3 = Vector3.zero;
@@ -196,6 +204,10 @@ public class BridgeJsonConverter : JsonConverter {
                         return true;
                     }
 
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
+                    }
+
                     Vector4 vector4 = Vector4.zero;
 
                     JObject obj = JObject.Load(reader);
@@ -214,6 +226,10 @@ public class BridgeJsonConverter : JsonConverter {
                     if (reader.TokenType == JsonToken.Null) {
                         result = Quaternion.identity;
                         return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
                     }
 
                     Vector4 vector4 = Vector4.zero;
@@ -274,6 +290,10 @@ public class BridgeJsonConverter : JsonConverter {
                         return true;
                     }
 
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
+                    }
+
                     JObject obj = JObject.Load(reader);
 
                     float r = obj.GetFloat("r");
@@ -330,6 +350,10 @@ public class BridgeJsonConverter : JsonConverter {
                     if (reader.TokenType == JsonToken.Null) {
                         result = null;
                         return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
                     }
 
                     JToken token = JToken.Load(reader);
@@ -433,6 +457,10 @@ public class BridgeJsonConverter : JsonConverter {
                     if (reader.TokenType == JsonToken.Null) {
                         result = null;
                         return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
                     }
 
                     JToken token = JToken.Load(reader);
@@ -546,8 +574,11 @@ public class BridgeJsonConverter : JsonConverter {
                         return true;
                     }
 
-                    JToken token = JToken.Load(reader);
-                    JObject obj = (JObject)token;
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
+                    }
+
+                    JObject obj = JObject.Load(reader);
 
                     List<GradientAlphaKey> gradientAlphaKeysList = new List<GradientAlphaKey>();
                     List<GradientColorKey> gradientColorKeysList = new List<GradientColorKey>();
@@ -606,6 +637,10 @@ public class BridgeJsonConverter : JsonConverter {
                     if (reader.TokenType == JsonToken.Null) {
                         result = null;
                         return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
                     }
 
                     JObject obj = JObject.Load(reader);
@@ -711,6 +746,10 @@ public class BridgeJsonConverter : JsonConverter {
                         return true;
                     }
 
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
+                    }
+
                     JObject obj = JObject.Load(reader);
 
                     float time = obj.GetFloat("time");
@@ -732,6 +771,10 @@ public class BridgeJsonConverter : JsonConverter {
                     if (reader.TokenType == JsonToken.Null) {
                         result = null;
                         return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
                     }
 
                     JObject obj = JObject.Load(reader);
@@ -758,6 +801,10 @@ public class BridgeJsonConverter : JsonConverter {
                     if (reader.TokenType == JsonToken.Null) {
                         result = null;
                         return true;
+                    }
+
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
                     }
 
                     JObject obj = JObject.Load(reader);
@@ -794,6 +841,10 @@ public class BridgeJsonConverter : JsonConverter {
                         result = resource;
                         return true;
 
+                    }
+
+                    if (reader.TokenType != JsonToken.StartObject) {
+                        return false;
                     }
 
                     JObject obj = JObject.Load(reader);

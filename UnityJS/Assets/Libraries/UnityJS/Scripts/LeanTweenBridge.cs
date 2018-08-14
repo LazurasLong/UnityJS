@@ -538,9 +538,18 @@ public class LeanTweenBridge : BridgeObject {
                         return;
                     }
 
-                    Vector3 to = Vector3.zero;
-                    if (!Bridge.bridge.ConvertToType<Vector3>(data["to"], ref to)) {
-                        Debug.LogError("LeanTweenBridge: AnimateData: to must be a Vector3. data: " + data);
+                    Vector3 to = Vector3.one;
+                    JToken toToken = data["to"];
+                    if (toToken.IsNumber()) {
+                        float s = (float)toToken;
+                        to = new Vector3(s, s, s);
+                    } else if (toToken.IsObject()) {
+                        if (!Bridge.bridge.ConvertToType<Vector3>(toToken, ref to)) {
+                            Debug.LogError("LeanTweenBridge: AnimateData: error converting to object to Vector3. data: " + data);
+                            return;
+                        }
+                    } else {
+                        Debug.LogError("LeanTweenBridge: AnimateData: to should be number or object. toToken: " + toToken + " " + toToken.Type + " data: " + data);
                         return;
                     }
 

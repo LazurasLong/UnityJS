@@ -1,0 +1,272 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1638243325637548}
+  m_IsPrefabAsset: 1
+--- !u!1 &1638243325637548
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4989061808383754}
+  - component: {fileID: 114882635812084054}
+  - component: {fileID: 114042512987522786}
+  m_Layer: 0
+  m_Name: Wire
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4989061808383754
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1638243325637548}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114042512987522786
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1638243325637548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a85c5879d519aa4ab2ebbf42591149a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nodes:
+  - position: {x: -19.990074, y: 9.698307, z: 0}
+    direction: {x: -15.851912, y: 9.763604, z: 0.29371357}
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - position: {x: -10.249899, y: 9.802574, z: 0}
+    direction: {x: -5.833309, y: 9.802562, z: 0.044031143}
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - position: {x: 9.965721, y: 9.874754, z: -0.07239342}
+    direction: {x: 14.980911, y: 9.87475, z: -0.25482178}
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - position: {x: 19.977375, y: 10.054554, z: 0.021413803}
+    direction: {x: 25.198711, y: 10.119832, z: -0.019119263}
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  curves:
+  - n1:
+      position: {x: -19.990074, y: 9.698307, z: 0}
+      direction: {x: -15.851912, y: 9.763604, z: 0.29371357}
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    n2:
+      position: {x: -10.249899, y: 9.802574, z: 0}
+      direction: {x: -5.833309, y: 9.802562, z: 0.044031143}
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - n1:
+      position: {x: -10.249899, y: 9.802574, z: 0}
+      direction: {x: -5.833309, y: 9.802562, z: 0.044031143}
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    n2:
+      position: {x: 9.965721, y: 9.874754, z: -0.07239342}
+      direction: {x: 14.980911, y: 9.87475, z: -0.25482178}
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  - n1:
+      position: {x: 9.965721, y: 9.874754, z: -0.07239342}
+      direction: {x: 14.980911, y: 9.87475, z: -0.25482178}
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    n2:
+      position: {x: 19.977375, y: 10.054554, z: 0.021413803}
+      direction: {x: 25.198711, y: 10.119832, z: -0.019119263}
+      Changed:
+        m_PersistentCalls:
+          m_Calls: []
+        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    Changed:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+  Length: 39.97962
+  NodeCountChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  CurveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+--- !u!114 &114882635812084054
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1638243325637548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bd00460a7997461e9d30ddc3bafcb47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 
+  bridge: {fileID: 0}
+  destroyed: 0
+  mouseTracking: 1
+  mouseEntered: 0
+  mouseEnteredTime: 0
+  mouseEnteredChanged: 0
+  triggerTracking: 0
+  triggerEntered: 0
+  triggerEnteredTime: 0
+  triggerEnteredChanged: 0
+  mouseDown: 0
+  mouseDownTime: 0
+  mouseDownChanged: 0
+  ignoringMouseClick: 0
+  isPointerOverUIObject: 0
+  mouseTrackingPosition: 1
+  mouseTrackingPositionHover: 0
+  mouseTrackingPositionHoverDelay: 0.1
+  mouseTrackingPositionDriftDelay: 0.1
+  mouseTrackingPositionHovering: 0
+  mouseTrackingPositionDriftTime: -1
+  screenSize: {x: 0, y: 0}
+  mousePosition: {x: 0, y: 0, z: 0}
+  mousePositionLast: {x: 0, y: 0, z: 0}
+  mousePositionChanged: 0
+  screenPosition: {x: 0, y: 0}
+  mousePositionToCameraOffset: {x: 0, y: 0, z: 0}
+  mouseTrackingRaycast: 1
+  mouseRayMaxDistance: Infinity
+  mouseRayLayerMask: -5
+  mouseRayQueryTriggerInteraction: 0
+  mouseRaycastResult: 0
+  mouseRaycastHitPointFaceCameraRotation: {x: 0, y: 0, z: 0, w: 0}
+  mouseRaycastHitBridgeObject: {fileID: 0}
+  mouseRaycastHitBridgeObjectID: 
+  mouseRaycastHitColliderBridgeObject: {fileID: 0}
+  mouseRaycastHitColliderBridgeObjectID: 
+  dragTracking: 0
+  dragging: 0
+  draggingSetsIsKinematic: 1
+  draggingLastIsKinematic: 0
+  dragStartDistance: 0
+  dragLastPosition: {x: 0, y: 0, z: 0}
+  dragLastPlanePosition: {x: 0, y: 0, z: 0}
+  dragPlanePosition: {x: 0, y: 0, z: 0}
+  dragLastMousePosition: {x: 0, y: 0, z: 0}
+  dragScreenDistance: {x: 0, y: 0, z: 0}
+  dragPlaneDistance: {x: 0, y: 0, z: 0}
+  rotateAmount: 0
+  collisionTracking: 1
+  collisionEntered: 0
+  collisionEnteredTime: 0
+  collisionEnteredChanged: 0
+  fromView: {fileID: 0}
+  fromTransform: {fileID: 0}
+  fromTransformAttached: 1
+  fromOffset: {x: 0, y: 0, z: 0}
+  fromLocalOffset: {x: 0, y: 0, z: 0}
+  fromLocalOffsetRotated: {x: 0, y: 0, z: 0}
+  fromAnchor: {x: 0, y: 0, z: 0}
+  fromAnchorLast: {x: 0, y: 0, z: 0}
+  fromPosition: {x: 0, y: 0, z: 0}
+  fromEndDistance: {x: 0, y: 0, z: 0}
+  fromEndDirection: {x: 10, y: 0, z: 0}
+  fromMiddleDistance: {x: 50, y: 0, z: 0}
+  fromMiddleDirection: {x: 60, y: 0, z: 0}
+  toView: {fileID: 0}
+  toTransform: {fileID: 0}
+  toTransformAttached: 1
+  toOffset: {x: 0, y: 0, z: 0}
+  toLocalOffset: {x: 0, y: 0, z: 0}
+  toLocalOffsetRotated: {x: 0, y: 0, z: 0}
+  toAnchor: {x: 0, y: 0, z: 0}
+  toAnchorLast: {x: 0, y: 0, z: 0}
+  toPosition: {x: 0, y: 0, z: 0}
+  toEndDistance: {x: 0, y: 0, z: 0}
+  toEndDirection: {x: -10, y: 0, z: 0}
+  toMiddleDistance: {x: -50, y: 0, z: 0}
+  toMiddleDirection: {x: -40, y: 0, z: 0}
+  cursorView: {fileID: 0}
+  cursorValue: 0.5
+  wireStart: 0
+  wireEnd: 0
+  wireHeight: 0
+  angle: 0
+  textureOffset: {x: 0, y: 0}
+  textureScale: {x: 1, y: 1}
+  textureOffsetPerSecond: {x: 0, y: 0}
+  updateMaterial: 0
+  updateMaterialAlways: 0
+  updateLine: 0
+  updateLineAlways: 0
+  mesh: {fileID: 4300002, guid: 22f875f3066754ca08e7f27c39bbab7a, type: 3}
+  material: {fileID: 2100000, guid: b01a611afcb0246feafc3108c3d28227, type: 2}
+  color: {r: 1, g: 1, b: 1, a: 1}
+  rotation: {x: 0, y: 0, z: 90}
+  scale: 1
+  spline: {fileID: 0}
+  splineFromPosition: {x: 0, y: 0, z: 0}
+  splineToPosition: {x: 0, y: 0, z: 0}
+  meshes: []
+  updateMeshes: 1

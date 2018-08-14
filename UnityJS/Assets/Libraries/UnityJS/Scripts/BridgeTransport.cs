@@ -108,7 +108,7 @@ public class BridgeTransport : MonoBehaviour
                 string.Join(",", firstEvents.ToArray());
         }
 
-        //Debug.Log("BridgeTransport: ReceiveJSToUnityEvents: evListString: " + evListString);
+        //Debug.Log("BridgeTransport: ReceiveJSToUnityEvents: eventCount: " + eventCount + " evListString: " + evListString.Length + " " + evListString);
 
         return evListString;
     }
@@ -147,7 +147,7 @@ public class BridgeTransport : MonoBehaviour
                 string.Join(",", firstEvents.ToArray());
         }
 
-        //Debug.Log("BridgeTransport: ReceiveUnityToJSEvents: evListString: " + evListString);
+        //Debug.Log("BridgeTransport: ReceiveUnityToJSEvents: eventCount: " + eventCount + " evListString: " + evListString.Length + " " + evListString);
 
         return evListString;
     }
@@ -174,7 +174,7 @@ public class BridgeTransport : MonoBehaviour
                 evListString + "," +
                 evListStringLength + ");";
 
-        //Debug.Log("BridgeTransport: DistributeJSEvents: js: " + js);
+        //Debug.Log("BridgeTransport: DistributeJSEvents: js: " + js.Length + " " + js);
 
         EvaluateJS(js);
     }
@@ -182,7 +182,7 @@ public class BridgeTransport : MonoBehaviour
 
     public virtual void EvaluateJS(string js)
     {
-        Debug.LogError("BridgeTransport: TODO: EvaluateJS: js: " + js);
+        Debug.LogError("BridgeTransport: TODO: EvaluateJS: js: " + js.Length + " " + js);
     }
 
 

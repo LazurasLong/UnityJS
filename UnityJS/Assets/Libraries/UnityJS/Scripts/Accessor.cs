@@ -473,36 +473,39 @@ public class Accessor {
             string path = (string)jsonValue;
             //Debug.Log("Accessor: SetProperty: excited: jsonValue: " + jsonValue + " path: " + path);
             if (string.IsNullOrEmpty(path)) {
-                Debug.LogError("Accessor: SetProperty: excited: value should be a string.");
-                return false;
-            }
 
-            Accessor pathAccessor = null;
-            if (!Accessor.FindAccessor(
-                    target,
-                    path,
-                    ref pathAccessor)) {
-
-                Debug.LogError("Accessor: SetProperty: excited: can't find path accessor for target: " + target + " path: " + path);
-                return false;
+                value = null;
 
             } else {
 
-                //Debug.Log("Accessor: SetProperty: excited: getting from pathAccessor: " + pathAccessor);
-                if (!pathAccessor.Get(ref value)) {
+                Accessor pathAccessor = null;
+                if (!Accessor.FindAccessor(
+                        target,
+                        path,
+                        ref pathAccessor)) {
 
-                    //Debug.Log("Accessor: SetProperty: excited: failed to get from pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
-
-                    if (!pathAccessor.conditional) {
-                        Debug.LogError("Accessor: SetProperty: excited: can't get pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
-                        return false;
-                    }
-
-                    value = null;
+                    Debug.LogError("Accessor: SetProperty: excited: can't find path accessor for target: " + target + " path: " + path);
+                    return false;
 
                 } else {
 
-                    //Debug.Log("Accessor: SetProperty: excited: got from pathAccessor: " + pathAccessor + " target: " + target + " path: " + path + " value: " + value);
+                    //Debug.Log("Accessor: SetProperty: excited: getting from pathAccessor: " + pathAccessor);
+                    if (!pathAccessor.Get(ref value)) {
+
+                        //Debug.Log("Accessor: SetProperty: excited: failed to get from pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
+
+                        if (!pathAccessor.conditional) {
+                            Debug.LogError("Accessor: SetProperty: excited: can't get pathAccessor: " + pathAccessor + " target: " + target + " path: " + path);
+                            return false;
+                        }
+
+                        value = null;
+
+                    } else {
+
+                        //Debug.Log("Accessor: SetProperty: excited: got from pathAccessor: " + pathAccessor + " target: " + target + " path: " + path + " value: " + value);
+
+                    }
 
                 }
 

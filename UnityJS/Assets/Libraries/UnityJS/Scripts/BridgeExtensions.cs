@@ -201,8 +201,8 @@ public static class BridgeExtensions {
     public static bool IsNumber(this JToken token)
     {
         return ((token != null) &&
-                (token.Type == JTokenType.Integer) &&
-                (token.Type == JTokenType.Float));
+                ((token.Type == JTokenType.Integer) ||
+                 (token.Type == JTokenType.Float)));
     }
     
 
@@ -728,6 +728,15 @@ public static class BridgeExtensions {
         Vector3[] positions = new Vector3[lineRenderer.positionCount];
         lineRenderer.GetPositions(positions);
         return positions;
+    }
+
+
+    public static void ResetParticleSystem(this ParticleSystem particleSystem)
+    {
+        //Debug.Log("BridgeExtensions: ParticleSystem: ResetParticleSystem: particleSystem: " + particleSystem);
+        particleSystem.Stop();
+        particleSystem.Clear();
+        particleSystem.Play();
     }
 
 

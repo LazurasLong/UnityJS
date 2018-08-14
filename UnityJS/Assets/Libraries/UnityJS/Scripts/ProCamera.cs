@@ -19,8 +19,6 @@ public class ProCamera : BridgeObject {
 
 
     public Camera proCamera;
-    public float yaw;
-    public float pitch;
     public float moveSpeed = 60.0f;
     public float yawSpeed = 60.0f;
     public float pitchSpeed = 60.0f;
@@ -65,17 +63,6 @@ public class ProCamera : BridgeObject {
             initialPosition = transform.position;
             initialRotation = transform.rotation;
             initialEulers = transform.rotation.eulerAngles;
-
-            forward = 
-                transform.rotation * Vector3.forward;
-
-            yaw =
-                Mathf.Atan2(forward.x, forward.z) *
-                Mathf.Rad2Deg;
-
-            pitch =
-                Mathf.Atan2(-forward.y, forward.z) *
-                Mathf.Rad2Deg;
 
         }
 
@@ -135,22 +122,46 @@ public class ProCamera : BridgeObject {
 
         if ((yawDelta != 0.0f) || 
             (pitchDelta != 0.0f)) {
-            pitch = pitch + pitchDelta;
-            //pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
-            yaw = yaw + yawDelta;
-            transform.rotation = 
-                Quaternion.Euler(0.0f, yaw, 0.0f) *
-                Quaternion.Euler(pitch, 0.0f, 0.0f);
-            forward = 
+
+            Vector3 forward = 
                 transform.rotation * Vector3.forward;
+
+            float yaw =
+                Mathf.Atan2(forward.x, forward.z) *
+                Mathf.Rad2Deg;
+
+            Quaternion q = Quaternion.identity;
+
+            if (pitchDelta != 0.0f) {
+                q *= Quaternion.AngleAxis(
+                    pitchDelta, 
+                    Quaternion.AngleAxis(yaw, Vector3.up) * Vector3.right);
+            }
+
+            if (yawDelta != 0.0f) {
+                q *= Quaternion.AngleAxis(
+                    yawDelta, 
+                    Vector3.up);
+            }
+
+            transform.rotation = 
+                q *
+                transform.rotation;
         }
 
         if (moveDelta != Vector3.zero) {
+
+            Vector3 forward = 
+                transform.rotation * Vector3.forward;
+            float yaw =
+                Mathf.Atan2(forward.x, forward.z) *
+                Mathf.Rad2Deg;
             Vector3 moveDeltaRotated =
                 Quaternion.Euler(0.0f, yaw, 0.0f) *
                 moveDelta;
             Vector3 pos =
                 transform.position + moveDeltaRotated;
+
 /*
             pos = 
                 new Vector3(
@@ -158,6 +169,7 @@ public class ProCamera : BridgeObject {
                     Mathf.Clamp(pos.y, positionMin.y, positionMax.y),
                     Mathf.Clamp(pos.z, positionMin.z, positionMax.z));
 */
+
             transform.position = pos;
         }
 

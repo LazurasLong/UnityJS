@@ -95,6 +95,10 @@ Object.assign(globals.sheetRefs, {
         "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
         131405460
     ],
+    "bows_road": [
+        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
+        1017844292
+    ],
     "blobs": [
         "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
         412054745
@@ -267,7 +271,7 @@ function DrawBackground_Pie(canvas, context, params, success, error)
     var subtend = SearchDefault('subtend', pie, pieTracker.subtend);
     var clockwise = SearchDefault('clockwise', pie, pieTracker.clockwise);
     var inactiveDistance = SearchDefault('inactiveDistance', pie, pieTracker.inactiveDistance);
-    var itemDistance = SearchDefault('itemDistance', pie, pieTracker.itemDistance);
+    var itemDistance = SearchDefault('itemDistance', pie, pieTracker.itemDistance); // TODO: search item too?
     var drawBackgroundGradient = SearchDefault('drawBackgroundGradient', pie, pieTracker.drawBackgroundGradient);
     var backgroundGradientInnerRadius = SearchDefault('backgroundGradientInnerRadius', pie, pieTracker.backgroundGradientInnerRadius);
     var backgroundGradientOuterRadius = SearchDefault('backgroundGradientOuterRadius', pie, pieTracker.backgroundGradientOuterRadius);
@@ -289,7 +293,9 @@ function DrawBackground_Pie(canvas, context, params, success, error)
         gradient.addColorStop(r, '#ffffff20');
         gradient.addColorStop(r + 0.001, '#000000A0');
         gradient.addColorStop(1, '#00000000');
-        if (pieTracker.sliceIndex == -1) {
+        if ((pieTracker.sliceIndex == -1) ||
+            !slices ||
+            !slices[pieTracker.sliceIndex]) {
             context.arc(cx, cy, backgroundGradientOuterRadius, 0, Math.PI * 2.0);
         } else {
             var slice = slices[pieTracker.sliceIndex];
@@ -648,7 +654,6 @@ function CreatePieTracker()
 
     function HandleEnterPieCenter(pie, target)
     {
-        //console.log("HandleEnterPieCenter");
         var handler = SearchDefault('onenterpiecenter', pie, target, null);
         CallHandler(handler, pie, target);
     }
@@ -850,7 +855,6 @@ function CreatePieTracker()
         var clockwise = SearchDefault('clockwise', pie, pieTracker.clockwise);
         var inactiveDistance = SearchDefault('inactiveDistance', pie, pieTracker.inactiveDistance);
         var itemDistance = SearchDefault('itemDistance', pie, pieTracker.itemDistance);
-        var pieTrackerView = PieTrackerView(pie);
         //console.log("pieTrackerView:", pieTrackerView);
 
         UpdateObject(pieTracker, {
@@ -863,8 +867,7 @@ function CreatePieTracker()
             subtend: subtend,
             clockwise: clockwise,
             inactiveDistance: inactiveDistance,
-            itemDistance: itemDistance,
-            pie: pieTrackerView
+            itemDistance: itemDistance
         });
 
         TrackPie(position, 0.0, 0.0, -1, -1, true);
@@ -880,6 +883,11 @@ function CreatePieTracker()
     {
         //console.log("StopPie", "pieTracker.tracking", pieTracker.tracking, "pieTracker.pie" , pieTracker.pie);
 
+        var pie = pieTracker.pie;
+        if (!pie)  {
+            return;
+        }
+
         var pinnable = SearchDefault('pinnable', pie, pieTracker.pinnable);
         if (pinnable && 
             !pieTracker.pinned &&
@@ -888,23 +896,31 @@ function CreatePieTracker()
             return;
         }
 
-        HidePie();
+        var stayUp =
+            ((pieTracker.sliceIndex >= 0) &&
+             (pie.slices[pieTracker.sliceIndex].stayUp ||
+              ((pieTracker.itemIndex >= 0) &&
+               pie.slices[pieTracker.sliceIndex] &&
+               pie.slices[pieTracker.sliceIndex].items &&
+               pie.slices[pieTracker.sliceIndex].items[pieTracker.itemIndex] &&
+               pie.slices[pieTracker.sliceIndex].items[pieTracker.itemIndex].stayUp)));
 
-        pieTracker.tracking = false;
+        if (!stayUp) {
 
-        UpdateObject(pieTracker, {
-            trackingMousePosition: false
-        });
+            HidePie();
 
-        var pie = pieTracker.pie;
-        var target = pieTracker.target;
-        if (!pie)  {
-            return;
+            pieTracker.tracking = false;
+
+            UpdateObject(pieTracker, {
+                trackingMousePosition: false
+            });
+
+            var nextPieID = null;
+            var target = pieTracker.target;
+
+            HandleStopPie(pie, target);
+
         }
-
-        var nextPieID = null;
-
-        HandleStopPie(pie, target);
 
         if (pieTracker.sliceIndex < 0) {
 
@@ -927,6 +943,7 @@ function CreatePieTracker()
 
                 var item = pieTracker.item;
                 if (item) {
+
                     HandleSelectItem(item, slice, pie, target);
 
                     nextPieID = item.pieID;
@@ -937,7 +954,11 @@ function CreatePieTracker()
 
         }
 
-        TrackPie(pieTracker.mousePosition, 0.0, 0.0, -1, -1, true);
+        if (stayUp) {
+            // TODO: Make sure the current item gets reselected without flickering.
+        } else {
+            TrackPie(pieTracker.mousePosition, 0.0, 0.0, -1, -1, true);
+        }
 
         if (nextPieID) {
             StartPie(pieTracker.mousePosition, nextPieID, pieTracker.target, true);
@@ -946,134 +967,70 @@ function CreatePieTracker()
     }
 
 
-    function ConstructPie()
+    function ConstructPie(pie)
     {
-        var pie = pieTracker.pie;
         if (!pie) {
             return;
         }
+
+        if (!pie.freeLabels) {
+            pie.freeLabels = [];
+        }
+
+        if (!pie.usedLabels) {
+            pie.usedLabels = [];
+        }
+
+        UpdateObject(pieTracker, {
+            pie: PieTrackerView(pie)
+        });
 
         if (!pie.groupObject) {
 
             pie.groupObject = CreatePrefab({
                 prefab: 'Prefabs/PieGroup',
+                parent: 'object:' + globals.textOverlays.id + '/overlay',
                 update: {
                     'gameObject/method:SetActive': [false]
-                },
-                postEvents: [
-                    {
-                        event: 'SetParent',
-                        data: {
-                            path: 'object:' + globals.textOverlays.id + '/overlay'
-                        }
-                    }
-                ]
-            });
-
-        }
-
-        if (pie.label &&
-            !pie.labelObject) {
-
-            pie.labelObject = CreatePrefab({
-                prefab: 'Prefabs/OverlayText',
-                update: {
-                    'textMesh/text': pie.label,
-                    'textMesh/fontSize': SearchDefault('pieLabelFontSize', pie, pieTracker.pieLabelFontSize),
-                    'textMesh/color': SearchDefault('pieLabelFontColor', pie, pieTracker.pieLabelFontColor),
-                    'textMesh/alignment': SearchDefault('pieLabelAlignment', pie, pieTracker.pieLabelAlignment)
-                    //'textMesh/anchor': SearchDefault('pieLabelAnchor', pie, pieTracker.pieLabelAnchor)
-                },
-                postEvents: [
-                    {
-                        event: 'SetParent',
-                        data: {
-                            path: 'object:' + pie.groupObject.id
-                        }
-                    }
-                ]
-            });
-
-        }
-
-        var slices = pie.slices;
-        if (slices) {
-
-            for (var sliceIndex = 0, sliceCount = slices.length; sliceIndex < sliceCount; sliceIndex++) {
-                var slice = slices[sliceIndex];
-
-                var items = slice.items;
-                if (items) {
-
-                    for (var itemIndex = 0, itemCount = items.length; itemIndex < itemCount; itemIndex++) {
-                        var item = items[itemIndex];
-
-                        if (item.label &&
-                            !item.labelObject) {
-
-                            item.labelObject = CreatePrefab({
-                                prefab: 'Prefabs/OverlayText',
-                                update: {
-                                    'textMesh/text': item.label,
-                                    'textMesh/fontSize': SearchDefault('itemLabelFontSize', item, slice, pie, pieTracker.itemLabelFontSize),
-                                    'textMesh/color': SearchDefault('itemLabelFontColor', item, slice, pie, pieTracker.itemLabelFontColor),
-                                    'textMesh/alignment': SearchDefault('itemLabelAlignment', item, slice, pie, pieTracker.itemLabelAlignment)
-                                    //'textMesh/anchor': SearchDefault('itemLabelAnchor', item, slice, pie, pieTracker.itemLabelAnchor)
-                                },
-                                postEvents: [
-                                    {
-                                        event: 'SetParent',
-                                        data: {
-                                            path: 'object:' + pie.groupObject.id
-                                        }
-                                    }
-                                ]
-                            });
-
-                        }
-
-                    }
-
                 }
-
-            }
+            });
 
         }
 
     }
 
 
-    function DeconstructPie()
+    function DeconstructPie(pie)
     {
-        var pie = pieTracker.pie;
         if (!pie) {
             return;
         }
 
         if (pie.labelObject) {
-            DestroyObject(pie.labelObject);
             delete pie.labelObject;
         }
 
         var slices = pie.slices;
         if (slices) {
-            for (var sliceIndex = 0, sliceCount = slices.length; sliceIndex < sliceCount; sliceIndex++) {
-                var slice = slices[sliceIndex];
-                if (slice.labelObject) {
-                    DestroyObject(slice.labelObject);
-                    delete slice.labelObject;
-                }
-                var items = slice.items;
-                if (items) {
-                    for (var itemIndex = 0, itemCount = items.length; itemIndex < itemCount; itemIndex++) {
-                        var item = items[itemIndex];
+            slices.forEach(function (slice) {
+                if (slice.items) {
+                    slice.items.forEach(function (item) {
                         if (item.labelObject) {
-                            DestroyObject(item.labelObject);
                             delete item.labelObject;
                         }
-                    }
+                    });
                 }
-            }
+            });
+        }
+
+        if (pie.freeLabels) {
+            pie.freeLabels.forEach(DeleteObject);
+            pie.freeLabels = [];
+        }
+
+        if (pie.usedLabels) {
+            pie.usedLabels.forEach(DeleteObject);
+            pie.usedLabels = [];
         }
 
         if (pie.groupObject) {
@@ -1084,15 +1041,40 @@ function CreatePieTracker()
     }
 
 
-    function LayoutPie()
+    function LayoutPie(pie)
     {
-        var pie = pieTracker.pie;
-        var target = pieTracker.target;
+        //console.log("LayoutPie", pie);
+
         if (!pie) {
             return;
         }
 
-        ConstructPie();
+        function MakeLabel()
+        {
+            var label;
+            if (pie.freeLabels.length) {
+                label = pie.freeLabels.pop();
+            } else {
+                 label = CreatePrefab({
+                    obj: {
+                        active: true
+                    },
+                    prefab: 'Prefabs/OverlayText',
+                    parent: 'object:' + pie.groupObject.id
+                });
+            }
+            pie.usedLabels.push(label);
+            return label;
+        }
+
+        ConstructPie(pie);
+
+        if (pie.usedLabels.length) {
+            pie.usedLabels.forEach(function (label) {
+                pie.freeLabels.push(label);
+            });
+            pie.usedLabels = [];
+        }
 
         var initialDirection = SearchDefault('initialDirection', pie, pieTracker.initialDirection);
         var subtend = SearchDefault('subtend', pie, pieTracker.subtend);
@@ -1107,14 +1089,13 @@ function CreatePieTracker()
             var clockSign = clockwise ? -1 : 1;
 
             var sliceSizeTotal = 0.0;
-            for (var sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++) {
-                var slice = slices[sliceIndex];
+            slices.forEach(function (slice) {
                 var sliceSize = 
-                    ('sliceSize' in slice)
+                    (slice && ('sliceSize' in slice))
                         ? slice.sliceSize
                         : 1;
                 sliceSizeTotal += sliceSize;
-            }
+            });
 
             var pieSubtend = 
                 (subtend == 0.0) 
@@ -1127,29 +1108,25 @@ function CreatePieTracker()
             var sliceDirection = initialDirection;
             var firstSlice = true;
 
-            for (var sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++) {
-                var slice = slices[sliceIndex];
+            var sliceIndex = 0;
+            slices.forEach(function (slice) {
+
                 var sliceSize = 
-                    ('sliceSize' in slice)
+                    (slice && ('sliceSize' in slice))
                         ? slice.sliceSize
                         : 1;
                 var sliceSubtend = sliceSize * sliceSizeScale;
                 var halfTurn = 0.5 * clockSign * sliceSubtend;
-
-                //console.log("layout 1 sliceIndex", sliceIndex, "sliceDirection", sliceDirection, "firstSlice", firstSlice, "subtend", subtend);
 
                 if (firstSlice) {
                     firstSlice = false;
                     // If the subtend was zero, use the whole pie, but start the first slice centered no the initial direction.
                     if (subtend == 0.0) {
                         sliceDirection -= halfTurn;
-                        //console.log("layout 2 sliceIndex", sliceIndex, "REWOUND TO sliceDirection", sliceDirection);
                     }
                 }
 
                 sliceDirection += halfTurn;
-
-                //console.log("layout 3 sliceIndex", sliceIndex, "sliceDirection", sliceDirection);
 
                 var dx = Math.cos(sliceDirection);
                 var dy = Math.sin(sliceDirection);
@@ -1161,6 +1138,7 @@ function CreatePieTracker()
 
                 var items = slice.items;
                 if (items) {
+
                     var vertical = Math.abs(dx) < 0.001;
                     var pivot = {
                         x: (vertical
@@ -1174,33 +1152,93 @@ function CreatePieTracker()
                                 : 0.0)
                             : 0.5)
                     };
+
                     var itemLabelDistance = SearchDefault('itemLabelDistance', slice, pie, pieTracker.itemLabelDistance);
-                    for (var itemIndex = 0, itemCount = items.length; itemIndex < itemCount; itemIndex++) {
-                        var item = items[itemIndex];
-                        //console.log("LayoutPie: itemIndex: " + itemIndex + " item:", JSON.stringify(item));
-                        if (item.labelObject) {
+
+                    var itemIndex = 0;
+                    items.forEach(function (item) {
+                        //console.log("LayoutPie item:", JSON.stringify(item));
+
+                        if (!item.label) {
+                            delete item.labelObject;
+                        } else {
                             var itemLabelPosition = SearchDefault('itemLabelPosition', item, slice, pie, pieTracker.itemLabelPosition);
                             var itemLabelOffset = SearchDefault('itemLabelOffset', item, slice, pie, pieTracker.itemLabelOffset);
                             var anchor = itemLabelPosition || {
                                 x: itemLabelOffset.x + (dx * (itemLabelDistance + (itemDistance * itemIndex))),
                                 y: itemLabelOffset.y + (dy * (itemLabelDistance + (itemDistance * itemIndex)))
                             };
-                            UpdateObject(item.labelObject, {
-                                'component:RectTransform/anchoredPosition': anchor,
-                                'component:RectTransform/pivot': pivot
-                            });
+
+                            item.labelObject = MakeLabel();
+
+                            var itemSelected =
+                                (sliceIndex == pieTracker.sliceIndex) &&
+                                (itemIndex  == pieTracker.itemIndex);
+                            var itemLabel =
+                                (itemSelected ? '<b>' : '') +
+                                item.label;
+
+                            var update = {
+                                'textMesh/text': itemLabel,
+                                'textMesh/fontSize': SearchDefault('itemLabelFontSize', item, slice, pie, pieTracker.itemLabelFontSize),
+                                'textMesh/color': SearchDefault('itemLabelFontColor', item, slice, pie, pieTracker.itemLabelFontColor),
+                                'textMesh/alignment': SearchDefault('itemLabelAlignment', item, slice, pie, pieTracker.itemLabelAlignment),
+                                'component:RectTransform/anchoredPosition': SearchDefault('pieLabelPosition', pie, pieTracker.pieLabelPosition),
+                                'component:RectTransform/pivot': pivot,
+                                'component:RectTransform/anchoredPosition': anchor
+                            };
+
+                            if (!item.labelObject.active) {
+                                update['gameObject/method:SetActive'] = [true];
+                                item.labelObject.active = true;
+                            }
+
+                            UpdateObject(item.labelObject, update);
                         }
-                    }
+
+                        itemIndex++;
+                    });
+
                 }
 
                 sliceDirection += halfTurn;
-            }
+                sliceIndex++;
+            });
+
         }
 
-        if (pie.labelObject) {
-            var pieLabelPosition = SearchDefault('pieLabelPosition', pie, pieTracker.pieLabelPosition);
-            UpdateObject(pie.labelObject, {
-                'component:RectTransform/anchoredPosition': pieLabelPosition
+        if (!pie.label) {
+            delete pie.labelObject;
+        } else {
+
+            pie.labelObject = MakeLabel();
+
+            var update = {
+                'textMesh/text': pie.label,
+                'textMesh/fontSize': SearchDefault('pieLabelFontSize', pie, pieTracker.pieLabelFontSize),
+                'textMesh/color': SearchDefault('pieLabelFontColor', pie, pieTracker.pieLabelFontColor),
+                'textMesh/alignment': SearchDefault('pieLabelAlignment', pie, pieTracker.pieLabelAlignment),
+                'component:RectTransform/pivot': { x: 0.5, y: 0.5 },
+                'component:RectTransform/anchoredPosition': SearchDefault('pieLabelPosition', pie, pieTracker.pieLabelPosition)
+            };
+
+            if (!pie.labelObject.active) {
+                update['gameObject/method:SetActive'] = [true];
+                pie.labelObject.active = true;
+            }
+
+            UpdateObject(pie.labelObject, update);
+
+        }
+
+        if (pie.freeLabels.length) {
+            pie.freeLabels.forEach(function (label) {
+                if (label.active) {
+                    UpdateObject(label, {
+                        'gameObject/method:SetActive': [false]
+                    });
+                    label.active = false;
+                }
             });
         }
 
@@ -1212,6 +1250,8 @@ function CreatePieTracker()
             'component:RectTransform/sizeDelta': groupSize
         });
 
+        var target = pieTracker.target;
+
         HandleLayoutPie(pie, target);
     }
 
@@ -1219,12 +1259,11 @@ function CreatePieTracker()
     function ShowPie(position)
     {
         var pie = pieTracker.pie;
-        var target = pieTracker.target;
         if (!pie) {
             return;
         }
 
-        LayoutPie();
+        LayoutPie(pie);
 
         pie.position = position;
 
@@ -1240,6 +1279,8 @@ function CreatePieTracker()
             'component:RectTransform/anchoredPosition': screenPosition,
             'gameObject/method:SetActive': [true]
         });
+
+        var target = pieTracker.target;
 
         HandleShowPie(pie, target);
         DrawPieBackground(pie, target);
@@ -1258,7 +1299,7 @@ function CreatePieTracker()
             'gameObject/method:SetActive': [false]
         });
 
-        //DeconstructPie();
+        //DeconstructPie(pie);
 
 
         HandleHidePie(pie, target);
@@ -1457,23 +1498,9 @@ function CreatePieTracker()
             itemLabelDistance: 75,
             itemLabelOffset: { x: 0, y: 0 },
             itemLabelPosition: null,
-            Info: function(item, slice, pie, target) {
-                console.log("Info", target);
-            },
-            Destroy: function(item, slice, pie, target) {
-                console.log("Delete", target);
-                DestroyObject(target);
-            },
-            Fix: function(item, slice, pie, target) {
-                UpdateObject(target, {
-                    'component:Rigidbody/isKinematic': true
-                });
-            },
-            Free: function(item, slice, pie, target) {
-                UpdateObject(target, {
-                    'component:Rigidbody/isKinematic': false
-                });
-            },
+            DeconstructPie: DeconstructPie,
+            LayoutPie: LayoutPie,
+            DrawPieBackground: DrawPieBackground,
             pies: {
 
                 'navigate': {
@@ -1615,7 +1642,7 @@ function CreatePieTracker()
                             : null;
 
                     var pieID = 
-                        target ? target.pieID : tuning.backgroundPieID;
+                        target ? target.pieID : (globals.tuning && globals.tuning.backgroundPieID);
 
                     //console.log("game.js: PieTracker: MouseButtonDown:", "mouseRaycastHitBridgeObjectID", results.mouseRaycastHitBridgeObjectID, "target:", target, (target ? target.id : ""), "pieID", pieID);
 
@@ -1984,36 +2011,36 @@ function CreateMap()
                                 query: {
                                     position: "transform/localPosition"
                                 },
-                                handler: function(obj, result) {
-                                    //console.log("MouseDown on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
-                                    if (obj.onMouseDown) obj.onMouseDown(obj, result);
+                                handler: function(obj, results) {
+                                    //console.log("MouseDown on Hex", "x", obj.x, "y", obj.y, "position", results.position, "prefabName", obj.prefabName);
+                                    if (obj.onMouseDown) obj.onMouseDown(obj, results);
                                 }
                             },
                             DragStart: {
                                 query: {
                                     position: "transform/localPosition"
                                 },
-                                handler: function(obj, result) {
-                                    //console.log("DragStart on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
-                                    if (obj.onDragStart) obj.onDragStart(obj, result);
+                                handler: function(obj, results) {
+                                    //console.log("DragStart on Hex", "x", obj.x, "y", obj.y, "position", results.position, "prefabName", obj.prefabName);
+                                    if (obj.onDragStart) obj.onDragStart(obj, results);
                                 }
                             },
                             DragMove: {
                                 query: {
                                     position: "transform/localPosition"
                                 },
-                                handler: function(obj, result) {
-                                    //console.log("DragMove on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
-                                    if (obj.onDragMove) obj.onDragMove(obj, result);
+                                handler: function(obj, results) {
+                                    //console.log("DragMove on Hex", "x", obj.x, "y", obj.y, "position", results.position, "prefabName", obj.prefabName);
+                                    if (obj.onDragMove) obj.onDragMove(obj, results);
                                 }
                             },
                             DragStop: {
                                 query: {
                                     position: "transform/localPosition"
                                 },
-                                handler: function(obj, result) {
-                                    //console.log("DragStop on Hex", "x", obj.x, "y", obj.y, "position", result.position, "prefabName", obj.prefabName);
-                                    if (obj.onDragStop) obj.onDragStop(obj, result);
+                                handler: function(obj, results) {
+                                    //console.log("DragStop on Hex", "x", obj.x, "y", obj.y, "position", results.position, "prefabName", obj.prefabName);
+                                    if (obj.onDragStop) obj.onDragStop(obj, results);
                                 }
                             }
                         },
@@ -2041,34 +2068,31 @@ function CreateMap()
 
                     var vegPrefab =
                         CreatePrefab({
-                            prefab: vegPrefabName, 
                             obj: {
                                 x: x,
                                 y: y,
                                 tileX: tileX,
                                 tileY: tileY
                             }, 
+                            prefab: vegPrefabName, 
+                            parent: 'object:' + tilePrefab.id,
                             update: {
-                                "transform/localPosition": {x: tileX, y: tileZ, z: tileY}
+                                "transform/localPosition": {
+                                    x: tileX, 
+                                    y: tileZ, 
+                                    z: tileY
+                                }
                             }, 
                             interests: {
                                 MouseDown: {
                                     query: {
                                         position: "transform/localPosition"
                                     },
-                                    handler: function(obj, result) {
-                                        //console.log("MouseDown on Veg", obj.x, obj.y, result.position, obj.prefabName);
+                                    handler: function(obj, results) {
+                                        //console.log("MouseDown on Veg", obj.x, obj.y, results.position, obj.prefabName);
                                     }
                                 }
-                            },
-                            postEvents: [
-                                {
-                                    event: 'SetParent',
-                                    data: {
-                                        'path': 'object:' + tilePrefab.id
-                                    }
-                                }
-                            ]
+                            }
 
                         });
 
@@ -2179,7 +2203,7 @@ function CreateBlobs()
                 data: [
                     {
                         command: 'scale',
-                        to: {x: blobData.size, y: blobData.size, z: blobData.size},
+                        to: blobData.size,
                         time: blobData.animateTime
                     }
                 ]
@@ -2264,7 +2288,7 @@ function CreateBlobs()
                     data: [
                         {
                             command: 'scale',
-                            to: {x: bloopData.size, y: bloopData.size, z: bloopData.size},
+                            to: bloopData.size,
                             time: bloopData.animateTime
                         }
                     ]
@@ -2366,7 +2390,7 @@ function CreateBlobs()
                         data: [
                             {
                                 command: 'scale',
-                                to: {x: bleepData.size, y: bleepData.size, z: bleepData.size},
+                                to: bleepData.size,
                                 time: bleepData.animateTime
                             }
                         ]
@@ -2464,22 +2488,22 @@ function CreatePlaces()
             },
             interests: {
                 DragStart: {
-                    handler: function(obj, result) {
+                    handler: function(obj, results) {
                         world.draggingPlace = obj.placeObject;
                         world.draggingPlaceKissed = {};
                         //console.log("game.js: Place Anchor: DragStart", obj.id);
                     }
                 },
                 DragStop: {
-                    handler: function(obj, result) {
+                    handler: function(obj, results) {
                         world.draggingPlace = null;
                         //console.log("game.js: Place Anchor: DragStop", obj.id);
                         QueryObject(obj.placeObject, {
                                 position: 'transform/position'
-                            }, function(result) {
-                                //console.log("Moving anchor " + obj.id + " to " + result.position.x + " " + result.position.y + " " + result.position.z);
+                            }, function(results) {
+                                //console.log("Moving anchor " + obj.id + " to " + results.position.x + " " + results.position.y + " " + results.position.z);
                                 UpdateObject(obj, {
-                                    "transform/position": result.position
+                                    "transform/position": results.position
                                 });
                             });
                     }
@@ -2548,16 +2572,16 @@ function CreatePlaces()
                         collisionImpulse: 'collision/impulse',
                         collisionRelativeVelocity: 'collision/relativeVelocity'
                     },
-                    handler: function(obj, result) {
+                    handler: function(obj, results) {
                         // Ignore if not another place.
-                        //console.log("game.js: Place: CollisionEnter", obj.id, JSON.stringify(result));
-                        var collisionPlace = world.placeObjectsByID[result.collisionObjectID];
+                        //console.log("game.js: Place: CollisionEnter", obj.id, JSON.stringify(results));
+                        var collisionPlace = world.placeObjectsByID[results.collisionObjectID];
                         if ((!collisionPlace) ||
                              (world.draggingPlace != obj)) {
                             return;
                         }
-                        world.draggingPlaceKissed[result.collisionObjectID] = true;
-                        //console.log("KISS", obj.id, result.collisionObjectID, JSON.stringify(world.draggingPlaceKissed), JSON.stringify(result));
+                        world.draggingPlaceKissed[results.collisionObjectID] = true;
+                        //console.log("KISS", obj.id, results.collisionObjectID, JSON.stringify(world.draggingPlaceKissed), JSON.stringify(results));
                         var foundConnection = null;
                         for (var i = 0, n = obj.connections.length; i < n; i++) {
                             var connection = obj.connections[i];
@@ -2600,16 +2624,16 @@ function CreatePlaces()
                         collisionImpulse: 'collision/impulse',
                         collisionRelativeVelocity: 'collision/relativeVelocity'
                     },
-                    handler: function(obj, result) {
+                    handler: function(obj, results) {
                         // Ignore if not another place.
-                        //console.log("game.js: Place: CollisionExit", obj.id, JSON.stringify(result));
-                        var collisionPlace = world.placeObjectsByID[result.collisionObjectID];
+                        //console.log("game.js: Place: CollisionExit", obj.id, JSON.stringify(results));
+                        var collisionPlace = world.placeObjectsByID[results.collisionObjectID];
                         if ((!collisionPlace) ||
                             (world.draggingPlace != obj)) {
                             return;
                         }
-                        delete world.draggingPlaceKissed[result.collisionObjectID];
-                        //console.log("UNKISS", obj.id, result.collisionObjectID, JSON.stringify(world.draggingPlaceKissed), JSON.stringify(result));
+                        delete world.draggingPlaceKissed[results.collisionObjectID];
+                        //console.log("UNKISS", obj.id, results.collisionObjectID, JSON.stringify(world.draggingPlaceKissed), JSON.stringify(results));
                     }
                 }
             }
@@ -2759,21 +2783,14 @@ function CreateRainbow(kind, fromTarget, toTarget, parent)
             obj: {
                 bows: []
             },
+            parent: parent ? ('object:' + parent.id) : null,
             update: {
                 'fromTransform!': 'object:' + fromTarget.id + '/transform',
                 'toTransform!': 'object:' + toTarget.id + '/transform',
                 bowHeight: rainbow.bowHeight,
                 fromWidth: rainbow.rainbowWidth,
                 toWidth: rainbow.rainbowWidth
-            },
-            postEvents: (!parent ? [] : [
-                {
-                    event: 'SetParent',
-                    data: {
-                        path: 'object:' + parent.id
-                    }
-                }
-            ])
+            }
         });
 
     world.rainbow = rainbow;
@@ -2790,15 +2807,9 @@ function CreateRainbow(kind, fromTarget, toTarget, parent)
         var bowObject =
             CreatePrefab({
                 prefab: 'Prefabs/Bow',
-                update: bowUpdate,
-                postEvents: [
-                    {
-                        event: 'SetParent',
-                        data: {
-                            'path': 'object:' + rainbowObject.id
-                        }
-                    }
-                ]});
+                parent: 'object:' + rainbowObject.id,
+                update: bowUpdate
+            });
 
         rainbowObject.bows.push(bowObject);
     }

@@ -34,8 +34,9 @@ public class Tracker : BridgeObject {
     public bool mouseTrackingPosition = true;
     public bool mouseTrackingPositionHover = false;
     public float mouseTrackingPositionHoverDelay = 0.1f;
+    public float mouseTrackingPositionDriftDelay = 0.1f;
     public bool mouseTrackingPositionHovering = false;
-    public float mouseTrackingPositionHoverMoveTime = -1.0f;
+    public float mouseTrackingPositionDriftTime = -1.0f;
     public Vector2 screenSize = Vector2.zero;
     public Vector3 mousePosition = Vector3.zero;
     public Vector3 mousePositionLast = Vector3.zero;
@@ -52,6 +53,8 @@ public class Tracker : BridgeObject {
     public Quaternion mouseRaycastHitPointFaceCameraRotation;
     public BridgeObject mouseRaycastHitBridgeObject;
     public string mouseRaycastHitBridgeObjectID;
+    public BridgeObject mouseRaycastHitColliderBridgeObject;
+    public string mouseRaycastHitColliderBridgeObjectID;
     public bool dragTracking = false;
     public bool dragging = false;
     public bool draggingSetsIsKinematic = true;
@@ -108,6 +111,8 @@ public class Tracker : BridgeObject {
     {
         mouseRaycastHitBridgeObject = null;
         mouseRaycastHitBridgeObjectID = null;
+        mouseRaycastHitColliderBridgeObject = null;
+        mouseRaycastHitColliderBridgeObjectID = null;
 
         if (!mouseTrackingPosition) {
             return;
@@ -126,19 +131,25 @@ public class Tracker : BridgeObject {
                 mousePosition.y - (screenSize.y * 0.5f));
 
         if (mouseTrackingPositionHover) {
-            if (mousePositionChanged) {
-                if (mouseTrackingPositionHovering) {
+
+            if (mouseTrackingPositionHovering) {
+
+                if (mousePositionChanged) {
                     mouseTrackingPositionHovering = false;
-                    mouseTrackingPositionHoverMoveTime = Time.time;
+                    mouseTrackingPositionDriftTime = Time.time;
                     SendEventName("Drift");
                 }
+
             } else {
-                if ((Time.time - mouseTrackingPositionHoverMoveTime) >= mouseTrackingPositionHoverDelay) {
-                    if (!mouseTrackingPositionHovering) {
-                        mouseTrackingPositionHovering = true;
-                        SendEventName("Hover");
-                    }
+
+                if (mousePositionChanged) {
+                    mouseTrackingPositionDriftTime = Time.time;
                 }
+                if ((Time.time - mouseTrackingPositionDriftTime) >= mouseTrackingPositionDriftDelay) {
+                    mouseTrackingPositionHovering = true;
+                    SendEventName("Hover");
+                }
+
             }
         }
 
@@ -197,6 +208,23 @@ public class Tracker : BridgeObject {
                     (mouseRaycastHitBridgeObject == null)
                         ? null
                         : mouseRaycastHitBridgeObject.id;
+
+                mouseRaycastHitColliderBridgeObject = null;
+                xform = mouseRaycastHit.collider.transform;
+                while (xform != null) {
+                    mouseRaycastHitColliderBridgeObject = xform.gameObject.GetComponent<BridgeObject>();
+                    if (mouseRaycastHitColliderBridgeObject != null) {
+                        break;
+                    }
+
+                    xform = xform.parent;
+                }
+
+                mouseRaycastHitColliderBridgeObjectID =
+                    (mouseRaycastHitColliderBridgeObject == null)
+                        ? null
+                        : mouseRaycastHitColliderBridgeObject.id;
+
             }
 
             //Debug.Log("Tracker: TrackMousePosition: cameraPosition: " + cameraPosition.x + " " + cameraPosition.y + " " + cameraPosition.z + " point: " + mouseRaycastHit.point.x + " " + mouseRaycastHit.point.y + " " + mouseRaycastHit.point.z + " offset: " + offset.x + " " + offset.y + " " + offset.z + " direction: " + direction);
@@ -268,6 +296,7 @@ public class Tracker : BridgeObject {
 
         }
 
+        SendEventName("MouseMove");
     }
 
 

@@ -55,20 +55,88 @@ MonoBehaviour:
   id: 
   bridge: {fileID: 0}
   destroyed: 0
-  angle: 0
-  fromTransformAttached: 1
+  mouseTracking: 1
+  mouseEntered: 0
+  mouseEnteredTime: 0
+  mouseEnteredChanged: 0
+  triggerTracking: 0
+  triggerEntered: 0
+  triggerEnteredTime: 0
+  triggerEnteredChanged: 0
+  mouseDown: 0
+  mouseDownTime: 0
+  mouseDownChanged: 0
+  ignoringMouseClick: 0
+  isPointerOverUIObject: 0
+  mouseTrackingPosition: 1
+  mouseTrackingPositionHover: 0
+  mouseTrackingPositionHoverDelay: 0.1
+  mouseTrackingPositionDriftDelay: 0.1
+  mouseTrackingPositionHovering: 0
+  mouseTrackingPositionDriftTime: -1
+  screenSize: {x: 0, y: 0}
+  mousePosition: {x: 0, y: 0, z: 0}
+  mousePositionLast: {x: 0, y: 0, z: 0}
+  mousePositionChanged: 0
+  screenPosition: {x: 0, y: 0}
+  mousePositionToCameraOffset: {x: 0, y: 0, z: 0}
+  mouseTrackingRaycast: 1
+  mouseRayMaxDistance: Infinity
+  mouseRayLayerMask: -5
+  mouseRayQueryTriggerInteraction: 0
+  mouseRaycastResult: 0
+  mouseRaycastHitPointFaceCameraRotation: {x: 0, y: 0, z: 0, w: 0}
+  mouseRaycastHitBridgeObject: {fileID: 0}
+  mouseRaycastHitBridgeObjectID: 
+  mouseRaycastHitColliderBridgeObject: {fileID: 0}
+  mouseRaycastHitColliderBridgeObjectID: 
+  dragTracking: 0
+  dragging: 0
+  draggingSetsIsKinematic: 1
+  draggingLastIsKinematic: 0
+  dragStartDistance: 0
+  dragLastPosition: {x: 0, y: 0, z: 0}
+  dragLastPlanePosition: {x: 0, y: 0, z: 0}
+  dragPlanePosition: {x: 0, y: 0, z: 0}
+  dragLastMousePosition: {x: 0, y: 0, z: 0}
+  dragScreenDistance: {x: 0, y: 0, z: 0}
+  dragPlaneDistance: {x: 0, y: 0, z: 0}
+  rotateAmount: 0
+  collisionTracking: 1
+  collisionEntered: 0
+  collisionEnteredTime: 0
+  collisionEnteredChanged: 0
+  fromView: {fileID: 0}
   fromTransform: {fileID: 0}
+  fromTransformAttached: 1
   fromOffset: {x: 0, y: 0, z: 0}
   fromLocalOffset: {x: 0, y: 0, z: 0}
   fromLocalOffsetRotated: {x: 0, y: 0, z: 0}
+  fromAnchor: {x: 0, y: 0, z: 0}
   fromPosition: {x: 0, y: 0, z: 0}
-  toTransformAttached: 1
+  fromBeforeOffset: {x: -1, y: 0, z: 0}
+  fromAfterOffset: {x: 2, y: 0, z: 0}
+  toView: {fileID: 0}
   toTransform: {fileID: 0}
-  toPosition: {x: 0, y: 0, z: 0}
+  toTransformAttached: 1
   toOffset: {x: 0, y: 0, z: 0}
   toLocalOffset: {x: 0, y: 0, z: 0}
   toLocalOffsetRotated: {x: 0, y: 0, z: 0}
+  toAnchor: {x: 0, y: 0, z: 0}
+  toPosition: {x: 0, y: 0, z: 0}
+  toBeforeOffset: {x: -2, y: 0, z: 0}
+  toAfterOffset: {x: 1, y: 0, z: 0}
+  cursorView: {fileID: 0}
+  cursorValue: 0.5
+  showSplinePoints: 0
+  offsetNormal: {x: 0, y: 0, z: 0}
+  splinePoints: []
+  linePoints: []
+  points: []
+  angle: 0
   lineRenderer: {fileID: 120906442093127462}
+  lineSegments: 20
+  splineSegments: 10
   bowSegments: 50
   bowHeight: 10
   bowRotation: 90
@@ -84,6 +152,7 @@ MonoBehaviour:
   textureOffset: {x: 0, y: 0}
   textureScale: {x: 1, y: 1}
   textureOffsetPerSecond: {x: 0, y: 0}
+  useWidthCurve: 1
   updateTexture: 0
   updateMaterial: 0
   updateMaterialAlways: 1

@@ -330,15 +330,17 @@ public class Bridge : MonoBehaviour {
 
             case "Create": {
 
-                string prefab = GetStringDefault(data, "prefab");
-                string component = GetStringDefault(data, "component");
-                string id = GetStringDefault(data, "id");
-                JObject update = GetJObjectDefault(data, "update");
-                JObject interests = GetJObjectDefault(data, "interests");
-                JArray preEvents = GetJArrayDefault(data, "preEvents");
-                JArray postEvents = GetJArrayDefault(data, "postEvents");
+                string id = data.GetString("id");
+                string prefab = data.GetString("prefab");
+                string component = data.GetString("component");
+                JArray preEvents = data.GetArray("preEvents");
+                string parent = data.GetString("parent");
+                bool worldPositionStays = data.GetBoolean("worldPositionStays", true);
+                JObject update = data.GetObject("update");
+                JObject interests = data.GetObject("interests");
+                JArray postEvents = data.GetArray("postEvents");
 
-                //Debug.Log("Bridge: DistributeUnityEvent: Create: prefab: " + prefab + " id: " + id + " update: " + update + " interests: " + interests + " preEvents: " + preEvents + " postEvents: " + postEvents);
+                //Debug.Log("Bridge: DistributeUnityEvent: Create: id: " + id + " prefab: " + prefab + " component: " + component + " preEvents: " + preEvents + " parent: " + parent + " worldPositionStay: " + worldPositionStays + " update: " + update + " interests: " + interests + " postEvents: " + postEvents);
 
                 GameObject instance = null;
                 if (string.IsNullOrEmpty(prefab)) {
@@ -400,6 +402,51 @@ public class Bridge : MonoBehaviour {
                     bridgeObject.HandleEvents(preEvents);
                 }
 
+                if (!String.IsNullOrEmpty(parent)) {
+                    //Debug.Log("BridgeObject: DistributeUnityEvent: Create: parent: bridgeObject: " + bridgeObject + " parent: " + parent);
+
+                    Accessor accessor = null;
+                    if (!Accessor.FindAccessor(
+                            bridgeObject,
+                            parent,
+                            ref accessor)) {
+
+                        Debug.LogError("Bridge: DistributeUnityEvent: Create: parent: can't find accessor for bridgeObject: " + bridgeObject + " parent: " + parent);
+
+                    } else {
+
+                        object obj = null;
+                        if (!accessor.Get(ref obj)) {
+
+                            if (!accessor.conditional) {
+                                Debug.LogError("Bridge: DistributeUnityEvent: Create: parent: can't get accessor: " + accessor + " bridgeObject: " + bridgeObject + " parent: " + parent);
+                            }
+
+                        } else {
+
+                            Component comp = obj as Component;
+                            if (comp == null) {
+
+                                if (!accessor.conditional) {
+                                    Debug.LogError("Bridge: DistributeUnityEvent: Create: parent: expected Component obj: " + obj + " this: " + this + " parent: " + parent);
+                                }
+
+                            } else {
+
+                                GameObject go = comp.gameObject;
+                                Transform xform = go.transform;
+                                //Debug.Log("Bridge: DistributeUnityEvent: Create: parent: xform: " + xform + " parent: " + parent + " worldPositionStays: " + worldPositionStays);
+
+                                bridgeObject.transform.SetParent(xform, worldPositionStays);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
                 if (update != null) {
                     bridgeObject.LoadUpdate(update);
                 }
@@ -422,12 +469,12 @@ public class Bridge : MonoBehaviour {
                 //Debug.Log("Bridge: DistributeUnityEvent: id: " + id + " ev: " + ev);
 
                 if (string.IsNullOrEmpty(id)) {
-                    Debug.LogError("Bridge: DistributeUnityEvent: missing id on eventName: " + eventName + " ev: " + ev);
+                    Debug.LogError("Bridge: DistributeUnityEvent: undefined id on eventName: " + eventName + " ev: " + ev);
                     return;
                 }
 
                 if (!idToObject.ContainsKey(id)) {
-                    Debug.Log("Bridge: DistributeUnityEvent: missing id: " + id + " ev: " + ev);
+                    Debug.LogWarning("Bridge: DistributeUnityEvent: missing id: " + id + " ev: " + ev);
                     return;
                 }
 
@@ -527,7 +574,7 @@ public class Bridge : MonoBehaviour {
         //Debug.Log("Bridge: QueryData: data: " + data);
 
         if (!string.IsNullOrEmpty(callbackID)) {
-           SendCallbackData(callbackID, data);
+            SendCallbackData(callbackID, data);
         }
 
     }
