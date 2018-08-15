@@ -126,6 +126,9 @@ public class LeanTweenBridge : BridgeObject {
     // Instance Variables
 
 
+    public int maxTweens = 1000;
+
+
     ////////////////////////////////////////////////////////////////////////
     // Static Variables
 
@@ -668,6 +671,8 @@ public class LeanTweenBridge : BridgeObject {
         } else {
             Debug.LogError("LeanTweenBridge: Awake: There should only be one leanTweenBridge!");
         }
+
+        LeanTween.init(maxTweens);
     }
 
 

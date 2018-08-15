@@ -537,29 +537,31 @@ function CreateCompany(company)
     }
 
 
-    function HighlightMarkets(marketIndex, highlight)
+    function HighlightMarkets(marketIndexes)
     {
-        // company.companyObject.yearObjects[].anchorObject.baseObject.marketHexObjects
+        // company.companyObject.yearObjects[].anchorObject.baseObject.tiles
 
-        //console.log("HighlightMarkets", "marketIndex", marketIndex, "highlight", highlight);
+        //console.log("HighlightMarkets", "marketIndexes", marketIndexes);
 
         company.companyObject.yearObjects.forEach(function (yearObject) {
 
-            yearObject.anchorObject.baseObject.marketHexObjects.forEach(function (marketHexObject) {
+            var baseObject = yearObject.anchorObject.baseObject;
 
-                if (marketHexObject.marketIndex != marketIndex) {
-                    return;
+            var tileIndexes = [];
+            baseObject.tiles.forEach(function (tile, tileIndex) {
+                if (!tile.dummy &&
+                    marketIndexes && 
+                    (marketIndexes.indexOf(tile.marketIndex) != -1)) {
+                    tileIndexes.push(tileIndex);
                 }
-
-                HighlightObject(marketHexObject, highlight, tuning.marketHighlightEffect, {
-                    'transform/localScale': { x: tuning.marketHighlightScale, y: tuning.marketHighlightScale, z: tuning.marketHighlightScale },
-                    'transform/localRotation': { pitch: 90 },
-                    'transform/localPosition': { y: 0.1 },
-                    'component:ParticleSystem/main/scalingMode': 'Hierarchy',
-                    'component:ParticleSystemRenderer/alignment': 'Local'
-                });
-
             });
+
+            UpdateObject(baseObject, {
+                highlightedTiles: tileIndexes,
+                updateHighlights: true
+            });
+
+            //console.log("HighlightMarkets", "year", yearObject.year, "marketIndexes", marketIndexes, "tileIndexes", tileIndexes);
 
         });
 
@@ -607,7 +609,7 @@ function CreateCompany(company)
 
                 var highlight =
                     unitIndexes &&
-                    unitIndexes.indexOf(unitObject.unit.index) != -1;
+                    (unitIndexes.indexOf(unitObject.unit.index) != -1);
                 HighlightObject(unitObject, highlight, tuning.unitHighlightEffect, update);
 
             });
@@ -617,7 +619,7 @@ function CreateCompany(company)
     }
 
 
-    function CreateYear(yearIndex)
+    function CreateYear(yearIndex, x, y, z)
     {
         var year =
             ((yearIndex >= 0) &&
@@ -626,7 +628,7 @@ function CreateCompany(company)
                 : 0;
 
         var valuation = 0;
-        height = tuning.hexDummyHeight;
+        var height = tuning.hexDummyHeight;
 
         if (year) {
             valuationTable.forEach(function (valuationYears) {
@@ -715,7 +717,10 @@ function CreateCompany(company)
         var baseObject = CreatePrefab({
             obj: {
                 anchorObject: anchorObject,
-                marketHexObjects: []
+                tiles: [],
+                tileColors: [],
+                tileHeights: [],
+                tilePositions: []
             },
             prefab: 'Prefabs/HexBase',
             parent: 'object:' + companyObject.id,
@@ -747,69 +752,34 @@ function CreateCompany(company)
                 'component:TrackerProxy/target!': 'object:' + anchorObject.id
             },
             interests: {
-                MouseEnter: {
+                TileEnter: {
                     query: {
-                        hexObjectID: 'mouseRaycastHit/collider?/component:BridgeObject?/id'
+                        currentTileIndex: 'currentTileIndex'
                     },
                     handler: function (obj, results) {
                         UpdateObject(obj, {
                             mouseTrackingPosition: true
                         });
-                        var hexObject =
-                            results.hexObjectID
-                                ? globals.objects[results.hexObjectID]
-                                : null;
-                        if (hexObject && !hexObject.dummy) {
-                            if ((!obj.highlightedHexObject) ||
-                                (obj.highlightedHexObject.marketIndex != hexObject.marketIndex)) {
-                                if (obj.highlightedHexObject) {
-                                    HighlightMarkets(obj.highlightedHexObject.marketIndex, false);
-                                }
-                                obj.highlightedHexObject = hexObject;
-                                HighlightMarkets(hexObject.marketIndex, true);
+                        var tile = obj.tiles ? obj.tiles[results.currentTileIndex] : null;
+                        if (tile && !tile.dummy) {
+                            if ((!obj.highlightedTile) ||
+                                (obj.highlightedTile.marketIndex != tile.marketIndex)) {
+                                obj.highlightedTile = tile;
+                                HighlightMarkets([tile.marketIndex]);
                             }
                         } else {
-                            if (obj.highlightedHexObject) {
-                                HighlightMarkets(obj.highlightedHexObject.marketIndex, false);
-                                obj.highlightedHexObject = null;
+                            if (obj.highlightedTile) {
+                                HighlightMarkets(null);
+                                obj.highlightedTile = null;
                             }
                         }
                     }
                 },
                 MouseExit: {
                     handler: function (obj, results) {
-                        UpdateObject(obj, {
-                            mouseTrackingPosition: false
-                        });
-                        if (obj.highlightedHexObject) {
-                            HighlightMarkets(obj.highlightedHexObject.marketIndex, false);
-                            obj.highlightedHexObject = null;
-                        }
-                    }
-                },
-                MouseMove: {
-                    query: {
-                        hexObjectID: 'mouseRaycastHit/collider?/component:BridgeObject?/id'
-                    },
-                    handler: function (obj, results) {
-                        var hexObject =
-                            results.hexObjectID
-                                ? globals.objects[results.hexObjectID]
-                                : null;
-                        if (hexObject && !hexObject.dummy) {
-                            if ((!obj.highlightedHexObject) ||
-                                (obj.highlightedHexObject.marketIndex != hexObject.marketIndex)) {
-                                if (obj.highlightedHexObject) {
-                                    HighlightMarkets(obj.highlightedHexObject.marketIndex, false);
-                                }
-                                obj.highlightedHexObject = hexObject;
-                                HighlightMarkets(hexObject.marketIndex, true);
-                            }
-                        } else {
-                            if (obj.highlightedHexObject) {
-                                HighlightMarkets(obj.highlightedHexObject.marketIndex, false);
-                                obj.highlightedHexObject = null;
-                            }
+                        if (obj.highlightedTile) {
+                            HighlightMarkets(null);
+                            obj.highlightedTile = null;
                         }
                     }
                 },
@@ -908,37 +878,33 @@ function CreateCompany(company)
             // Make one dummy hex if there is no year.
 
             var pos = world.hexBases[0].position;
-            var hexPosition = {
-                x: company.hexTileScale * tuning.hexDX * pos.x,
-                y: company.hexTileScale * height,
-                z: company.hexTileScale * tuning.hexDY * pos.z
-            };
-            var hexScale = {
-                x: company.hexTileScale,
-                y: company.hexTileScale * height / tuning.hexHeight,
-                z: company.hexTileScale
-            };
-            var hex = CreatePrefab({
-                obj: {
-                    dummy: true,
-                    height: height
-                },
-                prefab: 'Prefabs/Hex',
-                parent: 'object:' + baseObject.id + '/transform:Hexes',
-                worldPositionStays: false,
-                update: {
-                    'transform/localPosition': hexPosition,
-                    'transform/localScale': hexScale,
-                    'component:MeshRenderer/material/color': { r: 0.5, g: 0.5, b: 0.5 }
+            var color = '#808080';
+
+            var tile = {
+                dummy: true,
+                yearIndex: -1,
+                marketIndex: -1,
+                tileIndex: 0,
+                hexTileIndex: 0,
+                color: color,
+                height: tuning.hexDummyHeight,
+                position: {
+                    x: pos.x * tuning.hexDX,
+                    y: pos.y,
+                    z: pos.z * tuning.hexDY
                 }
-            });
+            };
+
+            baseObject.tiles.push(tile);
+            baseObject.tileColors.push(tile.color);
+            baseObject.tileHeights.push(tile.height);
+            baseObject.tilePositions.push(tile.position);
 
         } else {
 
             // Make a set of base hexes for each market.
 
             var hexTileIndex = 0;
-            var nonZeroMarketCount = 0;
 
             marketTable.forEach(function (market, marketIndex) {
                 
@@ -958,62 +924,59 @@ function CreateCompany(company)
                 //console.log("year", year, "marketSize", marketSize, "hexTileValue", company.hexTileValue, "marketHexTileCount", marketHexTileCount);
 
                 for (var tileIndex = 0; tileIndex < marketHexTileCount; tileIndex++) {
-                    (function (tileIndex) {
 
-                        var pos = world.hexBases[hexTileIndex++].position;
-                        var hexPosition = {
-                            x: company.hexTileScale * tuning.hexDX * pos.x,
-                            y: company.hexTileScale * height,
-                            z: company.hexTileScale * tuning.hexDY * pos.z
-                        };
-                        var hexScaleY = height / tuning.hexHeight;
-                        var hexScale = { 
-                            x: company.hexTileScale, 
-                            y: company.hexTileScale * hexScaleY,
-                            z: company.hexTileScale
-                        };
-                        var marketHexObject = CreatePrefab({
-                            obj: {
-                                dummy: false,
-                                marketIndex: marketIndex,
-                                yearIndex: yearIndex,
-                                tileIndex: tileIndex
-                            },
-                            prefab: 'Prefabs/Hex',
-                            parent: 'object:' + baseObject.id + '/transform:Hexes',
-                            worldPositionStays: false,
-                            update: {
-                                'transform/localPosition': hexPosition,
-                                'transform/localScale': hexScale,
-                                'component:MeshRenderer/materials/index:0/method:UpdateMaterial': [{
-                                    textureScale_MainTex: {
-                                        x: 1,
-                                        y: hexScaleY
-                                    }
-                                }],
-                                'component:MeshRenderer/materials/index:1/method:UpdateMaterial': [{
-                                    textureScale_MainTex: {
-                                        x: 1,
-                                        y: hexScaleY
-                                    }
-                                }],
-                                'component:MeshRenderer/materials/index:2/method:UpdateMaterial': [{
-                                    texture_MainTex: null,
-                                    texture_BumpMap: null,
-                                    color: color
-                                }]
+                    (function (tileIndex, hexTileIndex) {
+
+                        var pos = 
+                            world.hexBases[hexTileIndex].position;
+
+                        var tile = {
+                            dummy: false,
+                            yearIndex: yearIndex,
+                            marketIndex: marketIndex,
+                            tileIndex: tileIndex,
+                            hexTileIndex: hexTileIndex,
+                            color: color,
+                            height: height,
+                            position: {
+                                x: pos.x * tuning.hexDX,
+                                y: pos.y,
+                                z: pos.z * tuning.hexDY
                             }
-                        });
+                        };
 
-                        baseObject.marketHexObjects.push(marketHexObject);
+                        baseObject.tiles.push(tile);
+                        baseObject.tileColors.push(tile.color);
+                        baseObject.tileHeights.push(tile.height);
+                        baseObject.tilePositions.push(tile.position);
 
-                    })(tileIndex);
+                    })(tileIndex, hexTileIndex);
+
+                    hexTileIndex++;
 
                 }
 
             });
 
+        }
+
+        UpdateObject(baseObject, {
+            tileColors: baseObject.tileColors,
+            tileHeights: baseObject.tileHeights,
+            tilePositions: baseObject.tilePositions,
+            tileScale: company.hexTileScale
+        });
+
+        if (year) {
+
             if (tuning.yearEnabled) {
+
+                var yearPosition = {
+                    x: x, 
+                    y: y + height + yearHeight, 
+                    z: z
+                }
+                //console.log("year", year, "yearPosition", yearPosition.x, yearPosition.y, yearPosition.z, "height", height, "yearHeight", yearHeight, "x", x, "y", y, "z", z);
 
                 var yearObject = CreatePrefab({
                     obj: {
@@ -1025,7 +988,7 @@ function CreateCompany(company)
                         yearIndex: yearIndex,
                         unitObjects: [],
                         leafUnitObjects: [],
-                        localPosition: { x: 0, y: year.height + yearHeight, z: 0 },
+                        position: yearPosition,
                         height: height
                     },
                     prefab: 'Prefabs/Ball',
@@ -1033,7 +996,7 @@ function CreateCompany(company)
                     parent: 'object:' + baseObject.id,
                     update: {
                         "dragTracking": false,
-                        "transform/position": { x: x, y: height + yearHeight, z: z },
+                        "transform/position": yearPosition,
                         "transform/localScale": tinyScale,
                         "component:MeshRenderer/materials": [tuning.yearMaterial],
                         "component:MeshRenderer/enabled": tuning.yearRendererEnabled,
@@ -1104,7 +1067,7 @@ function CreateCompany(company)
                         value: 0,
                         indent: -1,
                         depth: 0,
-                        position: {x: x, y: height + yearHeight, z: z}
+                        position: yearObject.position
                     };
                     yearObject.rootUnit = rootUnit;
 
@@ -1144,403 +1107,220 @@ function CreateCompany(company)
 
                     });
 
-                    if (tuning.unitTree) {
+                    var layoutCount = nonZeroUnits.length;
+                    var layoutIndex = 0;
 
-                        var layoutCount = nonZeroUnits.length;
-                        var layoutIndex = 0;
+                    function CreateUnitTree(unit)
+                    {
 
-                        function CreateUnitTree(unit)
-                        {
+                        var ang = 
+                            layoutIndex++ * 
+                            (2.0 * Math.PI / layoutCount);
+                        unit.distance = 
+                            tuning.unitInitialDistance;
+                        var dx = Math.cos(ang);
+                        var dy = Math.sin(ang);
+                        var dz = Math.random() - 0.5;
+                        unit.position = {
+                            x: yearObject.position.x + dx * tuning.unitInitialDistance,
+                            y: yearObject.position.y + dy * tuning.unitInitialDistance,
+                            z: yearObject.position.z + dz
+                        };
 
-                            var ang = 
-                                layoutIndex * 
-                                (2.0 * Math.PI / layoutCount);
-                            unit.distance = 
-                                tuning.unitInitialDistance;
-                            unit.position = {
-                                x: x + Math.cos(ang) * tuning.unitInitialDistance,
-                                y: y + Math.sin(ang) * tuning.unitInitialDistance + height + yearHeight,
-                                z: z + Math.random() - 0.5
-                            };
-                            unit.isLeaf =
-                                !(unit.children && unit.children.length);
-                            unit.scale = 
-                                unit.isLeaf
-                                    ? unit.size
-                                    : tuning.unitNonLeafSize;
+                        //console.log("CreateUnitTree", "year", year, "year position", yearObject.position.x, yearObject.position.y, yearObject.position.z, "unit", unit, "index", unit.index, "x", x, "y", y, "z", z, "layoutIndex", layoutIndex, "layoutCount", layoutCount, "ang", ang, ang * (180.0 / Math.PI), "dx", dx, "dy", dy, "dz", dz, "unitInitialDistance", tuning.unitInitialDistance, "height", height, "yearHeight", yearHeight, "position", unit.position.x, unit.position.y, unit.position.z);
 
-                            unit.modelNames = [];
-                            unit.modelNumbers = [];
-                            unit.modelColors = [];
+                        unit.isLeaf =
+                            !(unit.children && unit.children.length);
+                        unit.scale = 
+                            unit.isLeaf
+                                ? unit.size
+                                : tuning.unitNonLeafSize;
 
-                            var modelString = unitModels[unit.index % unitModels.length].trim();
-                            if (modelString) {
+                        unit.modelNames = [];
+                        unit.modelNumbers = [];
+                        unit.modelColors = [];
 
-                                unit.modelNames = modelString.split(',');
+                        var modelString = unitModels[unit.index % unitModels.length].trim();
+                        if (modelString) {
 
-                                unit.modelNames.forEach(function (modelName, modelIndex) {
-                                    
-                                    var modelName = unit.modelNames[modelIndex].trim();
-                                    unit.modelNames[modelIndex] = modelName;
-                                    var modelNumber = modelType.indexOf(modelName);
+                            unit.modelNames = modelString.split(',');
 
-                                    if (modelNumber == -1) {
-                                        modelNumber = 0;
-                                        console.log("private.js: can't find modelNumber for i: " + i + " modelName: " + modelName + " modelType: " + JSON.stringify(modelType));
-                                    }
+                            unit.modelNames.forEach(function (modelName, modelIndex) {
 
-                                    unit.modelNumbers.push(modelNumber);
-                                    var colorIndex = modelNumber % modelColorScheme.length;
-                                    unit.modelColors.push(modelColorScheme[colorIndex]);
+                                var modelName = unit.modelNames[modelIndex].trim();
+                                unit.modelNames[modelIndex] = modelName;
+                                var modelNumber = modelType.indexOf(modelName);
 
-                                });
+                                if (modelNumber == -1) {
+                                    modelNumber = 0;
+                                    console.log("private.js: can't find modelNumber for i: " + i + " modelName: " + modelName + " modelType: " + JSON.stringify(modelType));
+                                }
 
-                            }
+                                unit.modelNumbers.push(modelNumber);
+                                var colorIndex = modelNumber % modelColorScheme.length;
+                                unit.modelColors.push(modelColorScheme[colorIndex]);
 
-                            var unitObject = CreatePrefab({
-                                obj: {
-                                    unit: unit,
-                                    year: year,
-                                    yearObject: yearObject,
-                                    yearIndex: yearIndex,
-                                    modelObjects: []
-                                },
-                                prefab: 'Prefabs/Unit',
-                                parent: 'object:' + companyObject.id,
-                                update: {
-                                    'dragTracking': true,
-                                    'transform/localPosition': unit.position,
-                                    'transform/localScale': tinyScale,
-                                    'transform:Collider/component:Collider/sharedMaterial': tuning.unitPhysicMaterial,
-                                    'transform:Collider/component:Collider/radius': tuning.unitColliderRadius,
-                                    'component:Rigidbody/isKinematic': tuning.unitIsKinematic,
-                                    'component:Rigidbody/useGravity': tuning.unitUseGravity,
-                                    'component:Rigidbody/mass': tuning.unitMass,
-                                    'component:Rigidbody/drag': tuning.unitDrag,
-                                    'component:Rigidbody/angularDrag': tuning.unitAngularDrag,
-                                    'component:Rigidbody/collisionDetectionMode': tuning.unitCollisionDetectionMode,
-                                    'component:SpringJoint/spring': tuning.unitSpring,
-                                    'component:SpringJoint/damper': tuning.unitDamper,
-                                    'component:SpringJoint/tolerance': tuning.unitTolerance,
-                                    'component:SpringJoint/enableCollision': tuning.unitEnableCollision,
-                                    'component:SpringJoint/autoConfigureConnectedAnchor': false,
-                                    'component:SpringJoint/anchor': {},
-                                    'component:SpringJoint/connectedBody!': 'object:' + unit.parent.unitObject.id + '/component:Rigidbody'
-                                },
-                                interests: {
-                                    MouseEnter: {
-                                        handler: function(unitObject, results) {
-                                            //console.log("MouseEnter unitObject", unitObject, "unit", unitObject.unit, "index", unitObject.unit.index, "yearIndex", yearIndex);
-                                            var text = ('' + unitObject.unit.name).trim() + ': $' + unitObject.unit.value;
-                                            ShowPopupText(text, 'object:' + unitObject.id + '/transform');
-                                            HighlightUnits([unitObject.unit.index]);
-                                        }
-                                    },
-                                    MouseExit: {
-                                        handler: function(unitObject, results) {
-                                            //console.log("MouseExit unitObject", unitObject, "unit", unitObject.unit, "index", unitObject.unit.index, "yearIndex", yearIndex);
-                                            HighlightUnits(null);
-                                        }
-                                    }
-                                },
-                                postEvents: [
-                                    {
-                                        event: 'Animate',
-                                        data: [
-                                            {
-                                                command: 'scale',
-                                                time: tuning.unitCreateAnimateTime,
-                                                to: unit.scale
-                                            }
-                                        ]
-                                    }
-                                ]
                             });
-
-                            yearObject.unitObjects.push(unitObject);
-                            unit.unitObject = unitObject;
-
-                            if (unit.isLeaf) {
-
-                                yearObject.leafUnitObjects.push(unit);
-
-                                unit.modelNames.forEach(function (modelName, modelIndex) {
-
-                                    var modelNumber = unit.modelNumbers[modelIndex];
-                                    var modelColor = unit.modelColors[modelIndex];
-                                    var ang = modelIndex * (2.0 * Math.PI / modelCount);
-                                    var dist = (modelCount == 1) ? 0 : tuning.unitModelOffset;
-                                    var dx = Math.cos(ang) * dist;
-                                    var dy = Math.sin(ang) * dist;
-                                    var modelObject = CreatePrefab({
-                                        obj: {
-                                            yearIndex: yearIndex,
-                                            unit: unit,
-                                            modelIndex: modelIndex,
-                                            name: modelName,
-                                            number: modelNumber,
-                                            color: modelColor
-                                        },
-                                        prefab: 'Prefabs/UnitModel',
-                                        parent: 'object:' + unitObject.id,
-                                        worldPositionStays: false,
-                                        update: {
-                                            "transform/localPosition": {x: dx, y: 0, z: dy},
-                                            "component:MeshRenderer/materials": [tuning.material],
-                                            "component:MeshRenderer/material/color": modelColor
-                                        },
-                                        interests: {
-                                            MouseEnter: {
-                                                handler: function(unit, results) {
-                                                    //console.log("MouseEnter modelObject", "modelIndex", modelIndex, "yearIndex", yearIndex);
-                                                    HighlightModels(modelIndex, true);
-                                                }
-                                            },
-                                            MouseExit: {
-                                                handler: function(unit, results) {
-                                                    //console.log("MouseEnter modelObject", "modelIndex", modelIndex, "yearIndex", yearIndex);
-                                                    HighlightModels(modelIndex, false);
-                                                }
-                                            }
-                                        }
-                                    });
-
-                                    unitObject.modelObjects.push(modelObject);
-
-                                });
-
-                            }
-
-                            if (tuning.unitArrows) {
-
-                                unitObject.unitArrow = 
-                                    CreateRainbow(
-                                        tuning.unitArrowRainbowType, 
-                                        unit.parent.unitObject,
-                                        unit.unitObject,
-                                        companyObject);
-
-                            }
-
-                            if (unit.isLeaf && tuning.unitLabels) {
-
-                                unitObject.labelObject = CreatePrefab({
-                                    prefab: "Prefabs/ProText",
-                                    parent: 'object:' + companyObject.id,
-                                    update: {
-                                        'textMesh/text': unit.name.trim(),
-                                        'textMesh/fontSize': tuning.unitLabelFontSize,
-                                        'trackPosition': 'Transform',
-                                        'transformPosition!': 'object:' + unit.unitObject.id + '/transform',
-                                        'extraOffset': { y: unit.size + tuning.labelHeightExtra },
-                                        'trackRotation': 'CameraRotation'
-                                    }
-                                });
-
-                            }
-
-                            if (unit.children && unit.children.length) {
-                                unit.children.forEach(CreateUnitTree);
-                            }
 
                         }
 
-                        rootUnit.children.forEach(CreateUnitTree);
-
-                    } else {
-
-                        // Collect the leaf units.
-                        nonZeroUnits.forEach(function (unit) {
-                            if (unit.children.length == 0) {
-                                yearObject.leafUnitObjects.push(unit);
-                            }
+                        var unitObject = CreatePrefab({
+                            obj: {
+                                unit: unit,
+                                year: year,
+                                yearObject: yearObject,
+                                yearIndex: yearIndex,
+                                modelObjects: []
+                            },
+                            prefab: 'Prefabs/Unit',
+                            parent: 'object:' + companyObject.id,
+                            update: {
+                                'dragTracking': true,
+                                'transform/position': unit.position,
+                                'transform/localScale': tinyScale,
+                                'transform:Collider/component:Collider/sharedMaterial': tuning.unitPhysicMaterial,
+                                'transform:Collider/component:Collider/radius': tuning.unitColliderRadius,
+                                'component:Rigidbody/isKinematic': tuning.unitIsKinematic,
+                                'component:Rigidbody/useGravity': tuning.unitUseGravity,
+                                'component:Rigidbody/mass': tuning.unitMass,
+                                'component:Rigidbody/drag': tuning.unitDrag,
+                                'component:Rigidbody/angularDrag': tuning.unitAngularDrag,
+                                'component:Rigidbody/collisionDetectionMode': tuning.unitCollisionDetectionMode,
+                                'component:SpringJoint/spring': tuning.unitSpring,
+                                'component:SpringJoint/damper': tuning.unitDamper,
+                                'component:SpringJoint/tolerance': tuning.unitTolerance,
+                                'component:SpringJoint/enableCollision': tuning.unitEnableCollision,
+                                'component:SpringJoint/autoConfigureConnectedAnchor': false,
+                                'component:SpringJoint/anchor': {},
+                                'component:SpringJoint/connectedBody!': 'object:' + unit.parent.unitObject.id + '/component:Rigidbody'
+                            },
+                            interests: {
+                                MouseEnter: {
+                                    handler: function(unitObject, results) {
+                                        //console.log("MouseEnter unitObject", unitObject, "unit", unitObject.unit, "index", unitObject.unit.index, "yearIndex", yearIndex);
+                                        var text = ('' + unitObject.unit.name).trim() + ': $' + unitObject.unit.value;
+                                        ShowPopupText(text, 'object:' + unitObject.id + '/transform');
+                                        HighlightUnits([unitObject.unit.index]);
+                                    }
+                                },
+                                MouseExit: {
+                                    handler: function(unitObject, results) {
+                                        //console.log("MouseExit unitObject", unitObject, "unit", unitObject.unit, "index", unitObject.unit.index, "yearIndex", yearIndex);
+                                        HighlightUnits(null);
+                                    }
+                                }
+                            },
+                            postEvents: [
+                                {
+                                    event: 'Animate',
+                                    data: [
+                                        {
+                                            command: 'scale',
+                                            time: tuning.unitCreateAnimateTime,
+                                            to: unit.scale
+                                        }
+                                    ]
+                                }
+                            ]
                         });
 
-                        var leafUnitCount = yearObject.leafUnitObjects.length;
+                        unit.unitObject = unitObject;
+                        yearObject.unitObjects.push(unitObject);
 
-                        yearObject.leafUnitObjects.forEach(function (unit, unitIndex) {
+                        if (unit.isLeaf) {
 
-                            unit.ang = 
-                                unitIndex * 
-                                (2.0 * Math.PI / leafUnitCount);
-                            unit.distance =
-                                (tuning.unitRadiusHuff * unit.size) + tuning.unitRadiusExtra;
-                            unit.position = {
-                                x: x + Math.cos(unit.ang) * unit.distance,
-                                y: y + Math.sin(unit.ang) * unit.distance + height + yearHeight,
-                                z: z + Math.random() - 0.5
-                            };
-                            unit.scale = unit.size;
+                            yearObject.leafUnitObjects.push(unit);
 
-                            unit.modelNames = [];
-                            unit.modelNumbers = [];
-                            unit.modelColors = [];
+                            unit.modelNames.forEach(function (modelName, modelIndex) {
 
-                            var modelString = unitModels[unit.index % unitModels.length].trim();
-                            if (modelString) {
-
-                                unit.modelNames = modelString.split(',');
-
-                                unit.modelNames.forEach(function (modelName, modelIndex) {
-                                    
-                                    var modelName = unit.modelNames[modelIndex].trim();
-                                    unit.modelNames[modelIndex] = modelName;
-                                    var modelNumber = modelType.indexOf(modelName);
-
-                                    if (modelNumber == -1) {
-                                        modelNumber = 0;
-                                        console.log("private.js: can't find modelNumber for i: " + i + " modelName: " + modelName + " modelType: " + JSON.stringify(modelType));
+                                var modelNumber = unit.modelNumbers[modelIndex];
+                                var modelColor = unit.modelColors[modelIndex];
+                                var ang = modelIndex * (2.0 * Math.PI / modelCount);
+                                var dist = (modelCount == 1) ? 0 : tuning.unitModelOffset;
+                                var dx = Math.cos(ang) * dist;
+                                var dy = Math.sin(ang) * dist;
+                                var modelObject = CreatePrefab({
+                                    obj: {
+                                        yearIndex: yearIndex,
+                                        unit: unit,
+                                        modelIndex: modelIndex,
+                                        name: modelName,
+                                        number: modelNumber,
+                                        color: modelColor
+                                    },
+                                    prefab: 'Prefabs/UnitModel',
+                                    parent: 'object:' + unitObject.id,
+                                    worldPositionStays: false,
+                                    update: {
+                                        "transform/localPosition": {x: dx, y: 0, z: dy},
+                                        "component:MeshRenderer/materials": [tuning.material],
+                                        "component:MeshRenderer/material/color": modelColor
+                                    },
+                                    interests: {
+                                        MouseEnter: {
+                                            handler: function(unit, results) {
+                                                //console.log("MouseEnter modelObject", "modelIndex", modelIndex, "yearIndex", yearIndex);
+                                                HighlightModels(modelIndex, true);
+                                            }
+                                        },
+                                        MouseExit: {
+                                            handler: function(unit, results) {
+                                                //console.log("MouseEnter modelObject", "modelIndex", modelIndex, "yearIndex", yearIndex);
+                                                HighlightModels(modelIndex, false);
+                                            }
+                                        }
                                     }
-
-                                    unit.modelNumbers.push(modelNumber);
-                                    var colorIndex = modelNumber % modelColorScheme.length;
-                                    unit.modelColors.push(modelColorScheme[colorIndex]);
-
                                 });
 
-                            }
+                                unitObject.modelObjects.push(modelObject);
 
-                            var unitObject = CreatePrefab({
-                                obj: {
-                                    unit: unit,
-                                    year: year,
-                                    yearObject: yearObject,
-                                    yearIndex: yearIndex,
-                                    modelObjects: []
-                                },
-                                prefab: 'Prefabs/Unit',
-                                parent: 'object:' + companyObject.id,
-                                update: {
-                                    'dragTracking': true,
-                                    'transform/localPosition': unit.position,
-                                    'transform/localScale': tinyScale,
-                                    'transform:Collider/component:Collider/sharedMaterial': tuning.unitPhysicMaterial,
-                                    'transform:Collider/component:Collider/radius': tuning.unitColliderRadius,
-                                    'component:Rigidbody/isKinematic': tuning.unitIsKinematic,
-                                    'component:Rigidbody/useGravity': tuning.unitUseGravity,
-                                    'component:Rigidbody/mass': tuning.unitMass,
-                                    'component:Rigidbody/drag': tuning.unitDrag,
-                                    'component:Rigidbody/angularDrag': tuning.unitAngularDrag,
-                                    'component:Rigidbody/collisionDetectionMode': tuning.unitCollisionDetectionMode,
-                                    'component:SpringJoint/spring': tuning.unitSpring,
-                                    'component:SpringJoint/damper': tuning.unitDamper,
-                                    'component:SpringJoint/tolerance': tuning.unitTolerance,
-                                    'component:SpringJoint/enableCollision': tuning.unitEnableCollision,
-                                    'component:SpringJoint/autoConfigureConnectedAnchor': false,
-                                    'component:SpringJoint/anchor': {},
-                                    'component:SpringJoint/connectedBody!': 'object:' + rootUnit.obj.id + '/component:Rigidbody'
-                                },
-                                interests: {
-                                    MouseEnter: {
-                                        handler: function(unitObject, results) {
-                                            //console.log("MouseEnter unitObject", unitObject, "unit", unitObject.unit, "index", unitObject.unit.index, "yearIndex", yearIndex);
-                                            var text = ('' + unitObject.unit.name).trim() + ': $' + unitObject.unit.value;
-                                            ShowPopupText(text, 'object:' + unitObject.id + '/transform');
-                                            HighlightUnits([unitObject.unit.index]);
-                                        }
-                                    },
-                                    MouseExit: {
-                                        handler: function(unitObject, results) {
-                                            //console.log("MouseExit unitObject", unitObject, "unit", unitObject.unit, "index", unitObject.unit.index, "yearIndex", yearIndex);
-                                            HighlightUnits(null);
-                                        }
-                                    }
-                                },
-                                postEvents: [
-                                    {
-                                        event: 'Animate',
-                                        data: [
-                                            {
-                                                command: 'scale',
-                                                time: tuning.unitCreateAnimateTime,
-                                                to: unit.scale
-                                            }
-                                        ]
-                                    }
-                                ]
                             });
 
-                            yearObject.unitObjects.push(unitObject);
-                            unit.unitObject = unitObject;
+                        }
 
-                            for (var modelIndex = 0, modelCount = unit.modelNames.length; modelIndex < modelCount; modelIndex++) {
-                                (function (modelIndex) {
+                        if (tuning.unitArrows) {
 
-                                    var modelName = unit.modelNames[modelIndex];
-                                    var modelNumber = unit.modelNumbers[modelIndex];
-                                    var modelColor = unit.modelColors[modelIndex];
-                                    var ang = modelIndex * (2.0 * Math.PI / modelCount);
-                                    var dist = (modelCount == 1) ? 0 : tuning.unitModelOffset;
-                                    var dx = Math.cos(ang) * dist;
-                                    var dy = Math.sin(ang) * dist;
-                                    var modelObject = CreatePrefab({
-                                        obj: {
-                                            yearIndex: yearIndex,
-                                            unit: unit,
-                                            modelIndex: modelIndex,
-                                            name: modelName,
-                                            number: modelNumber,
-                                            color: modelColor
-                                        },
-                                        prefab: 'Prefabs/UnitModel',
-                                        parent: 'object:' + unitObject.id,
-                                        worldPositionStays: false,
-                                        update: {
-                                            "transform/localPosition": {x: dx, y: 0, z: dy},
-                                            "component:MeshRenderer/materials": [tuning.material],
-                                            "component:MeshRenderer/material/color": modelColor
-                                        },
-                                        interests: {
-                                            MouseEnter: {
-                                                handler: function(unit, results) {
-                                                    //console.log("MouseEnter modelObject", "modelIndex", modelIndex, "yearIndex", yearIndex);
-                                                    HighlightModels(modelIndex, true);
-                                                }
-                                            },
-                                            MouseExit: {
-                                                handler: function(unit, results) {
-                                                    //console.log("MouseEnter modelObject", "modelIndex", modelIndex, "yearIndex", yearIndex);
-                                                    HighlightModels(modelIndex, false);
-                                                }
-                                            }
-                                        }
-                                    });
+                            unitObject.unitArrow = 
+                                CreateRainbow(
+                                    tuning.unitArrowRainbowType, 
+                                    unit.parent.unitObject,
+                                    unit.unitObject,
+                                    companyObject);
 
-                                    unitObject.modelObjects.push(modelObject);
+                        }
 
-                                })(modelIndex);
-                            }
+                        if (unit.isLeaf && tuning.unitLabels) {
 
-                            if (tuning.unitArrows) {
+                            unitObject.labelObject = CreatePrefab({
+                                prefab: "Prefabs/ProText",
+                                parent: 'object:' + companyObject.id,
+                                update: {
+                                    'textMesh/text': unit.name.trim(),
+                                    'textMesh/fontSize': tuning.unitLabelFontSize,
+                                    'trackPosition': 'Transform',
+                                    'transformPosition!': 'object:' + unit.unitObject.id + '/transform',
+                                    'extraOffset': { y: unit.size + tuning.labelHeightExtra },
+                                    'trackRotation': 'CameraRotation'
+                                }
+                            });
 
-                                unitObject.unitArrow = 
-                                    CreateRainbow(
-                                        tuning.unitArrowRainbowType, 
-                                        yearObject, 
-                                        unit.unitObject, 
-                                        companyObject);
+                        }
 
-                            }
-
-                            if (tuning.unitLabels) {
-
-                                unitObject.labelObject = CreatePrefab({
-                                    prefab: "Prefabs/ProText",
-                                    parent: 'object:' + companyObject.id,
-                                    update: {
-                                        'textMesh/text': unit.name.trim(),
-                                        'textMesh/fontSize': tuning.unitLabelFontSize,
-                                        'trackPosition': 'Transform',
-                                        'transformPosition!': 'object:' + unit.unitObject.id + '/transform',
-                                        'extraOffset': { y: unit.size + tuning.labelHeightExtra },
-                                        'trackRotation': 'CameraRotation'
-                                    }
-                                });
-                            }
-
-                        });
+                        if (unit.children && unit.children.length) {
+                            unit.children.forEach(function(subUnit, index) {
+                                window.setTimeout(function () {
+                                    CreateUnitTree(subUnit);
+                                }, tuning.unitCreateDelay * (index + 1));
+                            });
+                        }
 
                     }
+
+                    rootUnit.children.forEach(function(subUnit, index) {
+                        window.setTimeout(function () {
+                            CreateUnitTree(subUnit);
+                        }, tuning.unitCreateDelay * (index + 1));
+                    });
 
                 }
 
@@ -1557,7 +1337,6 @@ function CreateCompany(company)
                 if (wireCount > 0) {
 
                     var bundleWidth = wireCount;
-                    var height = tuning.bundleHeight;
 
                     var fromID = lastBaseObject.id;
 
@@ -1741,7 +1520,6 @@ function CreateCompany(company)
                                     update: {
                                         wireStart: 0,
                                         wireEnd: 1,
-                                        wireHeight: height,
                                         fromEndDistance: { x: 0.0, y: 0.0, z: 0.0 },
                                         fromEndDirection: { x: 5.0, y: 0.0, z: 0.0 },
                                         fromMiddleDistance: { x: 10.0, y: 0.0, z: 0.0 },
@@ -1776,7 +1554,6 @@ function CreateCompany(company)
 
                             bundleObject.wireObjects.push(wireObject);
 
-                            height += tuning.bundleHeightStep;
                          })(wireIndex);
                     }
 
@@ -1791,33 +1568,19 @@ function CreateCompany(company)
         }
 
         lastBaseObject = baseObject;
-        x += yearSpacing;
     }
 
 
     for (var yearIndex = firstYearIndex; yearIndex <= lastYearIndex; yearIndex++) {
-        todo.push((function(yearIndex) {
-            return function() {
-                CreateYear(yearIndex);
-            };
-        })(yearIndex));
+        (function (yearIndex, x, y, z) {
+            window.setTimeout(function() {
+                CreateYear(yearIndex, x, y, z);
+            }, 
+            tuning.yearBeforeDelay + (yearIndex * tuning.yearCreateDelay));
+        })(yearIndex, x, y, z);
+        x += yearSpacing;
     }
 
-
-    function DoNext()
-    {
-        if (todo.length == 0) {
-            return;
-        }
-
-        var f = todo.shift();
-
-        f();
-
-        if (todo.length) {
-            window.setTimeout(DoNext, tuning.betweenYearDelay);
-        }
-    }
 
     // Make a tree out of the entire unitOutline.
 
@@ -1934,11 +1697,11 @@ function CreateCompany(company)
                         label: marketLabel,
                         onenteritem: function(item, slice, pie, target) {
                             //console.log("Item Market Enter", marketLabel);
-                            HighlightMarkets(marketIndex, true);
+                            HighlightMarkets([marketIndex]);
                         },
                         onexititem: function(item, slice, pie, target) {
                             //console.log("Item Market Exit", marketLabel);
-                            HighlightMarkets(marketIndex, false);
+                            HighlightMarkets(null);
                         }
                     }
                 ]
@@ -2086,7 +1849,6 @@ function CreateCompany(company)
         itemDistance: 100
     }
 
-    window.setTimeout(DoNext, tuning.beforeYearDelay);
 }
 
 

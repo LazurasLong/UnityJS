@@ -296,7 +296,7 @@ public class Tracker : BridgeObject {
 
         }
 
-        SendEventName("MouseMove");
+        HandleMouseMove();
     }
 
 
@@ -426,7 +426,9 @@ public class Tracker : BridgeObject {
 
         if (dragTracking) {
             if (mouseDown) {
+
                 dragging = true;
+
                 if (draggingSetsIsKinematic) {
                     Rigidbody rb = gameObject.GetComponent<Rigidbody>();
                     if (rb != null) {
@@ -434,6 +436,7 @@ public class Tracker : BridgeObject {
                         rb.isKinematic = true;
                     }
                 }
+
                 dragPlane.SetNormalAndPosition(
                     Vector3.up,
                     transform.position);
@@ -447,16 +450,21 @@ public class Tracker : BridgeObject {
                 dragLastPosition = transform.position;
                 dragLastMousePosition = mousePosition;
 
-                SendEventName("DragStart");
+                HandleDragStart();
+
             } else {
+
                 dragging = false;
+
                 if (draggingSetsIsKinematic) {
                     Rigidbody rb = gameObject.GetComponent<Rigidbody>();
                     if (rb != null) {
                         rb.isKinematic = draggingLastIsKinematic;
                     }
                 }
-                SendEventName("DragStop");
+
+                HandleDragStop();
+
             }
         }
     }
@@ -528,6 +536,30 @@ public class Tracker : BridgeObject {
     {
         //Debug.Log("Tracker: HandleMouseUpAsButton", this);
         SendEventName("MouseUpAsButton");
+    }
+
+
+    public virtual void HandleMouseMove()
+    {
+        //Debug.Log("Tracker: HandleMouseMove", this);
+        SendEventName("MouseMove");
+
+    }
+
+
+    public virtual void HandleDragStart()
+    {
+        //Debug.Log("Tracker: HandleDragStart", this);
+        SendEventName("DragStart");
+
+    }
+
+
+    public virtual void HandleDragStop()
+    {
+        //Debug.Log("Tracker: HandleDragStop", this);
+        SendEventName("DragStop");
+
     }
 
 
