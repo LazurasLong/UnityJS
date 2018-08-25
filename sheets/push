@@ -1,2 +1,0 @@
-(cd JSONster ; clasp push)
-(cd JSONsterPrivate ; clasp push)

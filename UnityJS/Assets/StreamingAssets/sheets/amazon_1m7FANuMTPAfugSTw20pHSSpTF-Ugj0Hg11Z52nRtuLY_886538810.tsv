@@ -1,0 +1,47 @@
+object					
+	name	string	Amazon		
+					
+	hexTileValue	number	1000000000000		
+	hexTileScale	number	0.5		
+	modelColorScheme	string	model		
+	marketColorScheme	string	market		
+	verbSubjectColorScheme	string	verbSubject		
+	unitSizeMin	number	10		
+	unitSizeMax	number	30		
+					
+	cameraStartPosition	object			
+		x	number	0	
+		y	number	240	
+		z	number	-325	
+	cameraStartRotation	object			
+		x	number	30	
+		y	number	0	
+		z	number	0	
+					
+	valuationMin	number	157460000		
+	valuationMax	number	576548710000		
+	unitValueMax	number	108354		
+					
+	years	range	number	row 0	Amazon_Year
+					
+	financialType	range	string	column 0	Amazon_Financial_Type
+	financialTable	range	number	all	Amazon_Financial
+					
+	marketType	range	string	column 0	Amazon_Market_Type
+	marketDimension	range	string	column 0	Amazon_Market_Dimension
+	marketTable	range	number	all	Amazon_Market
+					
+	modelType	range	string	column 0	Amazon_Model_Type
+	modelTable	range	string	all	Amazon_Model
+					
+	unitOutline	range	string	column 0	Amazon_Unit_Outline
+	unitYears	range	string	column 0	Amazon_Unit_Years
+	unitModels	range	string	column 0	Amazon_Unit_Models
+	unitTable	range	number	all	Amazon_Unit
+					
+	valuationType	range	string	column 0	Amazon_Valuation_Type
+	valuationTable	range	number	all	Amazon_Valuation
+					
+	verb	range	string	column 0	Amazon_Verb
+	subject	range	string	column 0	Amazon_Subject
+	verbSubjectTable	range	string	all	Amazon_VerbSubject

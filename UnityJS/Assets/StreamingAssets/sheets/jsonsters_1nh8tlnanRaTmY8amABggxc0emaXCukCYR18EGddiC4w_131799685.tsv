@@ -1,0 +1,56 @@
+object				
+	object	object		
+		name	string	object
+		prefab	string	Prefabs/JSON_Object
+		indexed	boolean	TRUE
+		keyed	boolean	FALSE
+				
+				
+				
+				
+				
+	array	object		
+		name	string	array
+		prefab	string	Prefabs/JSON_Array
+		indexed	boolean	TRUE
+		keyed	boolean	FALSE
+				
+				
+				
+				
+				
+	number	object		
+		name	string	number
+		prefab	string	Prefabs/JSON_Number
+		indexed	boolean	FALSE
+		keyed	boolean	FALSE
+				
+				
+				
+				
+				
+	boolean	object		
+		name	string	boolean
+		prefab	string	Prefabs/JSON_Boolean
+		indexed	boolean	FALSE
+		keyed	boolean	FALSE
+				
+				
+				
+				
+				
+	string	object		
+		name	string	string
+		prefab	string	Prefabs/JSON_String
+		indexed	boolean	FALSE
+		keyed	boolean	FALSE
+				
+				
+				
+				
+				
+	null	object		
+		name	string	null
+		prefab	string	Prefabs/JSON_Null
+		indexed	boolean	FALSE
+		keyed	boolean	FALSE

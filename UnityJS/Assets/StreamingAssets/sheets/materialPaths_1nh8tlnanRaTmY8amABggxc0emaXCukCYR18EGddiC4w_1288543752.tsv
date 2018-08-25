@@ -1,0 +1,28 @@
+array		
+	string	Real Materials/Materials/[free] Aluminum common
+	string	Real Materials/Materials/[free] Brass common
+	string	Real Materials/Materials/[free] Copper common
+	string	Real Materials/Materials/[free] Copper very old
+	string	Real Materials/Materials/[free] Floor marble scattered
+	string	Real Materials/Materials/[free] Glass generic slightly dusty
+	string	Real Materials/Materials/[free] Granite polished
+	string	Real Materials/Materials/[free] Granite rough
+	string	Real Materials/Materials/[free] Marble polished white
+	string	Real Materials/Materials/[free] Marble rough white
+	string	Real Materials/Materials/[free] Plaster common
+	string	Real Materials/Materials/[free] Steel common
+	string	Real Materials/Materials/!UV density checker material
+	string	The_Texture_Lab/Materials/Base_Materials/Mat_1024/Mat_Blue_Grid_1024
+	string	The_Texture_Lab/Materials/Base_Materials/Mat_1024/Mat_Blue_Square_1024
+	string	The_Texture_Lab/Materials/Base_Materials/Mat_1024/Mat_Green_Grid_1024
+	string	The_Texture_Lab/Materials/Base_Materials/Mat_1024/Mat_Green_Square_1024
+	string	The_Texture_Lab/Materials/Base_Materials/Mat_1024/Mat_Red_Grid_1024
+	string	The_Texture_Lab/Materials/Base_Materials/Mat_1024/Mat_Red_Square_1024
+	string	The_Texture_Lab/Materials/Base_Materials/Mat_1024/Mat_White_Grid_1024
+	string	The_Texture_Lab/Materials/Base_Materials/Mat_1024/Mat_White_Square_1024
+	string	The_Texture_Lab/Materials/Metal_Materials/Mat_Copper_Base_1024
+	string	The_Texture_Lab/Materials/Metal_Materials/Mat_Iron_Base_1024
+	string	The_Texture_Lab/Materials/Metal_Materials/Mat_Steel_Base_1024
+	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024
+	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Grass_Base_1024
+	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Sand_Base_1024

@@ -1,0 +1,101 @@
+array	Places				
+	object	Place			
+		name	string	A	
+		position	object	Position of place.	
+			x	number	-300
+			y	number	5
+			z	number	250
+		size	object	Size of place.	
+			x	number	100
+			y	number	10
+			z	number	100
+		color	object	Color of place.	
+			r	number	0.5
+			g	number	1
+			b	number	1
+		topMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Grass_Base_1024	
+		topTextureZoom	number	0.01	
+		bottomMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		bottomTextureZoom	number	0.01	
+		sideMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		sideTextureZoom	number	0.04	
+	object	Place			
+		name	string	B	
+		position	object	Position of place.	
+			x	number	-150
+			y	number	5
+			z	number	250
+		size	object	Size of place.	
+			x	number	100
+			y	number	10
+			z	number	100
+		color	object	Color of place.	
+			r	number	0.5
+			g	number	1
+			b	number	1
+		topMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Grass_Base_1024	
+		topTextureZoom	number	0.01	
+		bottomMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		bottomTextureZoom	number	0.01	
+		sideMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		sideTextureZoom	number	0.04	
+	object	Place			
+		name	string	C	
+		position	object	Position of place.	
+			x	number	0
+			y	number	5
+			z	number	250
+		size	object	Size of place.	250
+			x	number	100
+			y	number	10
+			z	number	100
+		color	object	Color of place.	
+			r	number	0.5
+			g	number	1
+			b	number	1
+		topMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Grass_Base_1024	
+		topTextureZoom	number	0.01	
+		bottomMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		bottomTextureZoom	number	0.01	
+		sideMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		sideTextureZoom	number	0.04	
+	object	Place			
+		name	string	D	
+		position	object	Position of place.	
+			x	number	150
+			y	number	5
+			z	number	250
+		size	object	Size of place.	
+			x	number	100
+			y	number	10
+			z	number	100
+		color	object	Color of place.	
+			r	number	0.5
+			g	number	1
+			b	number	1
+		topMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Grass_Base_1024	
+		topTextureZoom	number	0.01	
+		bottomMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		bottomTextureZoom	number	0.01	
+		sideMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		sideTextureZoom	number	0.04	
+	object	Place			
+		name	string	E	
+		position	object	Position of place.	
+			x	number	300
+			y	number	5
+			z	number	250
+		size	object	Size of place.	
+			x	number	100
+			y	number	10
+			z	number	100
+		color	object	Color of place.	
+			r	number	0.5
+			g	number	1
+			b	number	1
+		topMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Grass_Base_1024	
+		topTextureZoom	number	0.01	
+		bottomMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		bottomTextureZoom	number	0.01	
+		sideMaterial	string	The_Texture_Lab/Materials/Nature_Materials/Mat_Dirt_Base_1024	
+		sideTextureZoom	number	0.04	

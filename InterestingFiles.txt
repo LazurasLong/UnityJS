@@ -1,65 +1,124 @@
-TODO: update -- this is out of date
+========================================================================
+Interesting Directories and Files:
+========================================================================
 
-Unity Bridge C# Source:
+UnityJS
+  Unity application directory
 
-unity/HyperJaunt/Assets/Code/BridgeManager.cs
-unity/HyperJaunt/Assets/Code/BridgeObject.cs
-unity/HyperJaunt/Assets/Code/BridgeWebView.cs
-unity/HyperJaunt/Assets/Code/CameraHolder.cs
-unity/HyperJaunt/Assets/Code/GUIHolder.cs
-unity/HyperJaunt/Assets/Code/GameState.cs
-unity/HyperJaunt/Assets/Code/GazeResponderBridgeObject.cs
-unity/HyperJaunt/Assets/Code/KineticText.cs
-unity/HyperJaunt/Assets/Code/MagicBall.cs
-unity/HyperJaunt/Assets/Code/Poster.cs
-unity/HyperJaunt/Assets/Code/QuadTile.cs
-unity/HyperJaunt/Assets/Code/SocketIOTest.cs
-unity/HyperJaunt/Assets/Code/TextureViewer.cs
-unity/HyperJaunt/Assets/Code/World.cs
+UnityJS/Assets
+  Unity project Assets directory.
 
-Unity Libraries:
+UnityJS/Assets/Libraries
+  UnityJS and third party libraries, including JsonDotNet, LeanTween,
+  SocketIO, and TextMesh Pro.
 
-unity/HyperJaunt/Assets/Libraries/FullSerializer
-unity/HyperJaunt/Assets/Libraries/FullSerializer/fsData.cs
-unity/HyperJaunt/Assets/Libraries/FullSerializer/fsSerializer.cs
-unity/HyperJaunt/Assets/Libraries/GoogleVR
-unity/HyperJaunt/Assets/Libraries/JsonDotNet
-unity/HyperJaunt/Assets/Libraries/SocketIO
-unity/HyperJaunt/Assets/Libraries/TextMesh Pro
-unity/HyperJaunt/Assets/Libraries/iTween
-unity/HyperJaunt/Assets/Libraries/iTweenPath
-unity/HyperJaunt/Assets/Libraries/unity-webview
-unity/HyperJaunt/Assets/Libraries/unity-webview/Plugins/WebViewObject.cs
-unity/HyperJaunt/Assets/Libraries/unity-webview/Plugins/iOS/WebView.mm -> ../../../../../../unity-webview/plugins/Mac/Sources/WebView.mm
+UnityJS/Assets/Libraries/UnityJS
+  UnityJS library.
 
-Streaming Assets for Web Browser:
+UnityJS/Assets/Libraries/UnityJS/Plugins
+  UnityJS plugins for Android, WebGL, iOS, macOS and Windows
+  platforms.
 
-unity/HyperJaunt/Assets/StreamingAssets/bridge.css
-unity/HyperJaunt/Assets/StreamingAssets/bridge.html
-unity/HyperJaunt/Assets/StreamingAssets/bridge.js
-unity/HyperJaunt/Assets/StreamingAssets/jquery-1.10.2.js
-unity/HyperJaunt/Assets/StreamingAssets/jquery-pie-demo.html
-unity/HyperJaunt/Assets/StreamingAssets/jquery-pie-demo.js
-unity/HyperJaunt/Assets/StreamingAssets/jquery-pie.css
-unity/HyperJaunt/Assets/StreamingAssets/jquery-pie.js
-unity/HyperJaunt/Assets/StreamingAssets/jquery.ui.widget.js
-unity/HyperJaunt/Assets/StreamingAssets/simple-demo.html
-unity/HyperJaunt/Assets/StreamingAssets/socket.io.js
-unity/HyperJaunt/Assets/StreamingAssets/titles.js
+UnityJS/Assets/Libraries/UnityJS/Resources
+  Resources used by UnityJS and example code, including Materials,
+  Meshes, PhysicMaterials, Prefabs, SDFFonts, Shaders, Skyboxes and
+  Textures.
 
-Built Unity Application Projects
+UnityJS/Assets/Libraries/UnityJS/Scenes
+  UnityJS scenes.
 
-unity/HyperJaunt/Builds/Android/HyperJaunt.apk
-unity/HyperJaunt/Builds/iOS/Unity-iPhone.xcodeproj
+UnityJS/Assets/Libraries/UnityJS/Scripts
+  UnityJS scripts.
 
-Unity WebView Extension Project for Android with Java, JNI, C++, WebView
+UnityJS/Assets/Libraries/UnityJS/Scripts/Accessor.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Bow.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Bridge.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BridgeExtensions.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BridgeJsonConverter.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BridgeObject.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BridgeTest.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BridgeTransport.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BridgeTransportSocketIO.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BridgeTransportWebGL.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BridgeTransportWebView.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/BrowserRenderer.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Bundle.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/CatmulRomSpline.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Cuboid.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/HexBase.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/HexTile.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Item.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/KeyboardTracker.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/KineticText.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/LeanTweenBridge.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Loader.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/MonoPInvokeCallbackAttribute.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/NamedAsset.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/NamedAssetManager.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/OverlayText.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/ParticleSystemBridge.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Pie.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/PieTracker.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/ProCamera.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/ProText.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/ProxyGroup.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Rainbow.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Scoop.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Slice.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/TextOverlays.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/TextureViewer.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Tile.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/ToolbarButton.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Tracker.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/TrackerProxy.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/UnityBridge.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/UnityJSPlugin.cs
+UnityJS/Assets/Libraries/UnityJS/Scripts/Wire.cs
 
-unity/unity-webview/plugins/Android/unitywebview/src/main/cpp/UnityWebView.cpp
-unity/unity-webview/plugins/Android/unitywebview/src/main/java/com/jauntvr/unitywebview/CWebViewPlugin.java
-unity/unity-webview/plugins/Android/unitywebview/src/main/java/com/jauntvr/unitywebview/ExternalSurface.java
+UnityJS/Assets/Libraries/UnityJS/link.xml
+  Linker xml configuration file, which declares which assemblies
+  should have their symbols preserved in order for reflection to work.
 
-Unity WebView Extension Project for OS/X with Objective C, WkWebView
-(Shares WebView.mm source code with iOS Unity plugin, included directly in XCode app project.)
+  If you get runtime errors about undefined names on a Unity or third
+  party class that should be defined, add a declaration of its
+  assembly with preserve="all" to this file.
 
-unity/unity-webview/plugins/Mac/Sources/WebView.mm
-unity/unity-webview/plugins/Mac/WebView.xcodeproj
+UnityJS/Assets/StreamingAssets
+  Directory of streaming web based files including JavaScript, CSS,
+  HTML, etc.
+
+UnityJS/Assets/StreamingAssets/bridge.css
+UnityJS/Assets/StreamingAssets/bridge.html
+UnityJS/Assets/StreamingAssets/bridge.jss
+UnityJS/Assets/StreamingAssets/game.html
+UnityJS/Assets/StreamingAssets/game.jss
+UnityJS/Assets/StreamingAssets/sheets
+UnityJS/Assets/StreamingAssets/sheets-index.jss
+UnityJS/Assets/StreamingAssets/sheets.jss
+UnityJS/Assets/StreamingAssets/unity.jss
+
+UnityJS/Assets/WebGLTemplates
+  Templates for wrapping WebGL UnityJS apps.
+
+UnityJS/Builds
+  Unity build output directories for Android, WebGL, iOS, Windows
+  platforms.
+
+build
+  Scripts and Packager Unity application directory to build
+  distribution of Unity extension.
+
+dist
+  Destination directory for distribution of built Unity extension.
+
+doc
+  UnityJS documentation.
+
+notes
+  Interesting notes and links.
+
+plugins
+  Source code of UnityJS plugin for Android, WebGL, Windows, iOS and
+  macOS platforms.
+
+========================================================================

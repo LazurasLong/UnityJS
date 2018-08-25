@@ -1,0 +1,6 @@
+table		Connections	
+	{ from string	to string	data json }
+	A	B	{"name": "A-B", "type": "road"}
+	B	C	{"name": "B-C", "type": "road"}
+	C	D	{"name": "C-D", "type": "road"}
+	D	E	{"name": "D-E", "type": "road"}

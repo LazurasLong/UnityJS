@@ -21,105 +21,8 @@ window.onerror = function(message, source, line, column, error) {
 
 globals.useApp = false;
 globals.appURL = 'https://script.google.com/macros/s/AKfycbx6yinuIWLYE21Sd7UuEDxiJE3443gZutmhBhXVNo8Kk8lwAMc/exec';
-globals.sheetRefs = {};
 globals.sheets = {};
 globals.ranges = {};
-
-
-Object.assign(globals.sheetRefs, {
-    "world": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        0
-    ],
-    "templates": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1535357011
-    ],
-    "texturePaths": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        580619937
-    ],
-    "materialPaths": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1288543752
-    ],
-    "prefabMap": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1469835123
-    ],
-    "tiles": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1579247368
-    ],
-    "rainbows": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        164091207
-    ],
-    "bows_rgbymc": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1544589805
-    ],
-    "bows_red": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1854560943
-    ],
-    "bows_green": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1454515772
-    ],
-    "bows_blue": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1466670725
-    ],
-    "bows_yellow": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1541060846
-    ],
-    "bows_magenta": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1996689157
-    ],
-    "bows_cyan": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        724646415
-    ],
-    "bows_arrow": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        568829119
-    ],
-    "bows_cobra": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        335200639
-    ],
-    "bows_connection": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        131405460
-    ],
-    "bows_road": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1017844292
-    ],
-    "blobs": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        412054745
-    ],
-    "jsonsters": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        131799685
-    ],
-    "pie": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        886810830
-    ],
-    "places": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        663766555
-    ],
-    "connections": [
-        "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w",
-        1921573503
-    ]
-});
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1863,7 +1766,7 @@ function LoadObjects()
     if (globals.useApp) {
         LoadSheetsFromApp(globals.appURL, LoadedSheetsSuccess, LoadedSheetsError);
     } else {
-        LoadSheets(globals.sheetRefs, LoadedSheetsSuccess, LoadedSheetsError);
+        LoadSheets(gSheetsIndex, LoadedSheetsSuccess, LoadedSheetsError);
     }
 
 }

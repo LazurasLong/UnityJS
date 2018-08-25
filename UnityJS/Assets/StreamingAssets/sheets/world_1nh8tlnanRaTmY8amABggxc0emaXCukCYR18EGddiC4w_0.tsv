@@ -1,0 +1,33 @@
+object		This is the top level "world" object.	
+			
+	createTemplatedObjects	boolean	TRUE
+	createMap	boolean	FALSE
+	createVegetation	boolean	FALSE
+	createRainbow	boolean	FALSE
+	createBlobs	boolean	FALSE
+	createJsonsters	boolean	FALSE
+	createPies	boolean	TRUE
+	createPlaces	boolean	TRUE
+	createTests	boolean	FALSE
+			
+	templates	sheet	templates
+	texturePaths	sheet	texturePaths
+	materialPaths	sheet	materialPaths
+	prefabMap	sheet	prefabMap
+	tiles	sheet	tiles
+	rainbows	sheet	rainbows
+	bows	sheet	bows_rgbymc
+	blobs	sheet	blobs
+	jsonsters	sheet	jsonsters
+	pie	sheet	pie
+	places	sheet	places
+	connections	sheet	connections
+			
+	templatedObjectNames	array	
+		string	skyCamera
+		string	eventSystem
+		string	unityBridge
+		string	leanTweenBridge
+		string	light
+		string	textOverlays
+		string	cuboid

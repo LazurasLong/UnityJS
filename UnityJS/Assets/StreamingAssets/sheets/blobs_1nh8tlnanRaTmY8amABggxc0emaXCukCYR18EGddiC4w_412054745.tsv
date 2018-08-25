@@ -1,0 +1,82 @@
+object					
+					
+	blobData	object			
+		position	object		
+			x	number	0
+			y	number	70
+			z	number	0
+		isKinematic	boolean	TRUE	
+		useGravity	boolean	FALSE	
+		mass	number	100	
+		drag	number	0.5	
+		angularDrag	number	0	
+		size	number	25	
+		material	string	The_Texture_Lab/Materials/Metal_Materials/Mat_Copper_Base_1024	
+		physicMaterial	string	PhysicMaterials/HighFrictionLowBounce	
+		colliderRadius	number	0.7	
+		ballSpread	number	0.1	
+		ballOffset	number	0	
+		ballAScale	number	1	
+		ballBScale	number	1	
+		animateTime	number	1	
+		createProText	boolean	TRUE	
+		createOverlayText	boolean	FALSE	
+		proTextFontSize	number	160	
+		overlayTextFontSize	number	24	
+					
+					
+					
+					
+					
+	bloopData	object			
+		isKinematic	boolean	FALSE	
+		useGravity	boolean	TRUE	
+		mass	number	10	
+		drag	number	0.2	
+		angularDrag	number	0	
+		spring	number	10	
+		count	number	8	
+		size	number	15	
+		distance	number	20	
+		material	string	The_Texture_Lab/Materials/Metal_Materials/Mat_Steel_Base_1024	
+		physicMaterial	string	PhysicMaterials/HighFrictionLowBounce	
+		colliderRadius	number	0.7	
+		ballSpread	number	0.1	
+		ballOffset	number	0	
+		ballAScale	number	1	
+		ballBScale	number	1	
+		linear	boolean	FALSE	
+		animateTime	number	1	
+		createProText	boolean	TRUE	
+		createOverlayText	boolean	FALSE	
+		proTextFontSize	number	100	
+		overlayTextFontSize	number	18	
+		createRainbow	boolean	TRUE	
+		rainbowType	string	arrow	
+					
+					
+	bleepData	object			
+		isKinematic	boolean	FALSE	
+		useGravity	boolean	TRUE	
+		mass	number	0.1	
+		drag	number	0.1	
+		angularDrag	number	0	
+		spring	number	10	
+		count	number	8	
+		size	number	6	
+		distance	number	10	
+		material	string	The_Texture_Lab/Materials/Metal_Materials/Mat_Steel_Base_1024	
+		physicMaterial	string	PhysicMaterials/HighFrictionLowBounce	
+		colliderRadius	number	0.7	
+		ballSpread	number	0.1	
+		ballOffset	number	0	
+		ballAScale	number	1	
+		ballBScale	number	1	
+		linear	boolean	FALSE	
+		animateTime	number	1	
+		createProText	boolean	TRUE	
+		createOverlayText	boolean	FALSE	
+		proTextFontSize	number	60	
+		overlayTextFontSize	number	12	
+		createRainbow	boolean	TRUE	
+		rainbowType	string	cobra	

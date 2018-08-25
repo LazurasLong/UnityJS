@@ -105,8 +105,11 @@ public class Wire: Tracker {
                 textureOffset = textureOffsetPerSecond * Time.time;
             }
 
-            //lineRenderer.material.mainTextureOffset = textureOffset;
-            //lineRenderer.material.mainTextureScale = textureScale;
+            foreach (GameObject go in meshes) {
+                MeshRenderer mr = go.GetComponent<MeshRenderer>();
+                mr.material = material;
+                mr.material.color = color;
+            }
         }
 
         if (fromTransformAttached &&

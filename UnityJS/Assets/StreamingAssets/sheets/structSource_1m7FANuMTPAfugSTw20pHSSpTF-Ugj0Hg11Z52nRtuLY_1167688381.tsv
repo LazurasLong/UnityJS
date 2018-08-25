@@ -1,0 +1,40 @@
+Name:	Struct							
+		Years:	1776	2018				
+Valuation:			 	 				
+	PreMoney Valuation		1000000	2000000				
+	Market Capitalization 		3000000	4000000				
+								
+Financials:								
+	Revenue		1000000	2000000				
+	   Net Profit/Loss 		3000000	4000000				
+	   Debt		100	200				 
+	   Equity 		300	400				
+								
+Markets:								
+   ($)	Cats		100000	200000				
+   ($)	Dogs		100000	200000				
+								
+Units:								
+  Brick and Mortar Stores	1776-2018	Bricklaying, Mortaring, Painting	50000	20000				
+    Red Bricks	1776-2018	Bricklaying, Mortaring, Painting	60000	30000				
+    Green Bricks	1776-2018	Bricklaying, Mortaring, Painting	70000	40000				
+    Blue Bricks	1776-2018	Bricklaying, Mortaring, Painting	80000	50000				
+  Online Stores	2018	E-Commerce, Product Sales, Subscription	0	60000				
+    One Bits	2018	E-Commerce, Product Sales, Subscription	0	70000				
+    Zero Bits	2018	E-Commerce, Product Sales, Subscription	0	80000				
+								
+Verbs:								
+Lay	Bricks		Lay Bricks	Lay Bricks				
+Cure	Mortar			Cure Mortar				
+Paint	Bricks			Paint Bricks				
+Write	Code			Write Code				
+Debug	Code			Debug Code				
+Ship	Code			Ship Code				
+								
+Models:								
+Bricklaying			Bricklaying	Bricklaying				
+Mortaring				Mortaring				
+Painting				Painting				
+E-Commerce				E-Commerce				
+Product Sales				Product Sales				
+Subscription				Subscription				

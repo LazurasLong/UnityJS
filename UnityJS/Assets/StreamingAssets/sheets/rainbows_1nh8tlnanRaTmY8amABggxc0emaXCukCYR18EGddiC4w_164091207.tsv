@@ -1,0 +1,67 @@
+object				
+	rgbymc	object		
+		rainbowWidth	number	12
+		bowHeight	number	40
+		bows	sheet	bows_rgbymc
+	red	object		
+		rainbowWidth	number	1
+		bowHeight	number	40
+		bows	array	
+			sheet	bows_red
+	green	object		
+		rainbowWidth	number	1
+		bowHeight	number	40
+		bows	array	
+			sheet	bows_green
+	blue	object		
+		rainbowWidth	number	1
+		bowHeight	number	40
+		bows	array	
+			sheet	bows_blue
+	yellow	object		
+		rainbowWidth	number	1
+		bowHeight	number	40
+		bows	array	
+			sheet	bows_yellow
+	magenta	object		
+		rainbowWidth	number	1
+		bowHeight	number	40
+		bows	array	
+			sheet	bows_magenta
+	cyan	object		
+		rainbowWidth	number	1
+		bowHeight	number	40
+		bows	array	
+			sheet	bows_cyan
+	cobra	object		
+		rainbowWidth	number	1
+		bowHeight	number	10
+		bows	array	
+			sheet	bows_cobra
+	arrow	object		
+		rainbowWidth	number	1
+		bowHeight	number	1
+		bows	array	
+			sheet	bows_arrow
+	arrows	object		
+		rainbowWidth	number	16
+		bowHeight	number	10
+		bows	array	
+			sheet	bows_arrow
+			sheet	bows_arrow
+			sheet	bows_arrow
+			sheet	bows_arrow
+			sheet	bows_arrow
+			sheet	bows_arrow
+			sheet	bows_arrow
+			sheet	bows_arrow
+	connection	object		
+		rainbowWidth	number	1
+		bowHeight	number	1
+		bows	array	
+			sheet	bows_connection
+	road	object		
+		rainbowWidth	number	1
+		bowHeight	number	1
+		bows	array	
+			sheet	bows_road

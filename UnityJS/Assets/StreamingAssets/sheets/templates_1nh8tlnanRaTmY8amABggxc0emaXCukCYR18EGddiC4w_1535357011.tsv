@@ -1,0 +1,121 @@
+object		These are named templates used to create various types of objects.						
+	proCamera	object		This is a fancy pro camera.				
+		prefab	string	Prefabs/ProCamera				
+		update	object					
+			transform/localPosition	object				
+				x	number	0		
+				y	number	180		Move the camera up in the positive Y direction.
+				z	number	-220		Move the camera back in the negative Z direction.
+			transform/localRotation	object				
+				pitch	number	30		Tilt the camera down a bit.
+			moveSpeed	number	60			
+			yawSpeed	number	60			
+			pitchSpeed	number	60			
+			orbitYawSpeed	number	60			
+			orbitPitchSpeed	number	60			
+			wheelPanSpeed	number	-30			
+			wheelZoomSpeed	number	30			
+			positionMin	object				
+				x	number	-100		
+				y	number	-100		
+			positionMin	object				
+				x	number	100		
+				y	number	100		
+			pitchMin	number	-90			
+			pitchMax	number	90			
+	skyCamera	object		This is a fancy sky camera.				
+		prefab	string	Prefabs/ProCamera				
+		update	object					
+			transform/localPosition	object				
+				x	number	0		
+				y	number	500		
+				z	number	0		
+			transform/localRotation	object				
+				pitch	number	90		
+			moveSpeed	number	-120			
+			yawSpeed	number	0			
+			pitchSpeed	number	0			
+			orbitYawSpeed	number	0			
+			orbitPitchSpeed	number	0			
+			wheelPanSpeed	number	-20			
+			wheelZoomSpeed	number	20			
+			positionMin	object				
+				x	number	-100		
+				y	number	-100		
+			positionMin	object				
+				x	number	100		
+				y	number	100		
+			pitchMin	number	90			
+			pitchMax	number	90			
+	eventSystem	object		This is the Unity event system.				
+		prefab	string	Prefabs/EventSystem		Nobody here but us chickens!		
+	unityBridge	object		This is the Unity bridge.				
+		prefab	string	Prefabs/UnityBridge				
+	leanTweenBridge	object		This is the tweening engine.				
+		prefab	string	Prefabs/LeanTweenBridge				
+		update	object					
+			maxTweens	number	1000			
+	light	object		This is the light.				
+		prefab	string	Prefabs/Light				
+		update	object					
+			component:Light/type	string	Directional		Directional lights only care about their rotation, not their position.	
+			transform/localRotation	object				
+				pitch	number	40		Tilt the light down a bit.
+				yaw	number	300		Turn the light around.
+	textOverlays	object		This is a set of text overlays.				
+		prefab	string	Prefabs/TextOverlays		These are used for text feedback and pie menus.		
+	cuboid	object		This is a cuboid, used for the floor.				
+		prefab	string	Prefabs/Cuboid		A cuboid has six individual face tiles that we can configure independently.		
+		update	object					
+			transform/localPosition	object		Position the cuboid in the world.		
+				x	number	0		
+				y	number	-5		
+				z	number	0		
+			transform/localScale	object		Set the size of the cuboid.		
+				x	number	1000		
+				y	number	10		
+				z	number	1000		
+			component:Collider/sharedMaterial	string	PhysicMaterials/HighFrictionLowBounce	Configure the physic material of the box collider.		
+			component:Rigidbody/isKinematic	boolean	TRUE			
+			tiles/index:0/textureScale	object		Configure the texture scale of the top tile.		
+				x	number	1		
+				y	number	1		
+			tiles/index:0/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the top tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:1/textureScale	object		Configure the texture scale of the bottom tile.		
+				x	number	1		
+				y	number	1		
+			tiles/index:1/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the bottom tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:2/textureScale	object		Configure the texture scale of the front tile.		
+				x	number	1		
+				y	number	0.01		
+			tiles/index:2/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the front tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:3/textureScale	object		Configure the texture scale of the back tile.		
+				x	number	1		
+				y	number	0.01		
+			tiles/index:3/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the back tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:4/textureScale	object		Configure the texture scale of the right tile.		
+				x	number	1		
+				y	number	0.01		
+			tiles/index:4/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the right tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:5/textureScale	object		Configure the texture scale of the left tile.		
+				x	number	1		
+				y	number	0.01		
+			tiles/index:5/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the left tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	

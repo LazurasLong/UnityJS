@@ -1,0 +1,17 @@
+object							
+	fromLocalOffset	object					
+		x	number	4			
+	toLocalOffset	object					
+		x	number	-4			
+	lineRenderer/colorGradient	object					
+		alphaKeys	array				
+			object				
+				time	number	0	
+				alpha	number	0.5	
+		colorKeys	array				
+			object				
+				time	number	0	
+				color	object		
+					r	number	0
+					g	number	1
+					b	number	1

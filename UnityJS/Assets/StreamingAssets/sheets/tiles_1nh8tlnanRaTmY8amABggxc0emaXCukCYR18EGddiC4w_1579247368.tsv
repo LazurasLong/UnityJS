@@ -1,0 +1,72 @@
+object											
+											
+	tileRows	number	5								
+	tileColumns	number	5								
+	tileX	number	0								
+	tileY	number	0								
+	tileZ	number	0								
+	tileDX	number	17.32								
+	tileDY	number	15								
+	tileGapDX	number	34.64	scale:	2						
+	tileGapDY	number	30	scale:	2						
+	rainbowType	string	rgbymc								
+											
+	tileName	grid	string	10	10						
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+		Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand	Hex_Sand
+											
+	tileMaterial	grid	string	10	10						
+		Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Copper common
+		Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Granite rough
+		Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Steel common
+		Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Copper common
+		Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Granite rough
+		Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Steel common
+		Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Copper common
+		Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Floor marble scattered	Real Materials/Materials/[free] Granite polished	Real Materials/Materials/[free] Granite rough	Real Materials/Materials/[free] Granite rough
+		Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Marble polished white	Real Materials/Materials/[free] Marble rough white	Real Materials/Materials/[free] Steel common	Real Materials/Materials/[free] Steel common
+		Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Aluminum common	Real Materials/Materials/[free] Brass common	Real Materials/Materials/[free] Copper common	Real Materials/Materials/[free] Copper common
+											
+	tileTexture	grid	string	10	10						
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
+											
+	tileHeight	grid	number	10	10						
+		19	14	2	15	7	19	11	3	14	17
+		4	13	14	12	4	13	0	6	4	15
+		10	18	0	15	6	11	0	5	12	5
+		8	6	1	15	10	3	7	18	12	20
+		7	14	0	5	4	1	16	19	15	2
+		7	17	6	1	9	8	0	9	18	11
+		15	0	0	4	1	17	4	3	6	15
+		9	1	12	17	17	20	3	2	15	17
+		19	18	12	18	8	11	14	11	5	16
+		18	15	2	6	10	12	1	14	15	6
+											
+	tileVegetation	grid	string	10	10						
+		SparseVeg	FarmWoods	FarmWoods	DenseWood	SparseWood	SparseWood	SparseVeg	AppleFarm	AppleFarm	SparseWood
+		FarmWoods	DenseWood	SparseVeg	FarmWoods	AppleFarm	HighlyDense	AppleFarm	SparseWood	SparseWood	SparseWood
+		FarmWoods	SparseWood	SparseWood	SparseWood	HighlyDense	HighlyDense	SparseWood	AppleFarm	SparseWood	SparseWood
+		SparseVeg	HighlyDense	HighlyDense	SparseVeg	FarmWoods	HighlyDense	DenseWood	SparseVeg	DenseWood	SparseWood
+		FarmWoods	FarmWoods	FarmWoods	DenseWood	SparseWood	SparseVeg	DenseWood	DenseWood	AppleFarm	SparseVeg
+		HighlyDense	FarmWoods	DenseWood	DenseWood	DenseWood	SparseVeg	SparseWood	AppleFarm	FarmWoods	SparseWood
+		HighlyDense	AppleFarm	HighlyDense	SparseWood	DenseWood	DenseWood	HighlyDense	HighlyDense	DenseWood	AppleFarm
+		SparseWood	SparseVeg	AppleFarm	SparseWood	AppleFarm	DenseWood	HighlyDense	AppleFarm	AppleFarm	FarmWoods
+		HighlyDense	SparseVeg	FarmWoods	HighlyDense	AppleFarm	SparseVeg	AppleFarm	HighlyDense	AppleFarm	AppleFarm
+		FarmWoods	SparseWood	DenseWood	DenseWood	SparseVeg	SparseVeg	SparseVeg	FarmWoods	SparseWood	FarmWoods

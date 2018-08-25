@@ -1,0 +1,47 @@
+object							
+	name	string	Netflix				Put the name of the company here. Everything else depends on it! 
+							Put company specific parameters here.
+	hexTileValue	number	1000000000000				
+	hexTileScale	number	0.5				
+	modelColorScheme	string	model				
+	marketColorScheme	string	market				
+	verbSubjectColorScheme	string	verbSubject				
+	unitSizeMin	number	10				
+	unitSizeMax	number	30				
+							Put the initial camera position here.
+	cameraStartPosition	object					
+		x	number	0			
+		y	number	240			
+		z	number	-325			
+	cameraStartRotation	object					
+		x	number	30			
+		y	number	0			
+		z	number	0			
+							The spreadsheet doesn't realize t hese need to be re-evaluated, so you need to edit them after you change the company name.
+	valuationMin	number	14000000				
+	valuationMax	number	175000000000				
+	unitValueMax	number	13000000000				
+							Don't need to change these below here.
+	years	range	number	row 0	Netflix_Year		
+							
+	financialType	range	string	column 0	Netflix_Financial_Type		
+	financialTable	range	number	all	Netflix_Financial		
+							
+	marketType	range	string	column 0	Netflix_Market_Type		
+	marketDimension	range	string	column 0	Netflix_Market_Dimension		
+	marketTable	range	number	all	Netflix_Market		
+							
+	modelType	range	string	column 0	Netflix_Model_Type		
+	modelTable	range	string	all	Netflix_Model		
+							
+	unitOutline	range	string	column 0	Netflix_Unit_Outline		
+	unitYears	range	string	column 0	Netflix_Unit_Years		
+	unitModels	range	string	column 0	Netflix_Unit_Models		
+	unitTable	range	number	all	Netflix_Unit		
+							
+	valuationType	range	string	column 0	Netflix_Valuation_Type		
+	valuationTable	range	number	all	Netflix_Valuation		
+							
+	verb	range	string	column 0	Netflix_Verb		
+	subject	range	string	column 0	Netflix_Subject		
+	verbSubjectTable	range	string	all	Netflix_VerbSubject		

@@ -20,22 +20,12 @@ public class TextOverlays: Tracker {
 
     public Canvas canvas;
     public RectTransform panel;
-    public Image image;
-    public RectTransform console;
-    public ScrollRect consoleTextScrollView;
-    public TextMeshProUGUI consoleText;
-    public ScrollRect consoleInputScrollView;
-    public TMP_InputField consoleInputField;
-    public TextMeshProUGUI topLeftText;
-    public TextMeshProUGUI topText;
-    public TextMeshProUGUI topRightText;
-    public TextMeshProUGUI leftText;
-    public TextMeshProUGUI centerText;
-    public TextMeshProUGUI rightText;
-    public TextMeshProUGUI bottomLeftText;
-    public TextMeshProUGUI bottomText;
-    public TextMeshProUGUI bottomRightText;
+    public Image panelImage;
+    public RectTransform infoPanel;
+    public RectTransform infoPanelImage;
+    public TextMeshProUGUI infoText;
     public RectTransform overlay;
+    public TextMeshProUGUI centerText;
 
 
     ////////////////////////////////////////////////////////////////////////

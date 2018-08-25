@@ -1,0 +1,47 @@
+object					
+	name	string	Struct		
+					
+	hexTileValue	number	100000		
+	hexTileScale	number	1		
+	modelColorScheme	string	model		
+	marketColorScheme	string	market		
+	verbSubjectColorScheme	string	verbSubject		
+	unitSizeMin	number	10		
+	unitSizeMax	number	20		
+					
+	cameraStartPosition	object			
+		x	number	0	
+		y	number	220	
+		z	number	-300	
+	cameraStartRotation	object			
+		x	number	30	
+		y	number	0	
+		z	number	0	
+					
+	valuationMin	number	1000000		
+	valuationMax	number	4000000		
+	unitValueMax	number	80000		
+					
+	years	range	number	row 0	Struct_Year
+					
+	financialType	range	string	column 0	Struct_Financial_Type
+	financialTable	range	number	all	Struct_Financial
+					
+	marketType	range	string	column 0	Struct_Market_Type
+	marketDimension	range	string	column 0	Struct_Market_Dimension
+	marketTable	range	number	all	Struct_Market
+					
+	modelType	range	string	column 0	Struct_Model_Type
+	modelTable	range	string	all	Struct_Model
+					
+	unitOutline	range	string	column 0	Struct_Unit_Outline
+	unitYears	range	string	column 0	Struct_Unit_Years
+	unitModels	range	string	column 0	Struct_Unit_Models
+	unitTable	range	number	all	Struct_Unit
+					
+	valuationType	range	string	column 0	Struct_Valuation_Type
+	valuationTable	range	number	all	Struct_Valuation
+					
+	verb	range	string	column 0	Struct_Verb
+	subject	range	string	column 0	Struct_Subject
+	verbSubjectTable	range	string	all	Struct_VerbSubject

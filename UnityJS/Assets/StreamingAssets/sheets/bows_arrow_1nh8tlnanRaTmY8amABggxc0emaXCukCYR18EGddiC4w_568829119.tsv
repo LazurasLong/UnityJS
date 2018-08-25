@@ -1,0 +1,47 @@
+object							
+	bowStart	number	0				
+	bowEnd	number	0.8				
+	startWidth	number	1				
+	endWidth	number	0				
+	widthMultiplier	number	1				
+	lineRenderer/alignment	string	View				
+	lineRenderer/colorGradient	object					
+		alphaKeys	array				
+			object				
+				time	number	0	
+				alpha	number	0.5	
+		colorKeys	array				
+			object				
+				time	number	0	
+				color	object		
+					r	number	0.5
+					g	number	0.5
+					b	number	1
+	lineRenderer/widthCurve	object					
+		animationCurveType	string	Keys			
+		keys	array				
+			object				
+				time	number	0	
+				value	number	1	
+				inTangent	number	0.5	
+				outTangent	number	0.5	
+			object				
+				time	number	0.1	
+				value	number	0.2	
+				inTangent	number	0.5	
+				outTangent	number	0.5	
+			object				
+				time	number	0.7	
+				value	number	0.2	
+				inTangent	number	0.5	
+				outTangent	number	0.5	
+			object				
+				time	number	0.71	
+				value	number	1	
+				inTangent	number	0.5	
+				outTangent	number	0.5	
+			object				
+				time	number	1	
+				value	number	0	
+				inTangent	number	0.5	
+				outTangent	number	0.5	

@@ -1,0 +1,243 @@
+object	Pie									
+	moveScale	number	1							
+	yawScale	number	1							
+	pitchScale	number	1							
+	orbitYawScale	number	1							
+	orbitPitchScale	number	1							
+	wheelZoomScale	number	0.5							
+	wheelPanScale	number	0.5							
+										
+	pies	object								
+										
+		main	object	Pie						
+			label	string	Pie					
+			drawBackground	string	DrawBackground_Pie					
+			slices	array						
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	Color	
+							pieID	string	color	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	NorthEast	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	East	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	SouthEast	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	Navigate	
+							pieID	string	navigate	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	SouthWest	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	West	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	NorthWest	
+										
+		compass	object	Pie						
+			label	string	Compass					
+			drawBackground	string	DrawBackground_Pie					
+			slices	array						
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	North	
+								pieID	color	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	NorthEast	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	East	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	SouthEast	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	South	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	SouthWest	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	West	
+				object	Slice					
+					items	array				
+						object	Item			
+							label	string	NorthWest	
+										
+		edit	object							
+			label	string	Edit					
+			slices	array						
+				object						
+					items	array				
+						object				
+							label	string	Info	
+							onselectitem	string	Info	
+				object						
+					items	array				
+						object				
+							label	string	Destroy	
+							pieID	string	destroyAreYouSure	
+										
+		destroyAreYouSure	object							
+			label	string	Destroy: Are you sure?					
+			slices	array						
+				object						
+					items	array				
+						object				
+							label	string	Yes, destroy!	
+							onselectitem	string	Destroy	
+				object						
+					items	array				
+						object				
+							label	string	No, don't destroy.	
+										
+		color	object							
+			label	string	Color					
+			slices	array						
+				object						
+					items	array				
+						object				
+							label	string	<color #0000ff>Blue	
+						object				
+							label	string	<color #00ff00>Green	
+						object				
+							label	string	<color #ff0000>Red	
+				object						
+					items	array				
+						object				
+							label	string	<color #ff0000>Red	
+				object						
+					items	array				
+						object				
+							label	string	<color #00ff00>Green	
+				object						
+					items	array				
+						object				
+							label	string	<color #0000ff>Blue	
+				object						
+					items	array				
+						object				
+							label	string	<color #ffff00>Yellow	
+						object				
+							label	string	<color #ff00ff>Magenta	
+						object				
+							label	string	<color #00ffff>Cyan	
+				object						
+					items	array				
+						object				
+							label	string	Brightness	
+				object						
+					items	array				
+						object				
+							label	string	Saturation	
+				object						
+					items	array				
+						object				
+							label	string	Hue	
+										
+		unit	object							
+			label	string	Unit					
+			slices	array						
+				object						
+					items	array				
+						object				
+							label	string	Info	
+							pieID	string	unitInfo	
+				object						
+					items	array				
+						object				
+							label	string	Bubbles	
+							pieID	string	unitBubbles	
+										
+		unitBubbles	object							
+			drawBackground	string	DrawBackground_Unit_Bubbles					
+			label	string	Unit					
+										
+		unitInfo	object							
+			drawBackground	string	DrawBackground_Unit_Info					
+			label	string	Info					
+										
+		years	object							
+			label	string	Amazon					
+			pieLabelPosition	object						
+				x	number	0				
+				y	number	120				
+			initialDirection	number	3.141592654					
+			subtend	number	6.283185307					
+			clockwise	boolean	TRUE					
+			slices	array						
+				object						
+					items	array				
+						object				
+							label	string	1996	
+							onselectitem	string	GoToYear	
+				object						
+					items	array				
+						object				
+							label	string	2003	
+							onselectitem	string	GoToYear	
+							itemLabelOffset	object		
+								x	number	20
+								y	number	0
+				object						
+					items	array				
+						object				
+							label	string	2010	
+							onselectitem	string	GoToYear	
+							itemLabelOffset	object		
+								x	number	-20
+								y	number	0
+				object						
+					items	array				
+						object				
+							label	string	2017	
+							onselectitem	string	GoToYear	
+				object						
+					sliceSize	number	4			
+					items	array				
+						object				
+							label	string	Below	
+		simple	object							
+			label	string	Simple					
+			initialDirection	number	-0.2					
+			clockwise	boolean	FALSE					
+			subtend	number	3.141592654					
+			slices	array						
+				object						
+					items	array				
+						object				
+							label	string	0	
+				object						
+					items	array				
+						object				
+							label	string	1	
+				object						
+					items	array				
+						object				
+							label	string	2	
+				object						
+					items	array				
+						object				
+							label	string	3	

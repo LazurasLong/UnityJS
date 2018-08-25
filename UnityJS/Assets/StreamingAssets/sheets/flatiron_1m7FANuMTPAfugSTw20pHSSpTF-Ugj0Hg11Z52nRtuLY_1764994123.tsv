@@ -1,0 +1,47 @@
+object					
+	name	string	Flatiron		
+					
+	hexTileValue	number	1000000000		
+	hexTileScale	number	0.5		
+	modelColorScheme	string	model		
+	marketColorScheme	string	market		
+	verbSubjectColorScheme	string	verbSubject		
+	unitSizeMin	number	10		
+	unitSizeMax	number	30		
+					
+	cameraStartPosition	object			
+		x	number	0	
+		y	number	355	
+		z	number	-525	
+	cameraStartRotation	object			
+		x	number	30	
+		y	number	0	
+		z	number	0	
+					
+	valuationMin	number	0		
+	valuationMax	number	1900000000		
+	unitValueMax	number	37100000		
+					
+	years	range	number	row 0	Flatiron_Year
+					
+	financialType	range	string	column 0	Flatiron_Financial_Type
+	financialTable	range	number	all	Flatiron_Financial
+					
+	marketType	range	string	column 0	Flatiron_Market_Type
+	marketDimension	range	string	column 0	Flatiron_Market_Dimension
+	marketTable	range	number	all	Flatiron_Market
+					
+	modelType	range	string	column 0	Flatiron_Model_Type
+	modelTable	range	string	all	Flatiron_Model
+					
+	unitOutline	range	string	column 0	Flatiron_Unit_Outline
+	unitYears	range	string	column 0	Flatiron_Unit_Years
+	unitModels	range	string	column 0	Flatiron_Unit_Models
+	unitTable	range	number	all	Flatiron_Unit
+					
+	valuationType	range	string	column 0	Flatiron_Valuation_Type
+	valuationTable	range	number	all	Flatiron_Valuation
+					
+	verb	range	string	column 0	Flatiron_Verb
+	subject	range	string	column 0	Flatiron_Subject
+	verbSubjectTable	range	string	all	Flatiron_VerbSubject

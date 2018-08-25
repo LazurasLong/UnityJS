@@ -1,0 +1,61 @@
+object							
+	bowStart	number	0				
+	bowEnd	number	1				
+	startWidth	number	0				
+	endWidth	number	0				
+	fromLocalOffset	object					
+		x	number	45			
+		y	number	5			
+	toLocalOffset	object					
+		x	number	-45			
+		y	number	5			
+	textureScale	object					
+		x	number	0.5			
+		y	number	0.5			
+	widthMultiplier	number	50				
+	lineRenderer/alignment	string	Local				
+	lineRenderer/colorGradient	object					
+		alphaKeys	array				
+			object				
+				time	number	0	
+				alpha	number	0.5	
+		colorKeys	array				
+			object				
+				time	number	0	
+				color	object		
+					r	number	0.5
+					g	number	0.5
+					b	number	1
+	lineRenderer/widthCurve	object					
+		animationCurveType	string	Keys			
+		keys	array				
+			object				
+				time	number	0	
+				value	number	0	
+				inTangent	number	0	
+				outTangent	number	0	
+			object				
+				time	number	0.2	
+				value	number	1	
+				inTangent	number	0	
+				outTangent	number	0	
+			object				
+				time	number	0.2	
+				value	number	0.5	
+				inTangent	number	0	
+				outTangent	number	0	
+			object				
+				time	number	0.8	
+				value	number	0.5	
+				inTangent	number	0	
+				outTangent	number	0	
+			object				
+				time	number	0.8	
+				value	number	1	
+				inTangent	number	0	
+				outTangent	number	0	
+			object				
+				time	number	1	
+				value	number	0	
+				inTangent	number	0	
+				outTangent	number	0	
