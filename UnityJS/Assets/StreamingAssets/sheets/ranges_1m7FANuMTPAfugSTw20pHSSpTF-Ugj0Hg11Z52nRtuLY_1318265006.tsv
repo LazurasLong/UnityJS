@@ -51,21 +51,21 @@ table
 	Netflix_Verb	netflixSource	928036165	31	1	8	1
 	Netflix_VerbSubject	netflixSource	928036165	31	4	8	4
 	Netflix_Year	netflixSource	928036165	2	4	1	4
-	Struct_Financial	structSource	1167688381	8	4	4	2
-	Struct_Financial_Type	structSource	1167688381	8	2	4	1
-	Struct_Market	structSource	1167688381	14	4	2	2
-	Struct_Market_Dimension	structSource	1167688381	14	1	2	1
-	Struct_Market_Type	structSource	1167688381	14	2	2	1
-	Struct_Model	structSource	1167688381	36	4	6	2
-	Struct_Model_Type	structSource	1167688381	36	1	6	1
+	Struct_Financial	structSource	1167688381	7	4	4	2
+	Struct_Financial_Type	structSource	1167688381	7	2	4	1
+	Struct_Market	structSource	1167688381	13	4	2	2
+	Struct_Market_Dimension	structSource	1167688381	13	1	2	1
+	Struct_Market_Type	structSource	1167688381	13	2	2	1
+	Struct_Model	structSource	1167688381	34	4	6	2
+	Struct_Model_Type	structSource	1167688381	34	1	6	1
 	Struct_Name	structSource	1167688381	1	2	1	1
-	Struct_Subject	structSource	1167688381	28	2	6	1
-	Struct_Unit	structSource	1167688381	18	4	7	2
-	Struct_Unit_Models	structSource	1167688381	18	3	7	1
-	Struct_Unit_Outline	structSource	1167688381	18	1	7	1
-	Struct_Unit_Years	structSource	1167688381	18	2	7	1
-	Struct_Valuation	structSource	1167688381	4	4	2	2
-	Struct_Valuation_Type	structSource	1167688381	4	2	2	1
-	Struct_Verb	structSource	1167688381	28	1	6	1
-	Struct_VerbSubject	structSource	1167688381	28	4	6	2
-	Struct_Year	structSource	1167688381	2	4	1	2
+	Struct_Subject	structSource	1167688381	26	2	6	1
+	Struct_Unit	structSource	1167688381	17	4	7	2
+	Struct_Unit_Models	structSource	1167688381	17	3	7	1
+	Struct_Unit_Outline	structSource	1167688381	17	1	7	1
+	Struct_Unit_Years	structSource	1167688381	17	2	7	1
+	Struct_Valuation	structSource	1167688381	3	4	2	2
+	Struct_Valuation_Type	structSource	1167688381	3	2	2	1
+	Struct_Verb	structSource	1167688381	26	1	6	1
+	Struct_VerbSubject	structSource	1167688381	26	4	6	2
+	Struct_Year	structSource	1167688381	1	4	1	2
