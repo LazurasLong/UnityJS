@@ -23,7 +23,7 @@ object		Tuning parameters.
 	bundleCursors	boolean	FALSE	
 	bundleCursorScale	number	1	
 	bundleElevationBase	number	5	
-	bundleElevationYear	number	30	
+	bundleElevationYear	number	0	
 	bundleEnabled	boolean	TRUE	
 	bundleGap	number	12	
 	bundleLaneWidth	number	1	
@@ -44,20 +44,84 @@ object		Tuning parameters.
 	hexDX	number	15	
 	hexDY	number	8.66	
 	hexHeight	number	15	
-	hexHeightMax	number	50	
-	hexHeightMin	number	2	
-	hexHeightRange	number	48	
 	hexZMax	number	3	
 	hexZMin	number	-4	
 	hexZRange	number	7	
 	highlightColor	string	#00ffff	
 	hoverDelay	number	0.25	
+	infoPanelColor	string	#ffffff	
+	infoPanelHeight	number	210	
+	infoPanelMarketFontColor	string	#000000	
+	infoPanelMarketFontName	string	Rubik	
+	infoPanelMarketFontSize	number	16	
+	infoPanelMarketFontStyle	string	bold	
+	infoPanelMarketGap	number	5	
+	infoPanelMarketIndent	number	15	
+	infoPanelModelFontColor	string	#000000	
+	infoPanelModelFontName	string	Rubik	
+	infoPanelModelFontSize	number	16	
+	infoPanelModelFontStyle	string	bold	
+	infoPanelModelGap	number	5	
+	infoPanelModelIndent	number	15	
+	infoPanelParentFontColor	string	#595959	
+	infoPanelParentFontName	string	Rubik	
+	infoPanelParentFontSize	number	12	
+	infoPanelParentFontStyle	string	normal	
+	infoPanelParentGap	number	5	
+	infoPanelParentIndent	number	10	
+	infoPanelTitleBorder	number	1	
+	infoPanelTitleBorderColor	string	#000000	
+	infoPanelTitleBoxColor	string	#c0c0c0	
+	infoPanelTitleFontColor	string	#000000	
+	infoPanelTitleFontLift	number	3	
+	infoPanelTitleFontName	string	Rubik	
+	infoPanelTitleFontSize	number	18	
+	infoPanelTitleFontStyle	string	bold	
+	infoPanelTitleGap	number	5	
+	infoPanelTitleIndent	number	8	
+	infoPanelTitleYearsFontColor	string	#000000	
+	infoPanelTitleYearsFontName	string	Rubik	
+	infoPanelTitleYearsFontSize	number	18	
+	infoPanelTitleYearsFontStyle	string	bold	
+	infoPanelUnitFontColor	string	#000000	
+	infoPanelUnitFontName	string	Rubik	
+	infoPanelUnitFontSize	number	16	
+	infoPanelUnitFontStyle	string	bold	
+	infoPanelUnitGap	number	5	
+	infoPanelUnitIndent	number	15	
+	infoPanelUnitModelBoxBorder	number	1	
+	infoPanelUnitModelBoxBorderColor	string	#000000	
+	infoPanelUnitModelBoxSize	number	12	
+	infoPanelUnitModelFontColor	string	#404040	
+	infoPanelUnitModelFontLift	number	-1	
+	infoPanelUnitModelFontName	string	Rubik	
+	infoPanelUnitModelFontSize	number	12	
+	infoPanelUnitModelFontStyle	string	normal	
+	infoPanelUnitModelGap	number	10	
+	infoPanelUnitModelIndent	number	30	
+	infoPanelUnitValueFontColor	string	#606060	
+	infoPanelUnitValueFontName	string	Rubik	
+	infoPanelUnitValueFontSize	number	12	
+	infoPanelUnitValueFontStyle	string	normal	
+	infoPanelUnitYearFontColor	string	#404040	
+	infoPanelUnitYearFontName	string	Rubik	
+	infoPanelUnitYearFontSize	number	12	
+	infoPanelUnitYearFontStyle	string	bold	
+	infoPanelUnitYearGap	number	10	
+	infoPanelUnitYearIndent	number	300	
+	infoPanelVerbSubjectFontColor	string	#000000	
+	infoPanelVerbSubjectFontName	string	Rubik	
+	infoPanelVerbSubjectFontSize	number	16	
+	infoPanelVerbSubjectFontStyle	string	bold	
+	infoPanelVerbSubjectGap	number	5	
+	infoPanelVerbSubjectIndent	number	15	
+	infoPanelWidth	number	420	
 	marketColorScheme	string	market	
 	marketHighlightEffect	string	Magic_Aura_02	
 	marketHighlightScale	number	20	
 	modelColorScheme	string	model	
-	modelHighlightScale	number	2	
 	modelHighlightEffect	string	Magic_Aura_01	
+	modelHighlightScale	number	2	
 	unitAngularDrag	number	0.7	
 	unitArrowRainbowType	string	arrow	
 	unitArrows	boolean	TRUE	
@@ -69,8 +133,8 @@ object		Tuning parameters.
 	unitCreateAnimateTime	number	1	
 	unitCreateDelay	number	250	
 	unitDamper	number	1	
-	unitDescribeParents	boolean	TRUE	
 	unitDescribeModels	boolean	TRUE	
+	unitDescribeParents	boolean	TRUE	
 	unitDistance	number	0.1	
 	unitDrag	number	2	
 	unitEnableCollision	boolean	TRUE	
@@ -103,13 +167,12 @@ object		Tuning parameters.
 	yearConstraints	string	FreezePositionX,FreezePositionY,FreezePositionZ,FreezeRotationX,FreezeRotationY,FreezeRotationZ	
 	yearCreateDelay	number	1000	
 	yearEnabled	boolean	TRUE	
-	yearHeight	number	40	
+	yearHeightMax	number	100	
+	yearHeightMin	number	40	
 	yearIsKinematic	boolean	FALSE	
 	yearLabelFontSize	number	80	
 	yearLabelHeight	number	30	
 	yearLabels	boolean	TRUE	
-	yearLiftHeight	number	20	
-	yearLiftTime	number	0.25	
 	yearMass	number	100	
 	yearMaterial	string	The_Texture_Lab/Materials/Metal_Materials/Mat_Steel_Base_1024	
 	yearMultiSelect	boolean	TRUE	

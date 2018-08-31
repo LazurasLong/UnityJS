@@ -21,7 +21,6 @@ using StringCallback = System.Action<string>;
 public class BridgeTransportSocketIO : BridgeTransport
 {
 
-    string urlSocketIO = "http://localhost:3000";
     public Socket socket;
 
 
@@ -29,7 +28,7 @@ public class BridgeTransportSocketIO : BridgeTransport
     {
         driver = "SocketIO";
 
-        socket = IO.Socket(urlSocketIO);
+        socket = IO.Socket(bridge.socketIOAddress);
         
         socket.On(Socket.EVENT_CONNECT, () => {
             socket.Emit("Hi");
@@ -40,8 +39,8 @@ public class BridgeTransportSocketIO : BridgeTransport
             socket.Disconnect();
         });
 
-        startedJS = true; // XXX
-        bridge.HandleTransportLoaded(); // XXX
+        startedJS = true;
+        bridge.HandleTransportStarted();
 
     }
 

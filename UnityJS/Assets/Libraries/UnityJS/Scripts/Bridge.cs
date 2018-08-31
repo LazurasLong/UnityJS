@@ -45,6 +45,10 @@ public class Bridge : MonoBehaviour {
     public string url = "bridge.html";
     public string spreadsheetID = "1nh8tlnanRaTmY8amABggxc0emaXCukCYR18EGddiC4w";
     public string configuration = "world";
+#if USE_SOCKETIO
+    public bool useSocketIO = false;
+    public string socketIOAddress;
+#endif
     public bool startedJS = false;
     public BridgeTransport transport;
 
@@ -213,28 +217,35 @@ public class Bridge : MonoBehaviour {
             return;
         }
 
-        transport =
-#if UNITY_EDITOR
- #if USE_SOCKETIO
-            gameObject.AddComponent<BridgeTransportSocketIO>();
- #else
-  #if USE_CEF
-            gameObject.AddComponent<BridgeTransportCEF>();
-  #else
-            gameObject.AddComponent<BridgeTransportWebView>();
-  #endif
- #endif
-#else
- #if UNITY_WEBGL
-            gameObject.AddComponent<BridgeTransportWebGL>();
- #else
-  #if USE_SOCKETIO
-            gameObject.AddComponent<BridgeTransportSocketIO>();
-  #else
-            gameObject.AddComponent<BridgeTransportWebView>();
-  #endif
- #endif
-#endif
+        #if UNITY_EDITOR
+            #if USE_SOCKETIO
+                if (useSocketIO) {
+                    transport = gameObject.AddComponent<BridgeTransportSocketIO>();
+                } else {
+            #endif
+                    #if USE_CEF
+                        transport = gameObject.AddComponent<BridgeTransportCEF>();
+                    #else
+                        transport = gameObject.AddComponent<BridgeTransportWebView>();
+                    #endif
+            #if USE_SOCKETIO
+                }
+            #endif
+        #else
+            #if UNITY_WEBGL
+                transport = gameObject.AddComponent<BridgeTransportWebGL>();
+            #else
+                #if USE_SOCKETIO
+                    if (useSocketIO) {
+                        transport = gameObject.AddComponent<BridgeTransportSocketIO>();
+                    } else {
+                #endif
+                        transport = gameObject.AddComponent<BridgeTransportWebView>();
+                #if USE_SOCKETIO
+                    }
+                #endif
+            #endif
+        #endif
 
         Debug.Log("Bridge: CreateTransport: transport: " + transport);
 

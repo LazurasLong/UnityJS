@@ -46,10 +46,7 @@ if (gGoogleSheets) {
 
         ss.addMenu("JSONster", [
             {name: 'Format Spreadsheet as JSON', functionName: 'FormatSpreadsheetAsJSON'},
-            {name: 'Clear Formatting', functionName: 'ClearFormatting'},
-            {name: 'Clear Groups', functionName: 'ClearGroups'},
-            {name: 'Make Named Ranges', functionName: 'MakeNamedRanges'},
-            {name: 'Update Named Ranges', functionName: 'UpdateNamedRanges'}
+            {name: 'Make Named Ranges', functionName: 'MakeNamedRanges'}
         ]);
     }
 
@@ -180,20 +177,26 @@ if (gGoogleSheets) {
 
     function GetNamedRanges()
     {
+        var ss = SpreadsheetApp.getActiveSpreadsheet();
+        var namedRanges = ss.getNamedRanges();
         var ranges = {};
-        var table = NamedRangeTable();
-        for (var i = 0, n = table.length; i < n; i++) {
-            var a = table[i];
+
+        for (var index = 0, n = namedRanges.length; index < n; index++) {
+            var namedRange = namedRanges[index];
+            var rangeName = namedRange.getName();
+            var range = namedRange.getRange();
+            var sheet = range.getSheet();
+
             var range = {
-                rangeName: a[0],
-                sheetName: a[1],
-                sheetID: a[2],
-                row: a[3],
-                column: a[4],
-                rows: a[5],
-                columns: a[6]
+                rangeName: rangeName,
+                sheetName: sheet.getName(),
+                sheetID: sheet.getSheetId(),
+                row: range.getRow(),
+                column: range.getColumn(),
+                rows: range.getNumRows(),
+                columns: range.getNumColumns()
             };
-            ranges[range.rangeName] = range;
+            ranges[rangeName] = range;
         }
 
         return ranges;
@@ -203,39 +206,39 @@ if (gGoogleSheets) {
     // =ARRAYFORMULA(GenerateNamedRangeSheet(Math.random()))
     function GenerateNamedRangeSheet(trigger)
     {
-      var ss = SpreadsheetApp.getActiveSpreadsheet();
-      var namedRanges = ss.getNamedRanges();
-      var result = [];
+        var ss = SpreadsheetApp.getActiveSpreadsheet();
+        var namedRanges = ss.getNamedRanges();
+        var result = [];
 
-      for (var index = 0, n = namedRanges.length; index < n; index++) {
+        for (var index = 0, n = namedRanges.length; index < n; index++) {
 
-        var namedRange = namedRanges[index];
-        var rangeName = namedRange.getName();
-        var range = namedRange.getRange();
-        var sheet = range.getSheet();
-        var sheetName = sheet.getName();
-        var sheetID = sheet.getSheetId();
-        var row = range.getRow();
-        var column = range.getColumn();
-        var rows = range.getNumRows();
-        var columns = range.getNumColumns();
+            var namedRange = namedRanges[index];
+            var rangeName = namedRange.getName();
+            var range = namedRange.getRange();
+            var sheet = range.getSheet();
+            var sheetName = sheet.getName();
+            var sheetID = sheet.getSheetId();
+            var row = range.getRow();
+            var column = range.getColumn();
+            var rows = range.getNumRows();
+            var columns = range.getNumColumns();
 
-        result.push([
-            "", rangeName, sheetName, sheetID, row, column, rows, columns
-        ]);
+            result.push([
+                "", rangeName, sheetName, sheetID, row, column, rows, columns
+            ]);
 
-      }
+        }
 
-      result.sort(
-          function(a, b) { 
-              return (a[1] < b[1]) ? -1 : ((a[1] > b[1]) ? 1 : 0); 
-          });
+        result.sort(
+            function(a, b) { 
+                return (a[1] < b[1]) ? -1 : ((a[1] > b[1]) ? 1 : 0); 
+            });
 
-      result.unshift(
-          ["table"],
-          ["", "{ rangeName string", "sheetName string", "sheetID string", "row number", "column number", "rows number", "columns number }" ]);
+        result.unshift(
+            ["table"],
+            ["", "{ rangeName string", "sheetName string", "sheetID string", "row number", "column number", "rows number", "columns number }" ]);
 
-      return result;
+        return result;
     }
 
 
@@ -589,6 +592,11 @@ if (gGoogleSheets) {
 
         //console.log("headers:", JSON.stringify(headers));
 
+        var fullRange = 
+            sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns());
+        ClearFormatting(sheet, fullRange);
+        fullRange.setNote(null);
+
         var namedRanges = spreadsheet.getNamedRanges();
         namedRanges.forEach(function (namedRange) {
             if (namedRange.getRange().getSheet() == sheet) {
@@ -606,23 +614,39 @@ if (gGoogleSheets) {
 
         for (var row = 0; row < rows; row++) {
             //console.log("row", row, "rows", rows, "columns", columns);
+
             for (var column = 0; column < columns; column++) {
+
                 var header = values[row][column];
+
                 var parts = headers[header];
                 if (!parts) {
                     continue;
                 }
+
+                var headerRange = sheet.getRange(row + 1, column + 1, 1, 1);
+                headerRange.setHorizontalAlignment('right');
+                headerRange.setFontWeight('bold');
+
                 //console.log("row", row, "column", column, "header", header, "parts", parts, "keys", Object.keys(headers));
+                
                 parts.forEach(function (part, partIndex) {
+
                     var rangeRow = row + part.rowOffset;
                     var rangeColumn = column + part.columnOffset;
+
                     if (part.suffix == 'Name') {
                         name = values[rangeRow][rangeColumn];
                     }
+
                     var rangeName = name + '_' + part.suffix;
+
                     //console.log("header", header, "rangeName", rangeName, "rowOffset", part.rowOffset, "columnOffset", part.columnOffset, "type", part.type, "suffix", part.suffix, "row", row, "column", column, "rangeRow", rangeRow, "rangeColumn", rangeColumn, "rowToColumnRows[rangeRow]", rowToColumnRows[rangeRow], "columnToRowColumns[rangeColumn]", columnToRowColumns[rangeColumn]);
+
                     if ((part.type == 'cell') || (part.type == 'column')) {
+
                         columnToRowColumns[rangeColumn] = 1;
+
                         if ((part.type == 'column') &&
                             !rowToColumnRows[rangeRow]) {
                             for (var columnRows = 0, maxRows = rows - rangeRow; columnRows < maxRows; columnRows++) {
@@ -632,13 +656,18 @@ if (gGoogleSheets) {
                                     break;
                                 }
                             }
+
                             rowToColumnRows[rangeRow] = columnRows;
                             //console.log("SET rowToColumnRows", "rangeRow", rangeRow, "columnRows", columnRows);
+
                         }
+
                     }
 
                     if ((part.type == 'cell') || (part.type == 'row')) {
+
                         rowToColumnRows[rangeRow] = 1;
+
                         if ((part.type == 'row') &&
                             !columnToRowColumns[rangeColumn]) {
                             for (var rowColumns = 0, maxColumns = columns - rangeColumn; rowColumns < maxColumns; rowColumns++) {
@@ -648,23 +677,33 @@ if (gGoogleSheets) {
                                     break;
                                 }
                             }
+
                             columnToRowColumns[rangeColumn] = rowColumns;
                             //console.log("SET columnToRowColumns", "rangeColumn", rangeColumn, "rowColumns", rowColumns);
+
                         }
+
                     }
 
                     var rangeRows =
                         ((part.type == 'cell') || (part.type == 'row'))
                             ? 1
                             : rowToColumnRows[rangeRow] || 1;
+
                     var rangeColumns =
                         ((part.type == 'cell') || (part.type == 'column'))
                             ? 1
                             : columnToRowColumns[rangeColumn] || 1;
 
                     var range = sheet.getRange(rangeRow + 1, rangeColumn + 1, rangeRows, rangeColumns);
+                    range.setBackgroundColor('#c0c0ff');
+                    range.setBorder(true, true, true, true, false, false, '#000000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+                    var note = 
+                        rangeName + ':\nrow ' + rangeRow + ' column: ' + rangeColumn + 
+                        '\nrows: ' + rangeRows + ' columns: ' + rangeColumns;
+                    range.setNote(note)
                     spreadsheet.setNamedRange(rangeName, range);
-                  
+
                     console.log("rangeName", rangeName, "rangeRow", rangeRow, "rangeColumn", rangeColumn, "rangeRows", rangeRows, "rangeColumns", rangeColumns);
 
                 });
@@ -890,6 +929,7 @@ if (gGoogleSheets) {
                 sheetSpec.sheetID;
             //console.log("LIVE sheetURL", sheetURL);
 
+            // Always use the proxy for now.
             params.proxyPrefix = 'https://donhopkins.com/home/_p/miniProxy.php';
 
             if (params.proxyPrefix) {

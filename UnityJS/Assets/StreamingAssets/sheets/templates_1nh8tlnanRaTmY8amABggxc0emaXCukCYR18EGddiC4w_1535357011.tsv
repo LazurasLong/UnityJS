@@ -14,13 +14,15 @@ object		These are named templates used to create various types of objects.
 			orbitYawSpeed	number	60			
 			orbitPitchSpeed	number	60			
 			wheelPanSpeed	number	-30			
-			wheelZoomSpeed	number	30			
+			wheelZoomSpeed	number	20			
 			positionMin	object				
-				x	number	-100		
-				y	number	-100		
-			positionMin	object				
-				x	number	100		
-				y	number	100		
+				x	number	-475		
+				y	number	10		
+				z	number	-475		
+			positionMax	object				
+				x	number	475		
+				y	number	300		
+				z	number	475		
 			pitchMin	number	-90			
 			pitchMax	number	90			
 	skyCamera	object		This is a fancy sky camera.				

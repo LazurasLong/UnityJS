@@ -1,3 +1,3 @@
-ssh dhopkins@donhopkins.com rm -rf home/UnityJS
-scp -r ../UnityJS/Builds/WebGL/UnityJS dhopkins@donhopkins.com:home
-ssh dhopkins@donhopkins.com du -s home/UnityJS
+ssh dhopkins@donhopkins.com rm -rf /home/sites/Struct/optionality
+scp -r ../UnityJS/Builds/WebGL/UnityJS dhopkins@donhopkins.com:/home/sites/Struct/optionality
+ssh dhopkins@donhopkins.com du -s /home/sites/Struct/optionality

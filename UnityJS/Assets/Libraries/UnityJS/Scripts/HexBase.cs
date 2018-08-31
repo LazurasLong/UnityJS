@@ -235,7 +235,7 @@ public class HexBase : Tracker {
             (mouseRaycastHit.collider.transform.gameObject.name == "Mesh")) {
             Transform hex = mouseRaycastHit.collider.transform.parent;
             string hexName = hex.gameObject.name;
-            tileIndex = int.Parse(hexName);
+            int.TryParse(hexName, out tileIndex);
         }
 
         if (tileIndex != currentTileIndex) {

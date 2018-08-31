@@ -15,6 +15,13 @@ public class Tracker : BridgeObject {
 
 
     ////////////////////////////////////////////////////////////////////////
+    // Class Variables
+
+
+    static public Tracker grabber;
+
+
+    ////////////////////////////////////////////////////////////////////////
     // Instance Variables
 
 
@@ -312,7 +319,8 @@ public class Tracker : BridgeObject {
 
     public virtual void OnMouseEnter()
     {
-        if (!mouseTracking) {
+        if (((grabber != null) && (grabber != this)) ||
+            !mouseTracking) {
             return;
         }
 
@@ -337,7 +345,8 @@ public class Tracker : BridgeObject {
 
     public virtual void OnMouseExit()
     {
-        if (!mouseTracking) {
+        if (((grabber != null) && (grabber != this)) ||
+            !mouseTracking) {
             return;
         }
 
@@ -370,7 +379,8 @@ public class Tracker : BridgeObject {
 
     public virtual void OnTriggerEnter()
     {
-        if (!triggerTracking) {
+        if (((grabber != null) && (grabber != this)) ||
+            !triggerTracking) {
             return;
         }
 
@@ -395,7 +405,8 @@ public class Tracker : BridgeObject {
 
     public virtual void OnTriggerExit()
     {
-        if (!triggerTracking) {
+        if (((grabber != null) && (grabber != this)) ||
+            !triggerTracking) {
             return;
         }
 
@@ -472,7 +483,8 @@ public class Tracker : BridgeObject {
 
     public virtual void OnMouseDown()
     {
-        if (!mouseTracking) {
+        if (((grabber != null) && (grabber != this)) ||
+            !mouseTracking) {
             return;
         }
 
@@ -495,7 +507,8 @@ public class Tracker : BridgeObject {
 
     public virtual void OnMouseUp()
     {
-        if (!mouseTracking) {
+        if (((grabber != null) && (grabber != this)) ||
+            !mouseTracking) {
             return;
         }
 
@@ -518,7 +531,8 @@ public class Tracker : BridgeObject {
 
     public virtual void OnMouseUpAsButton()
     {
-        if (!mouseTracking) {
+        if (((grabber != null) && (grabber != this)) ||
+            !mouseTracking) {
             return;
         }
 
@@ -565,7 +579,8 @@ public class Tracker : BridgeObject {
 
     public virtual void OnMouseDrag()
     {
-        if (!mouseTracking) {
+        if (((grabber != null) && (grabber != this)) ||
+            !mouseTracking) {
             return;
         }
 
@@ -586,6 +601,10 @@ public class Tracker : BridgeObject {
 
     public virtual void OnMouseOver()
     {
+        if ((grabber != null) && (grabber != this)) {
+            return;
+        }
+            
         //Debug.Log("Tracker: OnMouseOver", this);
 
         TrackMousePosition();

@@ -247,7 +247,7 @@ function DrawBackground_Pie(canvas, context, params, success, error)
             inactiveDistance,
             0,
             Math.PI * 2.0);
-        context.strokeStyle = 'black';
+        context.strokeStyle = '#808080';
         context.lineWidth = 2;
         context.stroke();
     }
@@ -286,7 +286,7 @@ function DrawBackground_Pie(canvas, context, params, success, error)
                 context.lineTo(
                     cx + (dx * length),
                     cy + (dy * length));
-                context.strokeStyle = 'black';
+                context.strokeStyle = '#808080';
                 context.lineWidth = 1;
                 context.stroke();
             }
@@ -307,7 +307,7 @@ function DrawBackground_Pie(canvas, context, params, success, error)
                 context.lineTo(
                     cx + (dx * length),
                     cy + (dy * length));
-                context.strokeStyle = 'black';
+                context.strokeStyle = '#808080';
                 context.lineWidth = 1;
                 context.stroke();
             }
@@ -343,9 +343,9 @@ function DrawToCanvas(params, drawer, success, error)
             switch (globals.driver) {
 
                 case "WebGL":
-                    var id = params.pie.backgroundSharedTextureID;
+                    var id = params.cache.backgroundSharedTextureID;
                     if (!id) {
-                        params.pie.backgroundSharedTextureID = id = 
+                        params.cache.backgroundSharedTextureID = id = 
                             window.bridge._UnityJS_AllocateTexture(params.width, params.height);
                         //console.log("game.js: DrawToCanvas: WebGL: AllocateTexture: width: " + params.width + " height: " + params.height + " id: " + id);
                     }
@@ -1082,7 +1082,7 @@ function CreatePieTracker()
                                 item.label;
 
                             var update = {
-                                'textMesh/text': itemLabel,
+                                'textMesh/text': SearchDefault('itemLabelPrefix', item, slice, pie, pieTracker.itemLabelPrefix) + itemLabel,
                                 'textMesh/fontSize': SearchDefault('itemLabelFontSize', item, slice, pie, pieTracker.itemLabelFontSize),
                                 'textMesh/color': SearchDefault('itemLabelFontColor', item, slice, pie, pieTracker.itemLabelFontColor),
                                 'textMesh/alignment': SearchDefault('itemLabelAlignment', item, slice, pie, pieTracker.itemLabelAlignment),
@@ -1117,7 +1117,7 @@ function CreatePieTracker()
             pie.labelObject = MakeLabel();
 
             var update = {
-                'textMesh/text': pie.label,
+                'textMesh/text': SearchDefault('pieLabelPrefix', pie, pieTracker.pieLabelPrefix) + pie.label,
                 'textMesh/fontSize': SearchDefault('pieLabelFontSize', pie, pieTracker.pieLabelFontSize),
                 'textMesh/color': SearchDefault('pieLabelFontColor', pie, pieTracker.pieLabelFontColor),
                 'textMesh/alignment': SearchDefault('pieLabelAlignment', pie, pieTracker.pieLabelAlignment),
@@ -1183,6 +1183,11 @@ function CreatePieTracker()
             'gameObject/method:SetActive': [true]
         });
 
+        UpdateObject(globals.proCamera, {
+            'trackerProxy/target!': 'object:' + pieTracker.id,
+            'trackerProxy/gameObject/method:SetActive': [true]
+        });
+
         var target = pieTracker.target;
 
         HandleShowPie(pie, target);
@@ -1202,8 +1207,12 @@ function CreatePieTracker()
             'gameObject/method:SetActive': [false]
         });
 
-        //DeconstructPie(pie);
+        UpdateObject(globals.proCamera, {
+            'trackerProxy/target!': null,
+            'trackerProxy/gameObject/method:SetActive': [false]
+        });
 
+        //DeconstructPie(pie);
 
         HandleHidePie(pie, target);
     }
@@ -1380,7 +1389,7 @@ function CreatePieTracker()
             backgroundGradientOuterRadius: 250,
             drawInactiveCircle: true,
             drawSlices: true,
-            sliceLength: 10,
+            sliceLength: 50,
             sliceLengthSelected: 100,
             startMousePosition: null,
             trackMousePosition: null,
@@ -1393,11 +1402,15 @@ function CreatePieTracker()
             itemIndex: -1,
             slice: null,
             item: null,
-            pieLabelFontSize: 22,
+            pieLabelFontSize: 24,
             pieLabelFontColor: '#ffffff',
+            pieLabelPrefix: '<b>',
+            pieLabelAlignment: 'Center',
             pieLabelPosition: { x: 0, y: 0 },
-            itemLabelFontSize: 18,
+            itemLabelFontSize: 16,
             itemLabelFontColor: '#ffffff',
+            itemLabelAlignment: 'Center',
+            itemLabelPrefix: '',
             itemLabelDistance: 75,
             itemLabelOffset: { x: 0, y: 0 },
             itemLabelPosition: null,
@@ -1675,6 +1688,7 @@ function DrawPieBackground(pie, target)
         width: 512, 
         height: 512, 
         pie: pie,
+        cache: pie,
         target: target
     };
 

@@ -32,7 +32,7 @@ object
 	marketTable	range	number	all	Struct_Market
 					
 	modelType	range	string	column 0	Struct_Model_Type
-	modelTable	range	string	all	Struct_Model
+	modelTable	range	boolean	all	Struct_Model
 					
 	unitOutline	range	string	column 0	Struct_Unit_Outline
 	unitYears	range	string	column 0	Struct_Unit_Years

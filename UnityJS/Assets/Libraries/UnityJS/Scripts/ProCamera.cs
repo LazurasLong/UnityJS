@@ -19,6 +19,7 @@ public class ProCamera : BridgeObject {
 
 
     public Camera proCamera;
+    public TrackerProxy trackerProxy;
     public float moveSpeed = 60.0f;
     public float yawSpeed = 60.0f;
     public float pitchSpeed = 60.0f;
@@ -33,8 +34,9 @@ public class ProCamera : BridgeObject {
     public float orbitPitchVelocity = 0.0f;
     public float wheelZoomVelocity = 0.0f;
     public float wheelPanVelocity = 0.0f;
-    public Vector3 positionMin = new Vector3(-100.0f, 0.0f, -100.0f);
-    public Vector3 positionMax = new Vector3(100.0f, 20.0f, 100.0f);
+    public float mouseScrollDeltaMax = 5.0f;
+    public Vector3 positionMin = new Vector3(-1000.0f, 1.0f, -1000.0f);
+    public Vector3 positionMax = new Vector3(1000.0f, 200.0f, 1000.0f);
     public float pitchMin = -90f;
     public float pitchMax = 90f;
     public bool initialized = false;
@@ -66,7 +68,8 @@ public class ProCamera : BridgeObject {
 
         }
 
-        float deltaTime = Time.deltaTime;
+        //float deltaTime = Time.deltaTime;
+        float deltaTime = Time.smoothDeltaTime; // Try smoothing!
         Vector3 moveDelta = moveVelocity * deltaTime;
         float yawDelta = yawVelocity * deltaTime;
         float pitchDelta = pitchVelocity * deltaTime;
@@ -117,8 +120,23 @@ public class ProCamera : BridgeObject {
         if (Input.GetKey("k")) {
             orbitPitchDelta -= orbitPitchSpeed * deltaTime;
         }
-        wheelZoomDelta += Input.mouseScrollDelta.y * wheelZoomSpeed * deltaTime;
-        wheelPanDelta += Input.mouseScrollDelta.x * wheelPanSpeed * deltaTime;
+
+        float scrollX =
+            Mathf.Clamp(Input.mouseScrollDelta.x, -mouseScrollDeltaMax, mouseScrollDeltaMax);
+        float scrollY = 
+            Mathf.Clamp(Input.mouseScrollDelta.y, -mouseScrollDeltaMax, mouseScrollDeltaMax);
+
+#if false
+        if (scrollX != 0.0f) {
+            Debug.Log("scrollX: " + scrollX + " deltaTime: " + Time.deltaTime + " smoothDeltaTime: " + Time.smoothDeltaTime);
+        }
+        if (scrollY != 0.0f) {
+            Debug.Log("scrollY: " + scrollY + " deltaTime: " + Time.deltaTime + " smoothDeltaTime: " + Time.smoothDeltaTime);
+        }
+#endif
+
+        wheelZoomDelta += scrollY * wheelZoomSpeed * deltaTime;
+        wheelPanDelta += scrollX * wheelPanSpeed * deltaTime;
 
         if ((yawDelta != 0.0f) || 
             (pitchDelta != 0.0f)) {
@@ -162,13 +180,11 @@ public class ProCamera : BridgeObject {
             Vector3 pos =
                 transform.position + moveDeltaRotated;
 
-/*
             pos = 
                 new Vector3(
                     Mathf.Clamp(pos.x, positionMin.x, positionMax.x),
                     Mathf.Clamp(pos.y, positionMin.y, positionMax.y),
                     Mathf.Clamp(pos.z, positionMin.z, positionMax.z));
-*/
 
             transform.position = pos;
         }
@@ -181,13 +197,13 @@ public class ProCamera : BridgeObject {
 
             Vector3 pos =
                 transform.position + zoomDeltaRotated;
-/*
+
             pos = 
                 new Vector3(
                     Mathf.Clamp(pos.x, positionMin.x, positionMax.x),
                     Mathf.Clamp(pos.y, positionMin.y, positionMax.y),
                     Mathf.Clamp(pos.z, positionMin.z, positionMax.z));
-*/
+
             transform.position = pos;
 
         }

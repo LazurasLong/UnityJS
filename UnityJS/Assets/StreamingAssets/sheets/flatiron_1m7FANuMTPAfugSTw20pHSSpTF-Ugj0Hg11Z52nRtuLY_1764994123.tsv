@@ -11,8 +11,8 @@ object
 					
 	cameraStartPosition	object			
 		x	number	0	
-		y	number	355	
-		z	number	-525	
+		y	number	300	
+		z	number	-475	
 	cameraStartRotation	object			
 		x	number	30	
 		y	number	0	

@@ -1,7 +1,5 @@
 fileFormatVersion: 2
 guid: 296f0b9efff2748ae80c4b5d9128f164
-timeCreated: 1523567696
-licenseType: Free
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -103,6 +101,7 @@ PluginImporter:
     second:
       enabled: 0
       settings:
+        AddToEmbeddedBinaries: false
         CompileFlags: 
         FrameworkDependencies: 
   userData: 

@@ -2,19 +2,19 @@ table
 	{ name string	rowOffset number	columnOffset number	type string	suffix string }
 	Name	0	1	cell	Name
 	Years	0	1	row	Year
-	Valuation	1	1	column	Valuation_Type
-	Valuation	1	3	grid	Valuation
-	Financials	1	1	column	Financial_Type
-	Financials	1	3	grid	Financial
-	Markets	1	0	column	Market_Dimension
-	Markets	1	1	column	Market_Type
-	Markets	1	3	grid	Market
-	Units	1	0	column	Unit_Outline
-	Units	1	1	column	Unit_Years
-	Units	1	2	column	Unit_Models
-	Units	1	3	grid	Unit
-	Verbs	1	0	column	Verb
-	Verbs	1	1	column	Subject
-	Verbs	1	3	grid	VerbSubject
-	Models	1	0	column	Model_Type
-	Models	1	3	grid	Model
+	Valuation	0	1	column	Valuation_Type
+	Valuation	0	4	grid	Valuation
+	Financials	0	1	column	Financial_Type
+	Financials	0	4	grid	Financial
+	Markets	0	1	column	Market_Dimension
+	Markets	0	2	column	Market_Type
+	Markets	0	4	grid	Market
+	Units	0	1	column	Unit_Outline
+	Units	0	2	column	Unit_Years
+	Units	0	3	column	Unit_Models
+	Units	0	4	grid	Unit
+	Verbs	0	1	column	Verb
+	Verbs	0	2	column	Subject
+	Verbs	0	4	grid	VerbSubject
+	Models	0	1	column	Model_Type
+	Models	0	4	grid	Model

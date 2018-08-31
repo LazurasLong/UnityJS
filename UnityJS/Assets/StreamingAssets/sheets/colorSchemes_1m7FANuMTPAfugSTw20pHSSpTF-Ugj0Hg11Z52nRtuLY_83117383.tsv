@@ -8,18 +8,18 @@ object
 		string	#ffff00
 			
 	model	array	
-		string	#394762
-		string	#835e3c
-		string	#998264
-		string	#71716c
-		string	#e1cba8
-		string	#8a9350
-		string	#a63c30
-		string	#c49685
-		string	#9c9184
+		string	#673AB7
+		string	#9E3FB0
+		string	#E9437F
+		string	#DB4437
+		string	#F19733
+		string	#F1CE38
+		string	#469689
+		string	#55BDD5
+		string	#3F51B5
 		string	#424243
-		string	#93b3dc
-		string	#bd735b
+		string	#7C66B7
+		string	#C073D1
 		string	#ff0000
 		string	#00ff00
 		string	#0000ff
@@ -44,19 +44,19 @@ object
 		string	#00ffff
 			
 	verbSubject	array	
-		string	#394762
-		string	#835e3c
-		string	#998264
-		string	#71716c
-		string	#e1cba8
-		string	#8a9350
-		string	#a63c30
-		string	#c49685
-		string	#9c9184
-		string	#424243
-		string	#93b3dc
-		string	#bd735b
-		string	#b0d0a0
+		string	#918FB8
+		string	#CDA7D1
+		string	#E99DA0
+		string	#DB4437
+		string	#FBB090
+		string	#F1DFAE
+		string	#EDFF9B
+		string	#A4C1B1
+		string	#B1CBD5
+		string	#8B91B5
+		string	#7C66B7
+		string	#C073D1
+		string	#E9626E
 		string	#00ff00
 		string	#0000ff
 		string	#00ffff
