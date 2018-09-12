@@ -1,38 +1,134 @@
-Name:	AMZN Fresh		Years:	1996	1999	2003	2007	2010	2017	2018
-										
-Valuation:	PreMoney Valuation			157000000	0	0	0	0	0	0
-	Market Capitalization 			0	300000000000	10388488917	39279000000	82080000000	576548710000	971960000000000
-									 	
-Financials:	Revenue			15746000	1140000000	5264000000	14835000000	34204000000	177866000000	231226000000
-	   Net Profit/Loss 			-6000000	-720000000	35000000	476000000	1152000000	3033000000	3943000000
-	   Debt			0	0	0	0	0	0	0
-	   Equity 			0	0	0	0	0	0	0
-										
-Markets:	   ($)	E-Commerce		700000	20000000	11778000000	204000000000	500000000000	2304000000000	3000000000000
-	   ($)	Online Ads		100000	200000	200000	200000	200000	200000	200000
-	   ($)	Broadband Customers		100000	200000	200000	200000	200000	200000	200000
-	   ($)	Mobile Smart Phone Customers 		100000	200000	200000	200000	200000	200000	200000
-	   ($)	Cloud Services		100000	200000	200000	200000	200000	200000	200000
-	   ($)	Retail 		100000	200000	200000	200000	200000	200000	200000
-										
-Units:	  Brick and Mortar Stores	1776-2018	Bricklaying, Mortaring, Painting	50000	20000	20000	20000	20000	20000	20000
-	    Red Bricks	1776-2018	Bricklaying, Mortaring, Painting	60000	30000	30000	30000	30000	30000	30000
-	    Green Bricks	1776-2018	Bricklaying, Mortaring, Painting	70000	40000	40000	40000	40000	40000	40000
-	    Blue Bricks	1776-2018	Bricklaying, Mortaring, Painting	80000	50000	50000	50000	50000	50000	50000
-	  Online Stores	2018	E-Commerce, Product Sales, Subscription	0	60000	60000	60000	60000	60000	60000
-	    One Bits	2018	E-Commerce, Product Sales, Subscription	0	70000	70000	70000	70000	70000	70000
-	    Zero Bits	2018	E-Commerce, Product Sales, Subscription	0	80000	80000	80000	80000	80000	80000
-										
-Verbs:	Lay	Bricks		TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	Cure	Mortar		FALSE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	Paint	Bricks		FALSE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	Write	Code		FALSE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	Debug	Code		FALSE	FALSE	FALSE	FALSE	FALSE	FALSE	FALSE
-	Ship	Code		FALSE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-										
-Models:	Bricklaying			TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	Mortaring			TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	Painting			TRUE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	E-Commerce			FALSE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	Product Sales			FALSE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
-	Subscription			FALSE	TRUE	TRUE	TRUE	TRUE	TRUE	TRUE
+Name:	AMZN Fresh		Years:	1996	1997	1998	1999	2000	2001	2002	2003	2004	2005	2006	2007	2008	2009	2010	2011	2012	2013	2014	2015	2016	2017	2018
+																										
+Valuation:	PreMoney Valuation			157000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+	Market Capitalization 			0	438000000	14700000000	300000000000	10000000000	2859000000	4311000000	10388488917	16322000000	10155000000	21098000000	39279000000	21253000000	59458000000	82080000000	79799000000	113644000000	185437000000	143382000000	322400000000	392937000000	576548710000	971960000000000
+																									 	
+Financials:	Revenue			15746000	147787000	609819000	1140000000	2761983000	3122433000	3932936000	5264000000	6921124000	8490000000	10711000000	14835000000	19166000000	24509000000	34204000000	48077000000	61093000000	74452000000	88988000000	107006000000	135987000000	177866000000	231226000000
+	   Net Profit/Loss 			-6000000	-31000000	-124546000	-720000000	-1411273000	-567277000	-149132000	35000000	588451000	359000000	190000000	476000000	645000000	902000000	1152000000	631000000	-39000000	274000000	-241000000	596000000	2371000000	3033000000	3943000000
+	   Debt			0			0				0				0			0							0	0
+	   Equity 			0			0				0				0			0							0	0
+																										
+Markets:	   ($)	E-Commerce		700000			  				11778000000				 			500000000000							2304000000000	3000000000000
+	   ($)	Online Ads		100000			 				 				 			200000							200000	200000
+	   ($)	Broadband Customers		100000			  				 				 			200000							200000	200000
+	   ($)	Mobile Smart Phone Customers 		100000			   				 				  			200000							200000	200000
+	   ($)	Cloud Services		100000			 				 				 			200000							200000	200000
+	   ($)	Retail 		100000			 				 				 			200000							200000	200000
+																										
+Units:	  Online Stores 	1996-2018	E-Commerce	15746000			 				5152000000				  			33215000000							20000	108354000000
+	      Media	1996-2018	E-Commerce	15746000			 				4049000000				 			14888000000							30000	18420000000
+	      Books	1996-2018	E-Commerce	15746000			 				2834000000				 			5955000000							40000	7368000000
+	      CDs and DVDs	 		0			 				1215000000				  			6700000000							50000	5526000000
+acquire	        Lovefilm	2011-2012		0			 								 			0								0
+	      Amazon Music	 		0			  				 				 			744000000							60000	2763000000
+	      App Store	 		0			 				 				 			0							70000	0
+acquire	      Washington Post			0																						
+	      Other Media			0														1489000000								
+	   Electronics, Merchandise			0							1013000000							18363000000								
+	      Amazon Kindle			0														367000000								
+	      Amazon Fresh			0														18000000								
+acquire	      Acquire Zappos			0														735000000								
+acquire	      Quidsi Diapers.com 	2017-2017		0														918000000								
+acquire	      Underground			0																						
+	      Amazon Alexa			0																						
+	      Amazon Echo			0																						
+acquire	      Souq	2017-		0																						
+acquire	      Pillpack	2018-		0																						
+	      Other Electronics			0							1013000000							16325000000								
+	      Other Merchandise			0																						
+	  Services			0							112000000															
+	      Third Party Services			0							64000000							286000000								
+	         Amazon Marketplaces			0							32000000							57000000								
+	         Third Party Logistics			0							16000000	 						229000000	 							
+	      Subscriptions			0														95000000								
+acquired	        Audible			0														67000000								
+	        Amazon Prime			0														28000000								
+	        Amazon Instant Video			0																						
+ 	   AWS			0														95000000								
+ 	      Mechanical Turk			0														10000000								
+ 	      Amazon Lumberyard			0																						
+ 	      AWS Hosting			0														85000000								
+	        S3			0																						
+	        EC2			0																						
+	 Physical Stores			0																						
+	   Amazon Books - Retail			0																						
+	   Whole Foods			0																						
+	 Advertising and Other			0														477000000								
+	   Amazon Marketing Services			0														429000000								
+acquired	      Askville			0														4000000								
+acquired	      GoodReads			0																						
+acquired	      Twitch			0																						
+	      Amazon Search, other ads 			0														425000000								
+	   Financing 			0														48000000								
+	      Co-Branded Credit Cards			0														48000000								
+	      Amazon Cash			0																						
+	   Acquisitions for Internal Ops			0																						
+	     Kiva Systems	2012-2012		0																						
+	 	 	 	0			80000				 				 			 							80000	80000
+																										
+Verbs:	???? acquisitions here? 	Bricks		TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+	Cure	Mortar		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+	Paint	Bricks		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+	Write	Code		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+	Debug	Code		FALSE			FALSE				FALSE				FALSE			FALSE							FALSE	FALSE
+	Ship	Code		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+																										
+Models:	E-Commerce			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+	Marketplaces			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+	Advertising			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+	Product Sales			FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
+	Pay-Per-Use																									
+	Subscription																									
+	Content Licensing																									
+	Content Development																									
+	Transaction Fee																									
+	Original Content																									
+	Physical Stores																									
+																										
+																										
+																										
+																										
+																										
+	 																									
+	Online Stores 																									
+	   Online Media 																									
+	       Books 																									
+	       CDs DVDs																									
+	       Acquired CD Now 																									
+	       Acquired CreateSpace (self-publish books)																									
+	       Amazon Music																									
+	       App Store																									
+	       Other media																									
+	   Electronics, Tools, Other Online Merchandize																									
+	      Amazon Kindle																									
+	      Amazon Fresh																									
+	      Acquire Zappos																									
+	      Acquire Quidsi Diapers.com (shut down 2017)																									
+	      Amazon Fire Phone (discontinued 2012)																									
+	      Acquired Underground																									
+	      Amazon Alexa 																									
+	      Amazon Echo																									
+	      Other Electronics																									
+	Services 																									
+	   Third Party Seller Fufillment and Services																									
+	      Amazon Marketplaces																									
+	      Third Party Logistics																									
+	   Subscription Services																									
+	      Acquired Audible 																									
+	      Amazon Prime																									
+	      Amazon Instant Video 																									
+	   AWS																									
+	      Mechanical Turk																									
+	       Amazon Lumberyard																									
+	       AWS Hosting																									
+	Physical Stores																									
+	   Amazon Books (retail)																									
+	   Whole Foods																									
+	Other																									
+	   Amazon Marketing Services																									
+	      Askville 																									
+	      Acquired GoodReads																									
+	      Acquired Twitch 																									
+	      Amazon Search and Advertising																									
+	   Co-Branded Credit Cards																									
+	Check																									

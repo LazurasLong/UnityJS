@@ -44,9 +44,6 @@ public class Wire: Tracker {
     public Vector3 toMiddleDistance = new Vector3(-50.0f, 0.0f, 0.0f);
     public Vector3 toMiddleDirection = new Vector3(-40.0f, 0.0f, 0.0f);
 
-    public Transform cursorView;
-    public float cursorValue = 0.5f;
-
     public float wireStart = 0.0f;
     public float wireEnd = 0.0f;
     public float wireHeight = 0.0f;
@@ -61,16 +58,22 @@ public class Wire: Tracker {
     public bool updateLine = false;
     public bool updateLineAlways = false;
 
-    public Mesh mesh;
-    public Material material;
     public Color color = Color.white;
     public Vector3 rotation;
-    public float scale = 1.0f;
+    public float radius = 0.5f;
+    public int sides = 8;
+    public float curveSmallDistance = 0.1f;
+    public float curveStepLength = 1.0f;
+    public float curveLength;
+    public float curveStepSize;
+    public int curveSteps;
     public Spline spline = null;
     public Vector3 splineFromPosition;
     public Vector3 splineToPosition;
     private bool updateSpline = true;
-    public List<GameObject> meshes = new List<GameObject>();
+    public MeshRenderer wireMeshRenderer;
+    public MeshFilter wireMeshFilter;
+    public Mesh wireMesh;
     public bool updateMeshes = true;
 
 
@@ -105,12 +108,10 @@ public class Wire: Tracker {
                 textureOffset = textureOffsetPerSecond * Time.time;
             }
 
-            foreach (GameObject go in meshes) {
-                MeshRenderer mr = go.GetComponent<MeshRenderer>();
-                mr.material = material;
-                mr.material.color = color;
-            }
+            wireMeshRenderer.material.color = color;
+
         }
+
 
         if (fromTransformAttached &&
             (fromTransform != null)) {
@@ -164,12 +165,6 @@ public class Wire: Tracker {
                     Quaternion.AngleAxis(-angle, Vector3.up);
             }
 
-            if (cursorView != null) {
-                cursorView.position = WirePosition(cursorValue);
-                cursorView.rotation =
-                    Quaternion.AngleAxis(-angle, Vector3.up);
-            }
-
         }
 
         if ((splineFromPosition != fromPosition) ||
@@ -216,40 +211,81 @@ public class Wire: Tracker {
 
     public void UpdateMeshes()
     {
-        foreach (GameObject go in meshes) {
-            if (go != null) {
-                if (Application.isPlaying) {
-                    Destroy(go);
-                } else {
-                    DestroyImmediate(go);
-                }
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+        var curves = spline.GetCurves();
+        int curveCount = curves.Count;
+        int curveIndex = 0;
+        Quaternion turnY = Quaternion.Euler(0, -90, 0);
+        bool firstPoint = true;
+        Vector3 lastCurvePoint = Vector3.zero;
+
+        foreach (CubicBezierCurve curve in curves) {
+
+            curveLength = curve.Length;
+            if ((curveLength <= 0.0f) ||
+                (curveStepLength <= 0.0f)) {
+                continue;
             }
+
+            curveSteps = (int)Mathf.Ceil(curveLength / curveStepLength);
+            curveStepSize = curveLength / (float)curveSteps;
+            float curvePos = 0.0f;
+            for (int curveStep = 0; 
+                 curveStep <= curveSteps; 
+                 curveStep++, curvePos = Mathf.Min(curvePos + curveStepSize, curveLength)) {
+                Vector3 curvePoint = curve.GetLocationAtDistance(curvePos);
+                Vector3 curveTangent = curve.GetTangentAtDistance(curvePos);
+                Quaternion q = CubicBezierCurve.GetRotationFromTangent(curveTangent) * turnY;
+
+                if (!firstPoint) {
+                    float distance = (lastCurvePoint - curvePoint).magnitude;
+                    if (distance < curveSmallDistance) {
+                        continue;
+                    }
+                }
+
+                int b = vertices.Count;
+                for (int side = 0; side < sides; side++) {
+                    float ang = (2.0f * Mathf.PI) * ((float)side / (float)sides);
+                    var dx = Mathf.Cos(ang);
+                    var dy = Mathf.Sin(ang);
+                    Vector3 v = 
+                        curvePoint +
+                        (q * new Vector3(0.0f, dx * radius, dy * radius));
+                    vertices.Add(v);
+                }
+
+                if (!firstPoint) {
+                    for (int side1 = 0; side1 < sides; side1++) {
+                        int side2 = (side1 + 1) % sides;
+                        triangles.Add(b + side2 - sides);
+                        triangles.Add(b + side2);
+                        triangles.Add(b + side1);
+                        triangles.Add(b + side1 - sides);
+                        triangles.Add(b + side2 - sides);
+                        triangles.Add(b + side1);
+                    }
+                }
+
+                lastCurvePoint = curvePoint;
+                firstPoint = false;
+            }
+
+            curveIndex++;
         }
 
-        meshes.Clear();
-
-        int i = 0;
-        foreach (CubicBezierCurve curve in spline.GetCurves()) {
-            GameObject go =
-                new GameObject("SplineMesh" + i++, typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshBender));
-            go.transform.parent = transform;
-            go.transform.localRotation = Quaternion.identity;
-            go.transform.localPosition = Vector3.zero;
-            go.transform.localScale = Vector3.one;
-            //go.hideFlags = HideFlags.NotEditable;
-
-            MeshRenderer mr = go.GetComponent<MeshRenderer>();
-            mr.material = material;
-            mr.material.color = color;
-
-            MeshBender mb = go.GetComponent<MeshBender>();
-            mb.SetSourceMesh(mesh, false);
-            mb.SetRotation(Quaternion.Euler(rotation), false);
-            mb.SetCurve(curve, false);
-            mb.SetStartScale(scale, false);
-            mb.SetEndScale(scale);
-            meshes.Add(go);
+        if (wireMesh == null) {
+            wireMesh = new Mesh();
+            wireMesh.MarkDynamic();
+            wireMeshFilter.mesh = wireMesh;
         }
+
+        wireMesh.triangles = new int[0];
+        wireMesh.vertices = vertices.ToArray();
+        wireMesh.triangles = triangles.ToArray();
+
+        wireMesh.RecalculateNormals();
 
         updateMeshes = false;
     }

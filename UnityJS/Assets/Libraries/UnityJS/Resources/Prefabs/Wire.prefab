@@ -21,6 +21,8 @@ GameObject:
   - component: {fileID: 4989061808383754}
   - component: {fileID: 114882635812084054}
   - component: {fileID: 114042512987522786}
+  - component: {fileID: 33523702359175888}
+  - component: {fileID: 23963527893892186}
   m_Layer: 0
   m_Name: Wire
   m_TagString: Untagged
@@ -41,6 +43,48 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &23963527893892186
+MeshRenderer:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1638243325637548}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
+  m_Materials:
+  - {fileID: 2100000, guid: 3b9ef3f9ea4174990b93c610a40701e4, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &33523702359175888
+MeshFilter:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1638243325637548}
+  m_Mesh: {fileID: 0}
 --- !u!114 &114042512987522786
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -247,8 +291,6 @@ MonoBehaviour:
   toEndDirection: {x: -10, y: 0, z: 0}
   toMiddleDistance: {x: -50, y: 0, z: 0}
   toMiddleDirection: {x: -40, y: 0, z: 0}
-  cursorView: {fileID: 0}
-  cursorValue: 0.5
   wireStart: 0
   wireEnd: 0
   wireHeight: 0
@@ -260,13 +302,19 @@ MonoBehaviour:
   updateMaterialAlways: 0
   updateLine: 0
   updateLineAlways: 0
-  mesh: {fileID: 4300002, guid: 22f875f3066754ca08e7f27c39bbab7a, type: 3}
-  material: {fileID: 2100000, guid: b01a611afcb0246feafc3108c3d28227, type: 2}
   color: {r: 1, g: 1, b: 1, a: 1}
   rotation: {x: 0, y: 0, z: 90}
-  scale: 1
+  radius: 0.5
+  sides: 8
+  curveSmallDistance: 0.1
+  curveStepLength: 1
+  curveLength: 0
+  curveStepSize: 0
+  curveSteps: 0
   spline: {fileID: 0}
   splineFromPosition: {x: 0, y: 0, z: 0}
   splineToPosition: {x: 0, y: 0, z: 0}
-  meshes: []
+  wireMeshRenderer: {fileID: 23963527893892186}
+  wireMeshFilter: {fileID: 33523702359175888}
+  wireMesh: {fileID: 0}
   updateMeshes: 1

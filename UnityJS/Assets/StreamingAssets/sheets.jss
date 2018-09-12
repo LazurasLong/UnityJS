@@ -930,7 +930,7 @@ if (gGoogleSheets) {
             //console.log("LIVE sheetURL", sheetURL);
 
             // Always use the proxy for now.
-            params.proxyPrefix = 'https://donhopkins.com/home/_p/miniProxy.php';
+            params.proxyPrefix = '/_p/miniProxy.php';
 
             if (params.proxyPrefix) {
                 sheetURL = params.proxyPrefix + '?' + sheetURL;

@@ -192,6 +192,25 @@ function CreatePrivate()
         'component:ProCamera/wheelPanSpeed': tuning.cameraWheelPanSpeed
     });
 
+    if (tuning.probes) {
+        for (var row = 0; row < tuning.probeRows; row++) {
+            for (var column = 0; column < tuning.probeColumns; column++) {
+                var x = (column - (tuning.probeColumns / 2)) * tuning.probeSpacing;
+                var z = (row - (tuning.probeRows / 2)) * tuning.probeSpacing;
+                var probe = CreatePrefab({
+                    prefab: 'Prefabs/ReflectionProbe',
+                    update: {
+                        'transform/position': {
+                            x: x,
+                            y: tuning.probeHeight,
+                            z: z
+                        }
+                    }
+                });
+            }
+        }
+    }
+
 }
 
 
@@ -1175,11 +1194,6 @@ function CreateCompany(company)
                         var dy = results.mousePosition.y - obj.dragStartPosition.y;
                         if (dx || dy) {
                             obj.dragMoved = true;
-                            companyObject.bundleObjects.forEach(function (bundleObject) {
-                                UpdateObject(bundleObject, {
-                                    'gameObject/method:SetActive': [false]
-                                });
-                            });
                         }
                     }
                 },
@@ -1195,13 +1209,6 @@ function CreateCompany(company)
                         }
 
                         obj.dragMoved = false;
-
-                        companyObject.bundleObjects.forEach(function (bundleObject) {
-                            UpdateObject(bundleObject, {
-                                'gameObject/method:SetActive': [true]
-                            });
-                        });
-
                     }
                 }
             }
@@ -1757,7 +1764,7 @@ function CreateCompany(company)
                                     worldPositionStays: false,
                                     update: {
                                         "transform/localPosition": {x: dx, y: 0, z: dy},
-                                        "component:MeshRenderer/materials": [tuning.material],
+                                        //"component:MeshRenderer/materials": [tuning.material],
                                         "component:MeshRenderer/material/color": modelColor
                                     },
                                     interests: {

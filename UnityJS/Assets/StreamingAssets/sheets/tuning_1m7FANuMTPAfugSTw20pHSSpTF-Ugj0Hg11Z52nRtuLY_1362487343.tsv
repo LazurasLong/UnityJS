@@ -50,7 +50,7 @@ object		Tuning parameters.
 	highlightColor	string	#00ffff	
 	hoverDelay	number	0.25	
 	infoPanelColor	string	#ffffff	
-	infoPanelHeight	number	210	
+	infoPanelHeight	number	230	
 	infoPanelMarketFontColor	string	#000000	
 	infoPanelMarketFontName	string	Rubik	
 	infoPanelMarketFontSize	number	16	
@@ -97,7 +97,7 @@ object		Tuning parameters.
 	infoPanelUnitModelFontName	string	Rubik	
 	infoPanelUnitModelFontSize	number	12	
 	infoPanelUnitModelFontStyle	string	normal	
-	infoPanelUnitModelGap	number	10	
+	infoPanelUnitModelGap	number	5	
 	infoPanelUnitModelIndent	number	30	
 	infoPanelUnitValueFontColor	string	#606060	
 	infoPanelUnitValueFontName	string	Rubik	
@@ -122,6 +122,11 @@ object		Tuning parameters.
 	modelColorScheme	string	model	
 	modelHighlightEffect	string	Magic_Aura_01	
 	modelHighlightScale	number	2	
+	probe	boolean	FALSE	
+	probeRows	number	4	
+	probeColumns	number	8	
+	probeSpacing	number	100	
+	probeHeight	number	30	
 	unitAngularDrag	number	0.7	
 	unitArrowRainbowType	string	arrow	
 	unitArrows	boolean	TRUE	

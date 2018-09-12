@@ -28,7 +28,7 @@ Total (Check)	 		$16	$5,264	$34,204	$177,866
  	 							
 Business Units JenAnalyzed								
 Online Stores 	1995	E-Commerce, Product Sales, Subscription, Marketplaces, Content Licensing	$15.746	$5,152	$33,251	$108,354		
-   BooksMusicCDsDVDs = "Media" Online	1995	E-Commerce, Product Sales, Subscription, Marketplaces, Content Licensing	$15.746	$4,049	$14,888	$18,420		
+   Online Media 	1995	E-Commerce, Product Sales, Subscription, Marketplaces, Content Licensing	$15.746	$4,049	$14,888	$18,420		
        Books 	1994	E-Commerce	$15.746	$2,834	$5,955	$7,368		
        CDs DVDs	1998	E-Commerce, Product Sales, Subscription, Marketplaces, Content Licensing	$0	$1,215	$6,700	$5,526		
        Amazon Music	2011	Marketplaces	$0	$0	$744	$2,763		
@@ -53,8 +53,8 @@ Services 	2006	Pay-Per-Use, Subscription, Content Licensing, Original Content, M
       Amazon Instant Video 	2015	Subscription, Content Licensing, Original Content 	$0	$0	$0	$972		
    AWS	2016	Pay-Per-Use	$0	$0	$95	$17,459		
       Mechanical Turk	2016	Pay-Per-Use	$0	$0	$10	$175		
-       Amazon Lumberyard	2017	Pay-Per-Use	$0	$0	$0	$175		
-       AWS Hosting	2004	Pay-Per-Use	$0	$0	$86	$17,110		
+      Amazon Lumberyard	2017	Pay-Per-Use	$0	$0	$0	$175		
+      AWS Hosting	2004	Pay-Per-Use	$0	$0	$86	$17,110		
 Physical Stores	2004	Physical Stores	$0	$0	$0	$5,798		
    Amazon Books (retail)	2006-2013	Physical Stores	$0	$0	$0	$1,276		
    Whole Foods	2013	Physical Stores	$0	$0	$0	$4,522		
