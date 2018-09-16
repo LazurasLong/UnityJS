@@ -33,7 +33,7 @@ function CreatePrivate()
     {
         DestroyHighlight(target);
         target.highlightObject = CreatePrefab({
-            prefab: effects.dir + '/' + name,
+            prefab: name,
             parent: 'object:' + target.id,
             worldPositionStays: false,
             update: {
@@ -63,7 +63,7 @@ function CreatePrivate()
             //console.log("effects enter item", item.label);
             delete item.selected;
             if (!item.stayUp && item.label) {
-                CreateHighlight(target, item.label);
+                CreateHighlight(target, effects.dir + '/' + item.label);
             }
         },
         onexititem: function(item, slice, pie, target) {
@@ -561,7 +561,7 @@ function CreateCompany(company)
             } else {
 
                 obj.highlightObject = CreatePrefab({
-                    prefab: world.prefabMap.effects.dir + '/' + effect,
+                    prefab: effect,
                     parent: 'object:' + obj.id,
                     worldPositionStays: false,
                     update: update
@@ -761,7 +761,7 @@ function CreateCompany(company)
     }
 
 
-    function HighlightModels(modelIndexes)
+    function HighlightModels(modelIndexes, cameraAttraction)
     {
         // company.companyObject.yearObjects[].unitObjects[].modelObjects[]
         //console.log("HighlightModels", modelIndexes && modelIndexes.join(','));
@@ -773,7 +773,8 @@ function CreateCompany(company)
                 z: tuning.modelHighlightScale
             },
             'component:ParticleSystem/main/scalingMode': 'Hierarchy',
-            'component:ParticleSystemRenderer/alignment': 'View'
+            'component:ParticleSystemRenderer/alignment': 'View',
+            'component:CameraAttractionForce/cameraAttraction': cameraAttraction
         };
 
         company.companyObject.yearObjects.forEach(function (yearObject) {
@@ -1096,7 +1097,7 @@ function CreateCompany(company)
     }
 
 
-    function HighlightUnits(unitIndexes)
+    function HighlightUnits(unitIndexes, cameraAttraction)
     {
         // company.companyObject.yearObjects[].unitObjects[]
 
@@ -1107,7 +1108,8 @@ function CreateCompany(company)
                 z: tuning.unitHighlightScale
             },
             'component:ParticleSystem/main/scalingMode': 'Hierarchy',
-            'component:ParticleSystemRenderer/alignment': 'View'
+            'component:ParticleSystemRenderer/alignment': 'View',
+            'component:CameraAttractionForce/cameraAttraction': cameraAttraction
         };
 
         company.companyObject.yearObjects.forEach(function (yearObject) {
@@ -1710,13 +1712,13 @@ function CreateCompany(company)
                                     handler: function(unitObject, results) {
                                         //console.log("MouseEnter unitObject", unitObject, "unit", unit, "unitIndex", unit.unitIndex, "yearIndex", yearIndex);
                                         DescribeUnit(unit, yearIndex);
-                                        HighlightUnits([unit.unitIndex]);
+                                        HighlightUnits([unit.unitIndex], 0);
                                     }
                                 },
                                 MouseExit: {
                                     handler: function(unitObject, results) {
                                         //console.log("MouseExit unitObject", unitObject, "unit", unit, "unitIndex", unit.unitIndex, "yearIndex", yearIndex);
-                                        HighlightUnits(null);
+                                        HighlightUnits(null, 0);
                                     }
                                 }
                             },
@@ -1772,13 +1774,13 @@ function CreateCompany(company)
                                             handler: function(modelObject, results) {
                                                 //console.log("MouseEnter modelObject", "unitModelIndex", unitModelIndex, "unitIndex", unit.unitIndex, "yearIndex", yearIndex);
                                                 DescribeModel(modelIndex, unit.unitIndex, yearIndex);
-                                                HighlightModels([modelIndex]);
+                                                HighlightModels([modelIndex], 0);
                                             }
                                         },
                                         MouseExit: {
                                             handler: function(unit, results) {
                                                 //console.log("MouseEnter modelObject", "modelIndex", modelIndex, "yearIndex", yearIndex);
-                                                HighlightModels(null);
+                                                HighlightModels(null, 0);
                                             }
                                         }
                                     }
@@ -2143,7 +2145,7 @@ function CreateCompany(company)
                             onenteritem: function(item, slice, pie, target) {
                                 var unitIndexes = GetAllUnitIndexes(subUnit);
                                 DescribeUnit(subUnit, -1);
-                                HighlightUnits(unitIndexes);
+                                HighlightUnits(unitIndexes, tuning.unitHighlightEffectCameraAttraction);
                             },
                             stayUp: !hasChildren,
                             pieID: subPieID
@@ -2166,15 +2168,15 @@ function CreateCompany(company)
             unit: unit,
             onenterpiecenter: function(item, slice, pie, target) {
                 var unitIndexes = GetAllUnitIndexes(unit);
-                HighlightUnits(unitIndexes);
+                HighlightUnits(unitIndexes, tuning.unitHighlightEffectCameraAttraction);
             },
             onstartpie: function(pie, target) {
                 var unitIndexes = GetAllUnitIndexes(unit);
-                HighlightUnits(unitIndexes);
+                HighlightUnits(unitIndexes, tuning.unitHighlightEffectCameraAttraction);
             },
             onstoppie: function(pie, target) {
                 if (unit.parent == null) {
-                    HighlightUnits(null);
+                    HighlightUnits(null, tuning.unitHighlightEffectCameraAttraction);
                 }
             }
         };
@@ -2219,11 +2221,11 @@ function CreateCompany(company)
                     onenteritem: function(item, slice, pie, target) {
                         //console.log("Item Model Enter", modelName);
                         DescribeModel(modelIndex, -1, -1);
-                        HighlightModels([modelIndex]);
+                        HighlightModels([modelIndex], tuning.modelHighlightEffectCameraAttraction);
                     },
                     onexititem: function(item, slice, pie, target) {
                         //console.log("Item Model Exit", modelName);
-                        HighlightModels(null);
+                        HighlightModels(null, tuning.modelHighlightEffectCameraAttraction);
                     }
                 }
             ]

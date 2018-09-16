@@ -117,10 +117,11 @@ object		Tuning parameters.
 	infoPanelVerbSubjectIndent	number	15	
 	infoPanelWidth	number	420	
 	marketColorScheme	string	market	
-	marketHighlightEffect	string	Magic_Aura_02	
+	marketHighlightEffect	string	Magic_Particle_Effects/Effects/Magic_Aura_02	
 	marketHighlightScale	number	20	
 	modelColorScheme	string	model	
-	modelHighlightEffect	string	Magic_Aura_01	
+	modelHighlightEffect	string	Prefabs/ModelHighlightEffect	
+	modelHighlightEffectCameraAttraction	number	50	
 	modelHighlightScale	number	2	
 	probe	boolean	FALSE	
 	probeRows	number	4	
@@ -144,7 +145,8 @@ object		Tuning parameters.
 	unitDrag	number	2	
 	unitEnableCollision	boolean	TRUE	
 	unitEnabled	boolean	TRUE	
-	unitHighlightEffect	string	Cell_02	
+	unitHighlightEffect	string	Prefabs/UnitHighlightEffect	
+	unitHighlightEffectCameraAttraction	number	50	
 	unitHighlightScale	number	2	
 	unitInitialDistance	number	20	
 	unitIsKinematic	boolean	FALSE	
@@ -156,13 +158,13 @@ object		Tuning parameters.
 	unitPhysicMaterial	string	PhysicMaterials/LowFrictionLowBounce	
 	unitRadiusExtra	number	1	
 	unitRadiusHuff	number	0	
-	unitSizeMax	number	20	
+	unitSizeMax	number	100	
 	unitSizeMin	number	10	
 	unitSpring	number	20	
 	unitTolerance	number	0.1	
 	unitUseGravity	boolean	FALSE	
 	verbSubjectColorScheme	string	verbSubject	
-	verbSubjectHighlightEffect	string	Magic_Ring_04	
+	verbSubjectHighlightEffect	string	Magic_Particle_Effects/Effects/Magic_Ring_04	
 	verbSubjectHighlightScale	number	3	
 	yearAngularDrag	number	0	
 	yearBeforeDelay	number	10	

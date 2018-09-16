@@ -6,8 +6,8 @@ object
 	modelColorScheme	string	model		
 	marketColorScheme	string	market		
 	verbSubjectColorScheme	string	verbSubject		
-	unitSizeMin	number	10		
-	unitSizeMax	number	30		
+	unitSizeMin	number	5		
+	unitSizeMax	number	50		
 					
 	cameraStartPosition	object			
 		x	number	0	
