@@ -744,6 +744,7 @@ function CreatePieTracker()
         //pie.clockwise = false;
 
         pieTracker.tracking = true;
+        pieTracker.justSelected = false;
         pieTracker.pinned = pinned;
         pieTracker.target = target;
         pieTracker.slices = pie.slices ? pie.slices.length : 0;
@@ -812,6 +813,7 @@ function CreatePieTracker()
 
             HidePie();
 
+            pieTracker.justSelected = true;
             pieTracker.tracking = false;
 
             UpdateObject(pieTracker, {
@@ -862,6 +864,8 @@ function CreatePieTracker()
         } else {
             TrackPie(pieTracker.mousePosition, 0.0, 0.0, -1, -1, true);
         }
+
+        pieTracker.justSelected = false;
 
         if (nextPieID) {
             StartPie(pieTracker.mousePosition, nextPieID, pieTracker.target, true);

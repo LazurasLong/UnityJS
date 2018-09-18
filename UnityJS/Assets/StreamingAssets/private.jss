@@ -654,9 +654,9 @@ function CreateCompany(company)
 
     function HighlightVerbSubjects(verbSubjectIndexes)
     {
-        // company.companyObject.yearObjects[].bundleObject.wireObjects[].fromBudObject|toBudObject
+        // companyObject.yearObjects[].bundleObject.wireObjects[].fromBudObject|toBudObject
 
-        company.companyObject.yearObjects.forEach(function (yearObject) {
+        companyObject.yearObjects.forEach(function (yearObject) {
 
             yearObject.bundleObject.wireObjects.forEach(function (wireObject) {
 
@@ -763,7 +763,7 @@ function CreateCompany(company)
 
     function HighlightModels(modelIndexes, cameraAttraction)
     {
-        // company.companyObject.yearObjects[].unitObjects[].modelObjects[]
+        // companyObject.yearObjects[].unitObjects[].modelObjects[]
         //console.log("HighlightModels", modelIndexes && modelIndexes.join(','));
 
         var update = {
@@ -777,7 +777,7 @@ function CreateCompany(company)
             'component:CameraAttractionForce/cameraAttraction': cameraAttraction
         };
 
-        company.companyObject.yearObjects.forEach(function (yearObject) {
+        companyObject.yearObjects.forEach(function (yearObject) {
 
             yearObject.unitObjects.forEach(function (unitObject) {
 
@@ -876,11 +876,11 @@ function CreateCompany(company)
 
     function HighlightMarkets(marketIndexes)
     {
-        // company.companyObject.yearObjects[].anchorObject.baseObject.tiles
+        // companyObject.yearObjects[].anchorObject.baseObject.tiles
 
         //console.log("HighlightMarkets", "marketIndexes", marketIndexes);
 
-        company.companyObject.yearObjects.forEach(function (yearObject) {
+        companyObject.yearObjects.forEach(function (yearObject) {
 
             var baseObject = yearObject.anchorObject.baseObject;
 
@@ -1033,7 +1033,7 @@ function CreateCompany(company)
                 pos.x = tuning.infoPanelUnitYearIndent;
                 pos.y = top;
 
-                company.companyObject.yearObjects.forEach(function (yearObject, yearIndex) {
+                companyObject.yearObjects.forEach(function (yearObject, yearIndex) {
                     pos.y += tuning.infoPanelUnitModelFontSize;
 
                     var yearLabel = '' + yearObject.year;
@@ -1099,7 +1099,7 @@ function CreateCompany(company)
 
     function HighlightUnits(unitIndexes, cameraAttraction)
     {
-        // company.companyObject.yearObjects[].unitObjects[]
+        // companyObject.yearObjects[].unitObjects[]
 
         var update = {
             'transform/localScale': {
@@ -1112,7 +1112,7 @@ function CreateCompany(company)
             'component:CameraAttractionForce/cameraAttraction': cameraAttraction
         };
 
-        company.companyObject.yearObjects.forEach(function (yearObject) {
+        companyObject.yearObjects.forEach(function (yearObject) {
 
             yearObject.unitObjects.forEach(function (unitObject) {
 
@@ -1126,6 +1126,76 @@ function CreateCompany(company)
 
         });
 
+    }
+
+
+    function PuffYearSoon(yearIndex, puffedUp)
+    {
+        var baseObject = companyObject.yearObjects[yearIndex].baseObject;
+
+        if (puffedUp == baseObject.wannaPuff) {
+            return;
+        }
+
+        baseObject.wannaPuff = puffedUp;
+        if (baseObject.gonnaPuff) {
+            return;
+        }
+
+        window.setTimeout(function() {
+
+            var animations = [];
+            var leafUnitObjects = baseObject.yearObject.leafUnitObjects;
+            baseObject.puffedUp = baseObject.wannaPuff;
+
+            if (baseObject.puffedUp) {
+
+                // Puff up all of this base's leaf units.
+                for (var i = 0, n = leafUnitObjects.length; i < n; i++) {
+
+                    var unit = leafUnitObjects[i];
+
+                    animations.push({
+                        command: 'scale',
+                        target: 'object:' + unit.unitObject.id + '/transform:Collider',
+                        time: tuning.unitColliderPuffTime,
+                        to: tuning.unitColliderPuff
+                    });
+
+                    UpdateObject(unit.unitObject, {
+                        'component:SpringJoint/anchor': unit.anchor
+                    });
+
+                }
+
+            } else {
+
+                // Un-puff all of the current base's units.
+                for (var i = 0, n = leafUnitObjects.length; i < n; i++) {
+
+                    var unit = leafUnitObjects[i];
+
+                    animations.push({
+                        command: 'scale',
+                        target: 'object:' + unit.unitObject.id + '/transform:Collider',
+                        time: tuning.unitColliderUnPuffTime,
+                        to: 1
+                    });
+
+                    UpdateObject(unit.unitObject, {
+                        'component:SpringJoint/anchor': {}
+                    });
+
+                }
+
+            }
+
+            // Perform all the animations, if any.
+            if (animations.length > 0) {
+                AnimateObject(baseObject, animations);
+            }
+
+        }, 0);
     }
 
 
@@ -1290,80 +1360,7 @@ function CreateCompany(company)
                 },
                 MouseDown: { // MouseDown on baseObject.
                     handler: function (obj, results) {
-
-                        var animations = [];
-
-                        // Select or toggle this base as the current base.
-                        // First deselect the current base, if there is one.
-                        if (companyObject.currentBaseObject) {
-
-                            // If the current base has a year, then un-puff all of its units and move it back down.
-                            var yearObject = companyObject.currentBaseObject.yearObject;
-                            if (yearObject != null) {
-
-                                // Un-puff all of the current base's units.
-                                for (var i = 0, n = yearObject.leafUnitObjects.length; i < n; i++) {
-
-                                    var unit = yearObject.leafUnitObjects[i];
-
-                                    animations.push({
-                                        command: 'scale',
-                                        target: 'object:' + unit.unitObject.id + '/transform:Collider',
-                                        time: tuning.unitColliderUnPuffTime,
-                                        to: 1
-                                    });
-
-                                    UpdateObject(unit.unitObject, {
-                                        'component:SpringJoint/anchor': {}
-                                    });
-
-                                }
-
-                            }
-                        }
-
-                        // If this was already the current base, then toggle off.
-                        if (companyObject.currentBaseObject == obj) {
-
-                            // Now no base is selected.
-                            companyObject.currentBaseObject = null;
-
-                        } else {
-
-                            // Select this base as the current base.
-                            companyObject.currentBaseObject = obj;
-
-                            // If this base has a year, then puff all of its units and move it up.
-                            var yearObject = obj.yearObject;
-                            if (yearObject != null) {
-
-                                // Puff up all of this base's leaf units.
-                                for (var i = 0, n = yearObject.leafUnitObjects.length; i < n; i++) {
-
-                                    var unit = yearObject.leafUnitObjects[i];
-
-                                    animations.push({
-                                        command: 'scale',
-                                        target: 'object:' + unit.unitObject.id + '/transform:Collider',
-                                        time: tuning.unitColliderPuffTime,
-                                        to: tuning.unitColliderPuff
-                                    });
-
-                                    UpdateObject(unit.unitObject, {
-                                        'component:SpringJoint/anchor': unit.anchor
-                                    });
-
-                                }
-
-                            }
-
-                        }
-
-                        // Perform all the animations, if any.
-                        if (animations.length > 0) {
-                            AnimateObject(obj, animations);
-                        }
-
+                        PuffYearSoon(yearIndex, !obj.puffedUp);
                     }
                 }
             }
@@ -1881,9 +1878,9 @@ function CreateCompany(company)
                                 'fromTransform!': 'object:' + fromID + '/transform',
                                 'toTransform!': 'object:' + toID + '/transform',
                                 fromWidth: 0,
-                                fromHeight: verbSubjectCount,
+                                fromHeight: verbSubjectCount * tuning.bundleWireSpread,
                                 toWidth: 0,
-                                toHeight: verbSubjectCount,
+                                toHeight: verbSubjectCount * tuning.bundleWireSpread,
                                 fromRotation: 90,
                                 toRotation: -90,
                                 updateWireHeight: false,
@@ -1994,6 +1991,7 @@ function CreateCompany(company)
                                     update: {
                                         wireStart: 0,
                                         wireEnd: 1,
+                                        radius: tuning.bundleWireRadius,
                                         fromEndDistance: { x: 0.0, y: 0.0, z: 0.0 },
                                         fromEndDirection: { x: 5.0, y: 0.0, z: 0.0 },
                                         fromMiddleDistance: { x: 10.0, y: 0.0, z: 0.0 },
@@ -2281,22 +2279,34 @@ function CreateCompany(company)
         sliceSize: topSliceSize
     });
 
-    for (var yearIndex = 0; yearIndex < yearCount; yearIndex++) {
-        (function (yearIndex) {
-            var year = years[yearIndex];
-            slices.push({
-                items: [
-                    {
-                        label: '' + year,
-                        onselectitem: function(item, slice, pie, target) {
-                            FocusYear(company, yearIndex);
+    years.forEach(function (year, yearIndex) {
+        slices.push({
+            items: [
+                {
+                    label: '' + year,
+                    onenteritem: function(item, slice, pie, target) {
+                        for (var i = 0; i < years.length; i++) {
+                            PuffYearSoon(i, i == yearIndex);
+                        }
+                    },
+                    onexititem: function(item, slice, pie, target) {
+                        if (!globals.pieTracker.justSelected) {
+                            for (var i = 0; i < years.length; i++) {
+                                PuffYearSoon(yearIndex, false);
+                            }
+                        }
+                    },
+                    onselectitem: function(item, slice, pie, target) {
+                        FocusYear(company, yearIndex);
+                        for (var i = 0; i < years.length; i++) {
+                            PuffYearSoon(i, i == yearIndex);
                         }
                     }
-                ],
-                sliceSize: topSliceSize
-            });
-        })(yearIndex);
-    }
+                }
+            ],
+            sliceSize: topSliceSize
+        });
+    });
 
     slices.push({
         items: [
@@ -2304,6 +2314,21 @@ function CreateCompany(company)
                 label: 'All',
                 onselectitem: function() {
                     FocusCompany(company);
+                    for (var yearIndex = 0; yearIndex < years.length; yearIndex++) {
+                        PuffYearSoon(yearIndex, true);
+                    }
+                },
+                onenteritem: function(item, slice, pie, target) {
+                    for (var yearIndex = 0; yearIndex < years.length; yearIndex++) {
+                        PuffYearSoon(yearIndex, true);
+                    }
+                },
+                onexititem: function(item, slice, pie, target) {
+                    if (!globals.pieTracker.justSelected) {
+                        for (var yearIndex = 0; yearIndex < years.length; yearIndex++) {
+                            PuffYearSoon(yearIndex, false);
+                        }
+                    }
                 }
             }
         ],
