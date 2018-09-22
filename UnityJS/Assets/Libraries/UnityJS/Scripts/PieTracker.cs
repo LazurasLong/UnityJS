@@ -36,6 +36,8 @@ public class PieTracker : Tracker {
     public bool clockwise = true;
     public float inactiveDistance = 30.0f;
     public float itemDistance = 30.0f;
+    public bool pinned = false;
+    public bool pinToCursor = true;
     public JObject _pie;
     public bool pieChanged = true;
 
@@ -214,6 +216,12 @@ public class PieTracker : Tracker {
 
         if (!mousePositionChanged) {
             return;
+        }
+
+        if (pinned &&
+            pinToCursor &&
+            !mouseDown) {
+            mousePositionStart = mousePosition;
         }
 
         mousePositionDelta = mousePosition - mousePositionStart;

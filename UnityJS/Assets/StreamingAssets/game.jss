@@ -729,7 +729,7 @@ function CreatePieTracker()
 
     function StartPie(position, pieID, target, pinned)
     {
-        //console.log("StartPie", "position", position.x, position.y, "pieID", pieID, "target", target, "pinned", pinned, "PIES", Object.keys(pieTracker.pies));
+        console.log("StartPie", "position", position.x, position.y, "pieID", pieID, "target", target, "pinned", pinned, "PIES", Object.keys(pieTracker.pies));
 
         var pie = pieTracker.pie = 
             pieTracker.pies[pieID] ||
@@ -748,10 +748,10 @@ function CreatePieTracker()
         pieTracker.pinned = pinned;
         pieTracker.target = target;
         pieTracker.slices = pie.slices ? pie.slices.length : 0;
-        pieTracker.piePosition = position;
 
         UpdateInterests(pieTracker, {
-            MousePositionChanged: true
+            MousePositionChanged: true,
+            pinned: pinned
         });
 
         var initialDirection = SearchDefault('initialDirection', pie, pieTracker.initialDirection);
@@ -759,6 +759,7 @@ function CreatePieTracker()
         var clockwise = SearchDefault('clockwise', pie, pieTracker.clockwise);
         var inactiveDistance = SearchDefault('inactiveDistance', pie, pieTracker.inactiveDistance);
         var itemDistance = SearchDefault('itemDistance', pie, pieTracker.itemDistance);
+        var pinToCursor = SearchDefault('pinToCursor', pie, pieTracker.pinToCursor);
         //console.log("pieTrackerView:", pieTrackerView);
 
         UpdateObject(pieTracker, {
@@ -766,6 +767,8 @@ function CreatePieTracker()
             mousePositionChanged: true,
             mousePositionStart: position,
             mousePositionLast: {x: -1, y: -1},
+            pinned: false,
+            pinToCursor: pinToCursor,
             slices: pieTracker.slices,
             initialDirection: initialDirection,
             subtend: subtend,
@@ -774,6 +777,7 @@ function CreatePieTracker()
             itemDistance: itemDistance
         });
 
+        console.log("StartPie TrackPie");
         TrackPie(position, 0.0, 0.0, -1, -1, true);
 
         HandleStartPie(pie, target);
@@ -785,7 +789,7 @@ function CreatePieTracker()
 
     function StopPie()
     {
-        //console.log("StopPie", "pieTracker.tracking", pieTracker.tracking, "pieTracker.pie" , pieTracker.pie);
+        console.log("StopPie", "pieTracker.tracking", pieTracker.tracking, "pieTracker.pie" , pieTracker.pie);
 
         var pie = pieTracker.pie;
         if (!pie)  {
@@ -797,6 +801,10 @@ function CreatePieTracker()
             !pieTracker.pinned &&
            (pieTracker.sliceIndex < 0)) {
             pieTracker.pinned = true;
+console.log("PINNED true");
+            UpdateObject(pieTracker, {
+                pinned: true
+            });
             return;
         }
 
@@ -809,15 +817,20 @@ function CreatePieTracker()
                pie.slices[pieTracker.sliceIndex].items[pieTracker.itemIndex] &&
                pie.slices[pieTracker.sliceIndex].items[pieTracker.itemIndex].stayUp)));
 
+console.log("stayUp", stayUp);
+
         if (!stayUp) {
 
             HidePie();
 
+            console.log("setting justSelected true");
             pieTracker.justSelected = true;
             pieTracker.tracking = false;
+            pieTracker.pinned = false;
 
             UpdateObject(pieTracker, {
-                trackingMousePosition: false
+                trackingMousePosition: false,
+                pinned: false
             });
 
             var nextPieID = null;
@@ -862,10 +875,14 @@ function CreatePieTracker()
         if (stayUp) {
             // TODO: Make sure the current item gets reselected without flickering.
         } else {
+console.log("stayUp so TrackPie");
             TrackPie(pieTracker.mousePosition, 0.0, 0.0, -1, -1, true);
         }
 
+        console.log("setting justSelected false");
         pieTracker.justSelected = false;
+
+        console.log("nextPieID", nextPieID);
 
         if (nextPieID) {
             StartPie(pieTracker.mousePosition, nextPieID, pieTracker.target, true);
@@ -1165,6 +1182,7 @@ function CreatePieTracker()
 
     function ShowPie(position)
     {
+        console.log("ShowPie");
         var pie = pieTracker.pie;
         if (!pie) {
             return;
@@ -1172,7 +1190,33 @@ function CreatePieTracker()
 
         LayoutPie(pie);
 
+        MovePie(pie, position);
+
+        UpdateObject(globals.proCamera, {
+            'trackerProxy/target!': 'object:' + pieTracker.id,
+            'trackerProxy/gameObject/method:SetActive': [true]
+        });
+
+        UpdateObject(pie.groupObject, {
+            'gameObject/method:SetActive': [true]
+        });
+
+        var target = pieTracker.target;
+
+        HandleShowPie(pie, target);
+        DrawPieBackground(pie, target);
+    }
+
+
+    function MovePie(pie, position)
+    {
+        console.log("MovePie", "pie", pie, "position", position);
+
         pie.position = position;
+
+        if (!pie.groupObject) {
+            return;
+        }
 
         var cx = pieTracker.screenSize.x * 0.5;
         var cy = pieTracker.screenSize.y * 0.5;
@@ -1183,26 +1227,17 @@ function CreatePieTracker()
         };
 
         UpdateObject(pie.groupObject, {
-            'component:RectTransform/anchoredPosition': screenPosition,
-            'gameObject/method:SetActive': [true]
+            'component:RectTransform/anchoredPosition': screenPosition
         });
 
-        UpdateObject(globals.proCamera, {
-            'trackerProxy/target!': 'object:' + pieTracker.id,
-            'trackerProxy/gameObject/method:SetActive': [true]
-        });
-
-        var target = pieTracker.target;
-
-        HandleShowPie(pie, target);
-        DrawPieBackground(pie, target);
     }
 
 
     function HidePie()
     {
+        console.log("HidePie");
+
         var pie = pieTracker.pie;
-        var target = pieTracker.target;
         if (!pie || !pie.groupObject) {
             return;
         }
@@ -1218,7 +1253,7 @@ function CreatePieTracker()
 
         //DeconstructPie(pie);
 
-        HandleHidePie(pie, target);
+        HandleHidePie(pie, pieTracker.target);
     }
 
 
@@ -1227,10 +1262,22 @@ function CreatePieTracker()
         //console.log("TrackPie", "pieTracker.tracking", pieTracker.tracking, "pieTracker.pie" , pieTracker.pie);
 
         var pie = pieTracker.pie;
-        var target = pieTracker.target;
         if (!pie)  {
             console.log("TrackPie: called with null pieTracker.pie! ");
             return;
+        }
+
+        if (pieTracker.pinned &&
+            !pieTracker.buttonDown) {
+            var pinToCursor = SearchDefault('pinToCursor', pie, pieTracker.pinToCursor);
+            if (pinToCursor) {
+                distance = 0.0;
+                direction = 0.0;
+                nextSliceIndex = -1;
+                nextItemIndex = -1;
+                console.log("pinToCursor MovePie", "justSelected", pieTracker.justSelected);
+                MovePie(pie, position);
+            }
         }
 
         var lastSliceIndex = 
@@ -1279,6 +1326,8 @@ function CreatePieTracker()
         pieTracker.itemIndex = nextItemIndex;
         pieTracker.slice = nextSlice;
         pieTracker.item = nextItem;
+
+        var target = pieTracker.target;
 
         if (changedSlice) {
 
@@ -1377,8 +1426,10 @@ function CreatePieTracker()
             clickDuration: 0.5,
             clickStartTime: -1,
             clickStartPosition: {x: 0, y: 0},
+            buttonDown: false,
             pinned: false,
             pinnable: true,
+            pinToCursor: false,
             target: null,
             id: 'main',
             slices: 8,
@@ -1421,114 +1472,7 @@ function CreatePieTracker()
             DeconstructPie: DeconstructPie,
             LayoutPie: LayoutPie,
             DrawPieBackground: DrawPieBackground,
-            pies: {
-
-                'navigate': {
-                    label: 'Navigate',
-                    slices: [
-                        {
-                            items: [
-                                {
-                                    label: "Approach",
-                                    onenteritem: function(item, slice, pie, target) {
-                                        //console.log("Approach ENTER", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            wheelZoomVelocity: (globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.wheelZoomScale
-                                        });
-                                    },
-                                    ontrackitem: function(item, slice, pie, target) {
-                                        //console.log("Approach TRACK", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            wheelZoomVelocity: (globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.wheelZoomScale
-                                        });
-                                    },
-                                    onexititem: function(item, slice, pie, target) {
-                                        //console.log("Approach EXIT", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            wheelZoomVelocity: 0
-                                        });
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            items: [
-                                {
-                                    label: "Turn =>",
-                                    onenteritem: function(item, slice, pie, target) {
-                                        //console.log("Turn => ENTER", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            yawVelocity: (globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.yawScale
-                                        });
-                                    },
-                                    ontrackitem: function(item, slice, pie, target) {
-                                        //console.log("Turn => TRACK", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            yawVelocity: (globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.yawScale
-                                        });
-                                    },
-                                    onexititem: function(item, slice, pie, target) {
-                                        //console.log("Turn => EXIT", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            yawVelocity: 0
-                                        });
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            items: [
-                                {
-                                    label: "Retreat",
-                                    onenteritem: function(item, slice, pie, target) {
-                                        //console.log("Retreat ENTER", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            wheelZoomVelocity: -(globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.wheelZoomScale
-                                        });
-                                    },
-                                    ontrackitem: function(item, slice, pie, target) {
-                                        //console.log("Retreat TRACK", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            wheelZoomVelocity: -(globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.wheelZoomScale
-                                        });
-                                    },
-                                    onexititem: function(item, slice, pie, target) {
-                                        //console.log("Retreat EXIT", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            wheelZoomVelocity: 0
-                                        });
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            items: [
-                                {
-                                    label: "<= Turn",
-                                    onenteritem: function(item, slice, pie, target) {
-                                        //console.log("<= Turn ENTER", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            yawVelocity: -(globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.yawScale
-                                        });
-                                    },
-                                    ontrackitem: function(item, slice, pie, target) {
-                                        //console.log("<= Turn TRACK", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            yawVelocity: -(globals.pieTracker.distance - globals.pieTracker.inactiveDistance) * globals.world.pie.yawScale
-                                        });
-                                    },
-                                    onexititem: function(item, slice, pie, target) {
-                                        //console.log("<= Turn EXIT", globals.pieTracker.distance);
-                                        UpdateObject(globals.proCamera, {
-                                            yawVelocity: 0
-                                        });
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
+            pies: {}
         },
         update: {
             tracking: true,
@@ -1549,6 +1493,7 @@ function CreatePieTracker()
 
                     pieTracker.screenSize = results.screenSize;
                     pieTracker.mouseRaycastHitPoint = results.mouseRaycastHitPoint;
+                    pieTracker.buttonDown = true;
 
                     if (pieTracker.tracking) {
                         //console.log("PieTracker: MouseButtonDown: already tracking pie so ignoring. updating pieTracker.mousePosition from", pieTracker.mousePosition, "to", results.mousePosition);
@@ -1603,6 +1548,7 @@ function CreatePieTracker()
                         return;
                     }
 
+                    console.log("MouseButtonUp TrackPie");
                     TrackPie(
                         results.mousePosition, 
                         results.distance, 
@@ -1610,6 +1556,8 @@ function CreatePieTracker()
                         results.sliceIndex, 
                         results.itemIndex,
                         false);
+
+                    pieTracker.buttonDown = false;
 
                     var pie = pieTracker.pie;
                     if (pie) {
