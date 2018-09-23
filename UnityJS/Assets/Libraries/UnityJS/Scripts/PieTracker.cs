@@ -258,25 +258,9 @@ public class PieTracker : Tracker {
         if (inactive) {
 
             sliceIndex = -1;
+            itemIndex = -1;
 
         } else {
-
-#if false
-
-            float sliceSubtend = 
-                (2.0f * Mathf.PI) / slices;
-
-            float rad =
-                NormalRad(
-                    initialDirection +
-                    ((clockwise ? -1.0f : 1.0f) *
-                     (direction -
-                      (sliceSubtend / 2.0f))));
-
-            sliceIndex =
-                (int)Mathf.Floor(rad / sliceSubtend);
-
-#else
 
             sliceIndex = -1;
 
@@ -289,6 +273,7 @@ public class PieTracker : Tracker {
                 //Debug.Log("pieSlices direction: " + direction + " mouseDX: " + mouseDX + " mouseDY: " + mouseDY);
 
                 float bestDot = -1.0e+6f;
+                JObject bestSlice = null;
                 int i = 0;
                 foreach (JObject slice in pieSlices) {
                     float dx = slice.GetFloat("dx");
@@ -300,26 +285,32 @@ public class PieTracker : Tracker {
                     //Debug.Log("i: " + i + " sliceDirection: " + sliceDirection + " dx: " + dx + " dy: " + dy + " dot: " + dot + " best: " + (dot > bestDot) + " slice: " + slice);
                     if (dot > bestDot) {
                         bestDot = dot;
+                        bestSlice = slice;
                         sliceIndex = i;
                     }
                     i++;
                 }
 
+                if (bestSlice != null) {
+                    JArray items = bestSlice.GetArray("items");
+                    if ((items != null) && 
+                        (items.Count > 0)) {
+                        
+                        itemIndex =
+                            (int)Mathf.Min(
+                                items.Count - 1,
+                                Mathf.Floor(
+                                    (distance - inactiveDistance) /
+                                    itemDistance));
+
+                    }
+                }
+
                 //Debug.Log("finally sliceIndex: " + sliceIndex + " i: " + i);
             }
 
-#endif
-
         }
 
-        if (inactive) {
-            itemIndex = -1;
-        } else {
-            itemIndex =
-                (int)Mathf.Floor(
-                    (distance - inactiveDistance) /
-                    itemDistance);
-        }
 
         SendEventName("MousePositionChanged");
 

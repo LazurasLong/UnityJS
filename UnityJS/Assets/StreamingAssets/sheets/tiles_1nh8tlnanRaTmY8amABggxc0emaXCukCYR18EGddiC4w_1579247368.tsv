@@ -48,25 +48,25 @@ object
 		Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001	Joao Paulo/Textures/Crystal_001/Crystal_001
 											
 	tileHeight	grid	number	10	10						
-		7	19	9	14	3	3	17	20	16	15
-		17	10	18	17	11	2	6	9	4	16
-		7	1	9	10	5	9	4	10	15	16
-		3	17	10	1	15	5	11	9	14	7
-		12	1	9	3	15	11	8	12	12	20
-		9	2	2	13	14	17	8	5	12	7
-		3	1	13	1	2	15	11	17	2	15
-		18	5	3	14	12	9	4	7	5	16
-		20	5	19	4	7	11	9	0	1	19
-		10	12	17	14	8	11	12	2	18	17
+		3	16	20	13	18	15	2	2	2	0
+		20	5	19	1	12	4	5	14	20	19
+		12	6	16	9	18	20	4	16	16	12
+		15	11	19	13	6	3	19	15	15	0
+		13	7	11	19	1	10	8	10	17	17
+		0	2	2	5	6	9	19	7	1	18
+		7	4	12	7	14	19	7	16	6	14
+		6	4	12	5	16	15	13	12	1	15
+		2	9	9	12	10	9	17	11	0	18
+		5	19	4	9	8	3	20	20	15	11
 											
 	tileVegetation	grid	string	10	10						
-		SparseVeg	AppleFarm	SparseWood	AppleFarm	DenseWood	SparseWood	FarmWoods	AppleFarm	FarmWoods	SparseVeg
-		SparseVeg	SparseWood	HighlyDense	SparseWood	AppleFarm	DenseWood	DenseWood	FarmWoods	SparseWood	SparseVeg
-		FarmWoods	DenseWood	SparseVeg	SparseWood	AppleFarm	DenseWood	AppleFarm	SparseVeg	SparseWood	FarmWoods
-		HighlyDense	HighlyDense	FarmWoods	AppleFarm	SparseVeg	HighlyDense	SparseVeg	SparseVeg	SparseWood	HighlyDense
-		SparseWood	AppleFarm	DenseWood	FarmWoods	DenseWood	FarmWoods	HighlyDense	HighlyDense	AppleFarm	AppleFarm
-		HighlyDense	DenseWood	SparseWood	SparseWood	HighlyDense	SparseVeg	FarmWoods	SparseVeg	SparseWood	AppleFarm
-		AppleFarm	HighlyDense	SparseVeg	SparseVeg	DenseWood	FarmWoods	AppleFarm	AppleFarm	FarmWoods	SparseWood
-		FarmWoods	SparseVeg	SparseVeg	SparseVeg	SparseVeg	DenseWood	SparseWood	SparseVeg	DenseWood	SparseVeg
-		SparseWood	AppleFarm	SparseVeg	DenseWood	SparseVeg	SparseVeg	HighlyDense	HighlyDense	FarmWoods	AppleFarm
-		SparseWood	FarmWoods	AppleFarm	FarmWoods	SparseWood	DenseWood	AppleFarm	HighlyDense	SparseWood	DenseWood
+		HighlyDense	DenseWood	AppleFarm	SparseWood	SparseVeg	SparseVeg	FarmWoods	SparseWood	SparseVeg	SparseVeg
+		SparseWood	AppleFarm	DenseWood	HighlyDense	FarmWoods	HighlyDense	FarmWoods	DenseWood	DenseWood	DenseWood
+		SparseWood	SparseWood	DenseWood	FarmWoods	HighlyDense	SparseVeg	FarmWoods	FarmWoods	FarmWoods	AppleFarm
+		DenseWood	HighlyDense	FarmWoods	SparseWood	DenseWood	FarmWoods	DenseWood	HighlyDense	SparseWood	HighlyDense
+		DenseWood	SparseVeg	FarmWoods	DenseWood	DenseWood	HighlyDense	FarmWoods	DenseWood	SparseWood	AppleFarm
+		AppleFarm	AppleFarm	DenseWood	SparseVeg	FarmWoods	AppleFarm	SparseWood	AppleFarm	HighlyDense	SparseWood
+		FarmWoods	HighlyDense	DenseWood	AppleFarm	SparseVeg	SparseWood	SparseWood	HighlyDense	SparseWood	AppleFarm
+		SparseVeg	SparseVeg	SparseVeg	SparseWood	SparseVeg	FarmWoods	FarmWoods	FarmWoods	DenseWood	DenseWood
+		DenseWood	HighlyDense	DenseWood	AppleFarm	DenseWood	AppleFarm	HighlyDense	DenseWood	SparseWood	DenseWood
+		HighlyDense	AppleFarm	SparseVeg	HighlyDense	FarmWoods	HighlyDense	AppleFarm	SparseVeg	SparseVeg	HighlyDense

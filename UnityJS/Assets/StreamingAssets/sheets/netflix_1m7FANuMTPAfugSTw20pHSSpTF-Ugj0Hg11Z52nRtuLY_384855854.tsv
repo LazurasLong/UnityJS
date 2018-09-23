@@ -1,8 +1,8 @@
 object							
 	name	string	Netflix				Put the name of the company here. Everything else depends on it! 
 							Put company specific parameters here.
-	hexTileValue	number	1000000000000				
-	hexTileScale	number	0.5				
+	hexTileValue	number	100000000				
+	hexTileScale	number	0.25				
 	modelColorScheme	string	model				
 	marketColorScheme	string	market				
 	verbSubjectColorScheme	string	verbSubject				

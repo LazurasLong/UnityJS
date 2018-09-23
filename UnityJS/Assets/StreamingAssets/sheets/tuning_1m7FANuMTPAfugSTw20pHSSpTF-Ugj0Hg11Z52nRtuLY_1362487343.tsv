@@ -18,17 +18,14 @@ object		Tuning parameters.
 	bundleAlpha	number	0.4	
 	bundleBudPrefab	string	Prefabs/RainbowBudBlock	
 	bundleBuds	boolean	TRUE	
-	bundleBudScale	number	1	
-	bundleCursorPrefab	string	Prefabs/RainbowBudBall	
-	bundleCursors	boolean	FALSE	
-	bundleCursorScale	number	1	
+	bundleBudScale	number	2	
 	bundleElevationBase	number	5	
 	bundleElevationYear	number	0	
 	bundleEnabled	boolean	TRUE	
 	bundleGap	number	12	
-	bundleLaneWidth	number	1	
-	bundleOverlapTweak	number	0.005	
 	bundleTop	number	50	
+	bundleWireRadius	number	1	
+	bundleWireSpread	number	2	
 	cameraMoveSpeed	number	80	
 	cameraOrbitPitchSpeed	number	60	
 	cameraOrbitYawSpeed	number	60	
@@ -121,20 +118,21 @@ object		Tuning parameters.
 	marketHighlightScale	number	20	
 	modelColorScheme	string	model	
 	modelHighlightEffect	string	Prefabs/ModelHighlightEffect	
-	modelHighlightEffectCameraAttraction	number	50	
+	modelHighlightCameraAttraction	number	5	
+	modelHighlightCameraAttractionPieDistanceScale	number	1	
 	modelHighlightScale	number	2	
 	probe	boolean	FALSE	
-	probeRows	number	4	
 	probeColumns	number	8	
-	probeSpacing	number	100	
 	probeHeight	number	30	
+	probeRows	number	4	
+	probeSpacing	number	100	
 	unitAngularDrag	number	0.7	
 	unitArrowRainbowType	string	arrow	
 	unitArrows	boolean	TRUE	
 	unitColliderPuff	number	3	
-	unitColliderPuffTime	number	0.5	
+	unitColliderPuffTime	number	0.25	
 	unitColliderRadius	number	0.4	
-	unitColliderUnPuffTime	number	0.5	
+	unitColliderUnPuffTime	number	0.25	
 	unitCollisionDetectionMode	string	ContinuousDynamic	
 	unitCreateAnimateTime	number	1	
 	unitCreateDelay	number	250	
@@ -146,7 +144,8 @@ object		Tuning parameters.
 	unitEnableCollision	boolean	TRUE	
 	unitEnabled	boolean	TRUE	
 	unitHighlightEffect	string	Prefabs/UnitHighlightEffect	
-	unitHighlightEffectCameraAttraction	number	50	
+	unitHighlightCameraAttraction	number	5	
+	unitHighlightCameraAttractionPieDistanceScale	number	1	
 	unitHighlightScale	number	2	
 	unitInitialDistance	number	20	
 	unitIsKinematic	boolean	FALSE	
@@ -172,7 +171,7 @@ object		Tuning parameters.
 	yearColliderRadius	number	0.5	
 	yearCollisionDetectionMode	string	ContinuousDynamic	
 	yearConstraints	string	FreezePositionX,FreezePositionY,FreezePositionZ,FreezeRotationX,FreezeRotationY,FreezeRotationZ	
-	yearCreateDelay	number	1000	
+	yearCreateDelay	number	500	
 	yearEnabled	boolean	TRUE	
 	yearHeightMax	number	100	
 	yearHeightMin	number	40	

@@ -121,3 +121,58 @@ object		These are named templates used to create various types of objects.
 				object				
 					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
 					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+	room	object		This is a cuboid, used for the room.				
+		prefab	string	Prefabs/Cuboid		A cuboid has six individual face tiles that we can configure independently.		
+		update	object					
+			transform/localPosition	object		Position the cuboid in the world.		
+				x	number	0		
+				y	number	-5		
+				z	number	0		
+			transform/localScale	object		Set the size of the cuboid.		
+				x	number	1000		
+				y	number	10		
+				z	number	1000		
+			component:Collider/sharedMaterial	string	PhysicMaterials/HighFrictionLowBounce	Configure the physic material of the box collider.		
+			component:Rigidbody/isKinematic	boolean	TRUE			
+			tiles/index:0/textureScale	object		Configure the texture scale of the top tile.		
+				x	number	1		
+				y	number	1		
+			tiles/index:0/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the top tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:1/textureScale	object		Configure the texture scale of the bottom tile.		
+				x	number	1		
+				y	number	1		
+			tiles/index:1/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the bottom tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:2/textureScale	object		Configure the texture scale of the front tile.		
+				x	number	1		
+				y	number	0.01		
+			tiles/index:2/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the front tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:3/textureScale	object		Configure the texture scale of the back tile.		
+				x	number	1		
+				y	number	0.01		
+			tiles/index:3/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the back tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:4/textureScale	object		Configure the texture scale of the right tile.		
+				x	number	1		
+				y	number	0.01		
+			tiles/index:4/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the right tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	
+			tiles/index:5/textureScale	object		Configure the texture scale of the left tile.		
+				x	number	1		
+				y	number	0.01		
+			tiles/index:5/component:MeshRenderer/material/method:UpdateMaterial	array		Configure the materials of the left tile.		
+				object				
+					texture_MainTex	string	Joao Paulo/Textures/Abstract_003/Abstract_003_COLOR	
+					texture_BumpMap	string	Joao Paulo/Textures/Abstract_003/Abstract_003_NORM	

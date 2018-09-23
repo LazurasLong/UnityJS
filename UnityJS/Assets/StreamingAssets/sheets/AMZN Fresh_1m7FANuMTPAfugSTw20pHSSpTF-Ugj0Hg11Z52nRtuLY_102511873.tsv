@@ -15,53 +15,52 @@ Markets:	   ($)	E-Commerce		700000			  				11778000000				 			500000000000						
 	   ($)	Cloud Services		100000			 				 				 			200000							200000	200000
 	   ($)	Retail 		100000			 				 				 			200000							200000	200000
 																										
-Units:	  Online Stores 	1996-2018	E-Commerce	15746000			 				5152000000				  			33215000000							20000	108354000000
-	      Media	1996-2018	E-Commerce	15746000			 				4049000000				 			14888000000							30000	18420000000
-	      Books	1996-2018	E-Commerce	15746000			 				2834000000				 			5955000000							40000	7368000000
-	      CDs and DVDs	 		0			 				1215000000				  			6700000000							50000	5526000000
-acquire	        Lovefilm	2011-2012		0			 								 			0								0
-	      Amazon Music	 		0			  				 				 			744000000							60000	2763000000
-	      App Store	 		0			 				 				 			0							70000	0
-acquire	      Washington Post			0																						
-	      Other Media			0														1489000000								
-	   Electronics, Merchandise			0							1013000000							18363000000								
-	      Amazon Kindle			0														367000000								
-	      Amazon Fresh			0														18000000								
-acquire	      Acquire Zappos			0														735000000								
-acquire	      Quidsi Diapers.com 	2017-2017		0														918000000								
-acquire	      Underground			0																						
-	      Amazon Alexa			0																						
-	      Amazon Echo			0																						
-acquire	      Souq	2017-		0																						
-acquire	      Pillpack	2018-		0																						
-	      Other Electronics			0							1013000000							16325000000								
-	      Other Merchandise			0																						
-	  Services			0							112000000															
-	      Third Party Services			0							64000000							286000000								
-	         Amazon Marketplaces			0							32000000							57000000								
-	         Third Party Logistics			0							16000000	 						229000000	 							
-	      Subscriptions			0														95000000								
-acquired	        Audible			0														67000000								
-	        Amazon Prime			0														28000000								
-	        Amazon Instant Video			0																						
- 	   AWS			0														95000000								
- 	      Mechanical Turk			0														10000000								
- 	      Amazon Lumberyard			0																						
- 	      AWS Hosting			0														85000000								
-	        S3			0																						
+Units:	  Online Stores 	1996-2018	E-Commerce	15746000			 				5152000000				  			33215000000							108354000000	108354000000
+	      Media	1996-2018	E-Commerce	15746000			 				4049000000				 			14888000000							18420180000	18420000000
+	         Books	1996-2018	E-Commerce	15746000			 				2834000000				 			5955000000							7368072000	7368000000
+	         CDs and DVDs	 		0			 				1215000000				  			6700000000							5526054000	5526000000
+acquire	          Lovefilm	2011-2012		0			 								 			0							0	0
+	          Amazon Musis	 		0			  				 				 			744000000							2763027000	2763000000
+	          App Store	 		0			 				 				 			0							1842018000	0
+acquire	          Washington Post			0																					380000000	
+	          Other Media			0														1489000000							541009000	
+	   Electronics, Merchandise			0							1013000000							18363000000							89933820000	
+	      Amazon Kindle			0														367000000							8993382000	
+	      Amazon Fresh			0														18000000							359735280	
+acquire	      Acquire Zappos			0														735000000							2698014600	
+acquire	      Quidsi Diapers.com 	2017-2017		0														918000000							0	
+acquire	      Underground			0																					899338200	
+	      Amazon Alexa Echo			0																					1200000000	
+acquire	      Souq	2017-		0																			270000000	405000000	607500000	
+acquire	      Pillpack	2018-		0																					0	Acquired
+	      Other Electronics			0							1013000000							16325000000							150351699840	
+	   Other Merchandise			0																					601406799360	
+	  Services			0							112000000														59061000000	
+	      Third Party Services			0							64000000							286000000							31881000000	
+	         Amazon Marketplaces			0							32000000							57000000							118000000	
+	         Third Party Logistics			0							16000000	 						229000000	 						31763040300	
+	      Subscriptions			0														95000000							9721000000	
+acquired	        Audible			0														67000000							1458000000	
+	        Amazon Prime			0														28000000							7291000000	
+	        Amazon Instant Video			0																					972000000	
+ 	   AWS			0														95000000							17459000000	
+ 	      Mechanical Turk			0														10000000							174590000	
+ 	      Amazon Lumberyard			0																					174590000	
+ 	      AWS Hosting			0														85000000							17109820000	
+	        S3			0														0								
 	        EC2			0																						
-	 Physical Stores			0																						
-	   Amazon Books - Retail			0																						
-	   Whole Foods			0																						
-	 Advertising and Other			0														477000000								
-	   Amazon Marketing Services			0														429000000								
-acquired	      Askville			0														4000000								
-acquired	      GoodReads			0																						
-acquired	      Twitch			0																						
-	      Amazon Search, other ads 			0														425000000								
-	   Financing 			0														48000000								
-	      Co-Branded Credit Cards			0														48000000								
-	      Amazon Cash			0																						
+	 Physical Stores			0																					5798000000	
+	   Amazon Books - Retail			0																					1275560000	
+	   Whole Foods			0																					4522440000	
+	 Advertising and Other			0														477000000							4653000000	
+	   Amazon Marketing Services			0														429000000							4187700000	
+acquired	      Askville			0														4000000							0	
+acquired	      GoodReads			0																					46530000	
+acquired	      Twitch			0																					46530000	
+	      Amazon Search, other ads 			0														425000000							3629.34	
+	   Financing 			0														48000000							4650000	
+	      Co-Branded Credit Cards			0														48000000							2325000	
+	      Amazon Cash			0																					2325000	
 	   Acquisitions for Internal Ops			0																						
 	     Kiva Systems	2012-2012		0																						
 	 	 	 	0			80000				 				 			 							80000	80000

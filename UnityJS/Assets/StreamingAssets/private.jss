@@ -543,7 +543,7 @@ function CreateCompany(company)
 
     function HighlightObject(obj, highlight, effect, update, alwaysUpdate)
     {
-        //console.log("HighlightObject", "obj", obj, "highlight", highlight, "effect", effect, "scale", scale);
+        //console.log("HighlightObject", "obj", obj, "highlight", highlight, "effect", effect, "update", update, "alwaysUpdate", alwaysUpdate);
 
         if (highlight != (obj.highlighted)) {
 
@@ -582,7 +582,7 @@ function CreateCompany(company)
 
         }
 
-        if (alwaysUpdate) {
+        if (alwaysUpdate && obj.highlightObject) {
             UpdateObject(obj.highlightObject, alwaysUpdate);
         }
 
@@ -1123,6 +1123,7 @@ function CreateCompany(company)
                     unitIndexes &&
                     (unitIndexes.indexOf(unitObject.unit.unitIndex) != -1);
 
+                //console.log("HighlightUnits unitObject", unitObject, "highlight", highlight);
                 HighlightObject(unitObject, highlight, tuning.unitHighlightEffect, update, alwaysUpdate);
 
             });
@@ -1712,7 +1713,7 @@ function CreateCompany(company)
                                     handler: function(unitObject, results) {
                                         //console.log("MouseEnter unitObject", unitObject, "unit", unit, "unitIndex", unit.unitIndex, "yearIndex", yearIndex);
                                         DescribeUnit(unit, yearIndex);
-                                        HighlightUnits([unit.unitIndex], 0, 0);
+                                        HighlightUnits([unit.unitIndex], tuning.unitHighlightScale, 0);
                                     }
                                 },
                                 MouseExit: {
@@ -2147,11 +2148,8 @@ function CreateCompany(company)
                                 var unitIndexes = GetAllUnitIndexes(subUnit);
                                 DescribeUnit(subUnit, -1);
                                 var distance =
-                                    pieTracker.distance -
-                                    SearchDefault('inactiveDistance', pie, pieTracker.inactiveDistance);
-                                var scale = 
-                                    tuning.unitHighlightScale +
-                                    tuning.unitHighlightScalePieDistanceScale * distance;
+                                    globals.pieTracker.distance -
+                                    SearchDefault('inactiveDistance', pie, globals.pieTracker.inactiveDistance);
                                 var cameraAttraction = 
                                     tuning.unitHighlightCameraAttraction +
                                     tuning.unitHighlightCameraAttractionPieDistanceScale * distance;
@@ -2232,15 +2230,12 @@ function CreateCompany(company)
                         //console.log("Item Model Enter", modelName);
                         DescribeModel(modelIndex, -1, -1);
                         var distance =
-                            pieTracker.distance -
-                            SearchDefault('inactiveDistance', pie, pieTracker.inactiveDistance);
-                        var scale = 
-                            tuning.modelHighlightScale +
-                            tuning.modelHighlightScalePieDistanceScale * distance;
+                            globals.pieTracker.distance -
+                            SearchDefault('inactiveDistance', pie, globals.pieTracker.inactiveDistance);
                         var cameraAttraction = 
                             tuning.modelHighlightCameraAttraction +
                             tuning.modelHighlightCameraAttractionPieDistanceScale * distance;
-                        HighlightModels([modelIndex], scale, cameraAttraction);
+                        HighlightModels([modelIndex], tuning.modelHighlightScale, cameraAttraction);
                     },
                     onexititem: function(item, slice, pie, target) {
                         //console.log("Item Model Exit", modelName);
