@@ -21,6 +21,10 @@ public class CameraAttractionForce: MonoBehaviour {
 
     void FixedUpdate()
     {
+        if (cameraAttraction == 0.0f) {
+            return;
+        }
+
         if (rb == null) {
             rb = (Rigidbody)gameObject.GetComponentInParent(typeof(Rigidbody));
         }
