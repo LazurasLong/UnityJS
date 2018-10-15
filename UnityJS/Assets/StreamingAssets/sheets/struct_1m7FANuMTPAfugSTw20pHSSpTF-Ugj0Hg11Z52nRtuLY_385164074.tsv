@@ -45,3 +45,7 @@ object
 	verb	range	string	column 0	Struct_Verb
 	subject	range	string	column 0	Struct_Subject
 	verbSubjectTable	range	string	all	Struct_VerbSubject
+					
+	mergeOutline	range	string	column 0	Struct_Merge_Outline
+	mergeModels	range	string	column 0	Struct_Merge_Models
+	mergeVerbTable	range	string	all	Struct_Merge_Verb

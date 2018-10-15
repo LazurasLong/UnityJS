@@ -9,9 +9,9 @@ mergeInto(LibraryManager.library, {
 
 
     // Called by Unity when awakened.
-    _UnityJS_HandleAwake: function _UnityJS_HandleAwake(allocateTextureCallback, freeTextureCallback, lockTextureCallback, unlockTextureCallback)
+    _UnityJS_HandleAwake: function _UnityJS_HandleAwake(allocateTextureCallback, freeTextureCallback, lockTextureCallback, unlockTextureCallback, allocateDataCallback, freeDataCallback, lockDataCallback, unlockDataCallback)
     {
-        //console.log("UnityJS.jslib: _UnityJS_HandleAwake: allocateTextureCallback: " + allocateTextureCallback + " freeTextureCallback: " + freeTextureCallback + " lockTextureCallback: " + lockTextureCallback + " unlockTextureCallback: " + unlockTextureCallback);
+        //console.log("UnityJS.jslib: _UnityJS_HandleAwake: allocateTextureCallback: " + allocateTextureCallback + " freeTextureCallback: " + freeTextureCallback + " lockTextureCallback: " + lockTextureCallback + " unlockTextureCallback: " + unlockTextureCallback + allocateDataCallback: " + allocateDataCallback + " freeDataCallback: " + freeDataCallback + " lockDataCallback: " + lockDataCallback + " unlockDataCallback: " + unlockDataCallback);
 
         if (!window.bridge) {
             window.bridge = {};
@@ -76,6 +76,51 @@ mergeInto(LibraryManager.library, {
             //console.log("UnityJS.jslib: _UnityJS_UpdateTexture: done");
         }
         window.bridge._UnityJS_UpdateTexture = _UnityJS_UpdateTexture;
+
+        function _UnityJS_AllocateData(size)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_AllocateData: size: " + size + " allocateDataCallback: " + allocateDataCallback);
+            var result = Runtime.dynCall('ii', allocateDataCallback, [size]);
+            //console.log("UnityJS.jslib: _UnityJS_AllocateData: result: " + result);
+            return result;
+        };
+        window.bridge._UnityJS_AllocateData = _UnityJS_AllocateData;
+
+        function _UnityJS_FreeData(id)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_FreeData: id: " + id + " freeDataCallback: " + freeDataCallback);
+            Runtime.dynCall('vi', freeDataCallback, [id]);
+        }
+        window.bridge._UnityJS_FreeData = _UnityJS_FreeData;
+
+        function _UnityJS_LockData(id)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_LockData: id: " + id + " lockDataCallback: " + lockDataCallback);
+            var result = Runtime.dynCall('ii', lockDataCallback, [id]);
+            //console.log("UnityJS.jslib: _UnityJS_LockData: result: " + result);
+            return result;
+        }
+        window.bridge._UnityJS_LockData = _UnityJS_LockData;
+
+        function _UnityJS_UnlockData(id)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_UnlockData: id: " + id + " unlockDataCallback: " + unlockDataCallback);
+            Runtime.dynCall('vi', unlockDataCallback, [id]);
+        }
+        window.bridge._UnityJS_UnlockData = _UnityJS_UnlockData;
+
+        function _UnityJS_UpdateData(id, data)
+        {
+            //console.log("UnityJS.jslib: _UnityJS_UpdateData: id: " + id + " data: " + data + " length: " + data.length);
+            var pointer = _UnityJS_LockData(id);
+            var byteCount = data.length;
+            var heapBytes = new Uint8Array(Module.HEAPU8.buffer, pointer, byteCount);
+            //console.log("UnityJS.jslib: _UnityJS_UpdateData: pointer: " + pointer + " byteCount: " + byteCount + " buffer: " + buffer + " heapBytes: " + heapBytes);
+            heapBytes.set(data);
+            _UnityJS_UnlockData(id);
+            //console.log("UnityJS.jslib: _UnityJS_UpdateData: done");
+        }
+        window.bridge._UnityJS_UpdateData = _UnityJS_UpdateData;
 
     },
 

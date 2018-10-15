@@ -18,3 +18,6 @@ table
 	Verbs	0	4	grid	VerbSubject
 	Models	0	1	column	Model_Type
 	Models	0	4	grid	Model
+	Merges	0	1	column	Merge_Outline
+	Merges	0	3	column	Merge_Models
+	Merges	0	4	grid	Merge_Verb

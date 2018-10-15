@@ -32,21 +32,37 @@ public class BridgeTransportWebGL : BridgeTransport
     };
 
 
+    public class DataInfo {
+        public int id;
+        public int size;
+        public bool locked;
+        public byte[] data;
+        public GCHandle handle;
+        public IntPtr pointer;
+    };
+
+
     public delegate int AllocateTextureDelegate(int width, int height);
     public delegate void FreeTextureDelegate(int id);
     public delegate int LockTextureDelegate(int id);
     public delegate void UnlockTextureDelegate(int id);
+    public delegate int AllocateDataDelegate(int size);
+    public delegate void FreeDataDelegate(int id);
+    public delegate int LockDataDelegate(int id);
+    public delegate void UnlockDataDelegate(int id);
 
 
     public static Dictionary<int, TextureInfo> textureInfos = new Dictionary<int, TextureInfo>();
     public static int nextTextureID = 1;
+    public static Dictionary<int, DataInfo> dataInfos = new Dictionary<int, DataInfo>();
+    public static int nextDataID = 1;
 
 
     private const string PLUGIN_DLL = "__Internal";
 
 
     [DllImport(PLUGIN_DLL)]
-    public static extern void _UnityJS_HandleAwake(AllocateTextureDelegate allocateTextureCallback, FreeTextureDelegate freeTextureCallback, LockTextureDelegate lockTextureCallback, UnlockTextureDelegate unlockTextureCallback);
+    public static extern void _UnityJS_HandleAwake(AllocateTextureDelegate allocateTextureCallback, FreeTextureDelegate freeTextureCallback, LockTextureDelegate lockTextureCallback, UnlockTextureDelegate unlockTextureCallback, AllocateDataDelegate allocateDataCallback, FreeDataDelegate freeDataCallback, LockDataDelegate lockDataCallback, UnlockDataDelegate unlockDataCallback);
 
 
     [DllImport(PLUGIN_DLL)]
@@ -84,16 +100,16 @@ public class BridgeTransportWebGL : BridgeTransport
     {
         //Debug.Log("BridgeTransportWebGL: AllocateTexture: width: " + width + " height: " + height + " id: " + nextTextureID);
 
-        TextureInfo tex = new TextureInfo();
-        tex.id = nextTextureID++;
-        tex.width = width;
-        tex.height = height;
-        tex.texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        tex.locked = false;
-        tex.data = null;
-        textureInfos[tex.id] = tex;
+        TextureInfo textureInfo = new TextureInfo();
+        textureInfo.id = nextTextureID++;
+        textureInfo.width = width;
+        textureInfo.height = height;
+        textureInfo.texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        textureInfo.locked = false;
+        textureInfo.data = null;
+        textureInfos[textureInfo.id] = textureInfo;
 
-        return tex.id;
+        return textureInfo.id;
     }
 
 
@@ -106,9 +122,9 @@ public class BridgeTransportWebGL : BridgeTransport
             return;
         }
 
-        TextureInfo tex = textureInfos[id];
+        TextureInfo textureInfo = textureInfos[id];
 
-        if (tex.locked) {
+        if (textureInfo.locked) {
             Debug.LogError("BridgeTransportWebGL: FreeTexture: free while locked! id: " + id);
             UnlockTexture(id);
         }
@@ -125,23 +141,23 @@ public class BridgeTransportWebGL : BridgeTransport
             return 0;
         }
 
-        TextureInfo tex = textureInfos[id];
+        TextureInfo textureInfo = textureInfos[id];
 
-        if (tex.locked) {
+        if (textureInfo.locked) {
             Debug.LogError("BridgeTransportWebGL: LockTexture: already locked: " + id);
             return 0;
         }
 
-        tex.locked = true;
-        if (tex.data == null) {
-            tex.data = new byte[tex.width * tex.height * 4];
+        textureInfo.locked = true;
+        if (textureInfo.data == null) {
+            textureInfo.data = new byte[textureInfo.width * textureInfo.height * 4];
         }
-        tex.handle = GCHandle.Alloc(tex.data, GCHandleType.Pinned);
-        tex.pointer = tex.handle.AddrOfPinnedObject();
+        textureInfo.handle = GCHandle.Alloc(textureInfo.data, GCHandleType.Pinned);
+        textureInfo.pointer = textureInfo.handle.AddrOfPinnedObject();
 
-        //Debug.Log("BridgeTransportWebGL: LockTexture: locked. pointer: " + tex.pointer);
+        //Debug.Log("BridgeTransportWebGL: LockTexture: locked. pointer: " + textureInfo.pointer);
 
-        return (int)tex.pointer;
+        return (int)textureInfo.pointer;
     }
 
 
@@ -155,20 +171,110 @@ public class BridgeTransportWebGL : BridgeTransport
             return;
         }
 
-        TextureInfo tex = textureInfos[id];
+        TextureInfo textureInfo = textureInfos[id];
 
-        if (!tex.locked) {
+        if (!textureInfo.locked) {
             Debug.LogError("BridgeTransportWebGL: UnlockTexture: not locked: " + id);
             return;
         }
 
-        tex.texture.LoadRawTextureData(tex.data);
-        tex.texture.Apply();
-        tex.handle.Free();
-        tex.locked = false;
-        //tex.data = null;
-        tex.pointer = (IntPtr)0;
+        textureInfo.texture.LoadRawTextureData(textureInfo.data);
+        textureInfo.texture.Apply();
+        textureInfo.handle.Free();
+        textureInfo.locked = false;
+        //textureInfo.data = null;
+        textureInfo.pointer = (IntPtr)0;
         //Debug.Log("BridgeTransportWebGL: UnlockTexture: unlocked.");
+    }
+    
+
+    [MonoPInvokeCallback(typeof(AllocateDataDelegate))]
+    public static int AllocateData(int size)
+    {
+        //Debug.Log("BridgeTransportWebGL: AllocateData: size: " + size + " id: " + nextDataID);
+
+        DataInfo dataInfo = new DataInfo();
+        dataInfo.id = nextDataID++;
+        dataInfo.size = size;
+        dataInfo.data = new byte[size];
+        dataInfo.locked = false;
+        dataInfo.data = null;
+        dataInfos[dataInfo.id] = dataInfo;
+
+        return dataInfo.id;
+    }
+
+
+    [MonoPInvokeCallback(typeof(FreeDataDelegate))]
+    public static void FreeData(int id)
+    {
+        //Debug.Log("BridgeTransportWebGL: FreeData: id: " + id);
+        if (!dataInfos.ContainsKey(id)) {
+            Debug.LogError("BridgeTransportWebGL: FreeData: invalid id: " + id);
+            return;
+        }
+
+        DataInfo dataInfo = dataInfos[id];
+
+        if (dataInfo.locked) {
+            Debug.LogError("BridgeTransportWebGL: FreeData: free while locked! id: " + id);
+            UnlockData(id);
+        }
+
+        dataInfos.Remove(id);
+    }
+
+
+    [MonoPInvokeCallback(typeof(LockDataDelegate))]
+    public static int LockData(int id)
+    {
+        if (!dataInfos.ContainsKey(id)) {
+            Debug.LogError("BridgeTransportWebGL: LockData: invalid id: " + id);
+            return 0;
+        }
+
+        DataInfo dataInfo = dataInfos[id];
+
+        if (dataInfo.locked) {
+            Debug.LogError("BridgeTransportWebGL: LockData: already locked: " + id);
+            return 0;
+        }
+
+        dataInfo.locked = true;
+        if (dataInfo.data == null) {
+            dataInfo.data = new byte[dataInfo.size];
+        }
+        dataInfo.handle = GCHandle.Alloc(dataInfo.data, GCHandleType.Pinned);
+        dataInfo.pointer = dataInfo.handle.AddrOfPinnedObject();
+
+        //Debug.Log("BridgeTransportWebGL: LockData: locked. pointer: " + dataInfo.pointer);
+
+        return (int)dataInfo.pointer;
+    }
+
+
+    [MonoPInvokeCallback(typeof(UnlockDataDelegate))]
+    public static void UnlockData(int id)
+    {
+        //Debug.Log("BridgeTransportWebGL: UnlockData: id: " + id);
+
+        if (!dataInfos.ContainsKey(id)) {
+            Debug.LogError("BridgeTransportWebGL: UnlockData: invalid id: " + id);
+            return;
+        }
+
+        DataInfo dataInfo = dataInfos[id];
+
+        if (!dataInfo.locked) {
+            Debug.LogError("BridgeTransportWebGL: UnlockData: not locked: " + id);
+            return;
+        }
+
+        // TODO ...
+        dataInfo.handle.Free();
+        dataInfo.locked = false;
+        dataInfo.pointer = (IntPtr)0;
+        //Debug.Log("BridgeTransportWebGL: UnlockData: unlocked.");
     }
     
 
@@ -180,7 +286,11 @@ public class BridgeTransportWebGL : BridgeTransport
             AllocateTexture,
             FreeTexture,
             LockTexture,
-            UnlockTexture);
+            UnlockTexture,
+            AllocateData,
+            FreeData,
+            LockData,
+            UnlockData);
     }
 
 
@@ -231,7 +341,13 @@ public class BridgeTransportWebGL : BridgeTransport
     }
 
 
-    public override bool HasSharedTextures()
+    public override bool HasSharedTexture()
+    {
+        return true;
+    }
+
+
+    public override bool HasSharedData()
     {
         return true;
     }
@@ -246,9 +362,24 @@ public class BridgeTransportWebGL : BridgeTransport
             return null;
         }
 
-        TextureInfo tex = textureInfos[id];
+        TextureInfo textureInfo = textureInfos[id];
 
-        return tex.texture;
+        return textureInfo.texture;
+    }
+
+
+    public override byte[] GetSharedData(int id)
+    {
+        //Debug.Log("BridgeTransportWebGL: GetSharedData: id: " + id);
+
+        if (!dataInfos.ContainsKey(id)) {
+            Debug.LogError("BridgeTransport: GetSharedData: invalid id: " + id);
+            return null;
+        }
+
+        DataInfo dataInfo = dataInfos[id];
+
+        return dataInfo.data;
     }
 
 

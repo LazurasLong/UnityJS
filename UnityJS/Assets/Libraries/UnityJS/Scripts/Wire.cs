@@ -70,11 +70,13 @@ public class Wire: Tracker {
     public Spline spline = null;
     public Vector3 splineFromPosition;
     public Vector3 splineToPosition;
-    private bool updateSpline = true;
+    public bool updateSpline = true;
+    public bool updateSplineAlways = false;
     public MeshRenderer wireMeshRenderer;
     public MeshFilter wireMeshFilter;
     public Mesh wireMesh;
     public bool updateMeshes = true;
+    public bool updateMeshesAlways = false;
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -172,11 +174,11 @@ public class Wire: Tracker {
             updateSpline = true;
         }
 
-        if (updateSpline) {
+        if (updateSpline || updateSplineAlways) {
             UpdateSpline();
         }
 
-        if (updateMeshes) {
+        if (updateMeshes || updateMeshesAlways) {
             UpdateMeshes();
         }
 

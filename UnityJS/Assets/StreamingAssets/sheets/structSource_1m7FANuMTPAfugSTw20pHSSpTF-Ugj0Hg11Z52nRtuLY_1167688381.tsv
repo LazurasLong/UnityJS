@@ -1,3 +1,5 @@
+Struct Spreadsheet									
+									
 Name:	Struct		Years:	1776	2018				
 									
 Valuation:	PreMoney Valuation			1000000					
@@ -11,13 +13,13 @@ Financials:	Revenue			1000000	2000000
 Markets:	   ($)	Cats		100000	200000				
 	   ($)	Dogs		100000	200000				
 									
-Units:	  Brick and Mortar Stores	1776-2018	Bricklaying, Mortaring, Painting	50000	20000				
-	    Red Bricks	1776-2018	Bricklaying, Mortaring, Painting	60000	30000				
-	    Green Bricks	1776-2018	Bricklaying, Mortaring, Painting	70000	40000				
-	    Blue Bricks	1776-2018	Bricklaying, Mortaring, Painting	80000	50000				
-	  Online Stores	2018	E-Commerce, Product Sales, Subscription	0	60000				
-	    One Bits	2018	E-Commerce, Product Sales, Subscription	0	70000				
-	    Zero Bits	2018	E-Commerce, Product Sales, Subscription	0	80000				
+Units:	Brick and Mortar Stores	1776-2018	Bricklaying, Mortaring, Painting	50000	20000				
+	  Red Bricks	1776-2018	Bricklaying, Mortaring, Painting	60000	30000				
+	  Green Bricks	1776-2018	Bricklaying, Mortaring, Painting	70000	40000				
+	  Blue Bricks	1776-2018	Bricklaying, Mortaring, Painting	80000	50000				
+	Online Stores	2018	E-Commerce, Product Sales, Subscription	0	60000				
+	  One Bits	2018	E-Commerce, Product Sales, Subscription	0	70000				
+	  Zero Bits	2018	E-Commerce, Product Sales, Subscription	0	80000				
 									
 Verbs:	Lay	Bricks		x	x				
 	Cure	Mortar		x	x				
@@ -25,6 +27,10 @@ Verbs:	Lay	Bricks		x	x
 	Write	Code			x				
 	Debug	Code			x				
 	Ship	Code			x				
+	Consume	Company							
+	Acquire	Company							
+	Merge	Company							
+	Acquihire	Company							
 									
 Models:	Bricklaying			x	x				
 	Mortaring			x	x				
@@ -32,3 +38,11 @@ Models:	Bricklaying			x	x
 	E-Commerce				x				
 	Product Sales				x				
 	Subscription				x				
+									
+Merges:	Brick and Mortar Stores		Bricklaying, Mortaring, Painting	Consume					
+	  Red Bricks		Bricklaying, Mortaring, Painting	Acquire					
+	  Green Bricks		Bricklaying, Mortaring, Painting	Merge					
+	  Blue Bricks		Bricklaying, Mortaring, Painting	Acquihire					
+	Online Stores		E-Commerce, Product Sales, Subscription		Consume				
+	  One Bits		E-Commerce, Product Sales, Subscription		Acquire				
+	  Zero Bits		E-Commerce, Product Sales, Subscription		Acquire				

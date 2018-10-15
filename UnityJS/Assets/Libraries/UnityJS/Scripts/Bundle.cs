@@ -22,9 +22,9 @@ public class Bundle: BridgeObject {
     public Vector3 fromOffset;
     public Vector3 fromLocalOffset;
     public Vector3 fromLocalOffsetRotated;
+    public Vector3 fromLocalSpread;
+    public Vector3 fromLocalSpreadRotated;
     public Vector3 fromPosition;
-    public float fromWidth;
-    public float fromHeight;
     public float fromRotation;
     public float fromAngle;
 
@@ -34,9 +34,9 @@ public class Bundle: BridgeObject {
     public Vector3 toOffset;
     public Vector3 toLocalOffset;
     public Vector3 toLocalOffsetRotated;
+    public Vector3 toLocalSpread;
+    public Vector3 toLocalSpreadRotated;
     public Vector3 toPosition;
-    public float toWidth;
-    public float toHeight;
     public float toRotation;
     public float toAngle;
 
@@ -90,6 +90,16 @@ public class Bundle: BridgeObject {
                 wires = wireList.ToArray();
             }
 
+            if (fromTransformAttached && (fromTransform != null)) {
+                fromPosition =
+                    fromTransform.position + fromOffset;
+            }
+
+            if (toTransformAttached && (toTransform != null)) {
+                toPosition =
+                    toTransform.position + toOffset;
+            }
+
             angle =
                 Mathf.Atan2(
                     toPosition.z - fromPosition.z,
@@ -126,40 +136,23 @@ public class Bundle: BridgeObject {
 
                 t *= (float)(n - 1) / (float)n;
 
+                fromLocalSpreadRotated =
+                    rotate * (t * fromLocalSpread);
+                toLocalSpreadRotated =
+                    rotate * (t * toLocalSpread);
+
                 wire.fromTransform = fromTransformAttached ? fromTransform : null;
                 wire.toTransform = toTransformAttached ? toTransform : null;
-
-                if (fromTransformAttached && 
-                    (wire.fromTransform != null)) {
-                    fromPosition =
-                        fromTransform.position + fromOffset + fromLocalOffsetRotated;
-                }
-
-                if (toTransformAttached &&
-                    (wire.toTransform != null)) {
-                    toPosition =
-                        toTransform.position + toOffset + toLocalOffsetRotated;
-                }
 
                 wire.fromOffset = 
                     fromOffset +
                     fromLocalOffsetRotated +
-                    new Vector3(
-                        (t * fromWidth *
-                         Mathf.Cos(fromAngle)),
-                        t * fromHeight, 
-                        (t * fromWidth *
-                         Mathf.Sin(fromAngle)));
+                    fromLocalSpreadRotated;
 
                 wire.toOffset = 
                     toOffset +
                     toLocalOffsetRotated +
-                    new Vector3(
-                        (t * toWidth *
-                        Mathf.Cos(toAngle)),
-                        t * toHeight, 
-                        (t * toWidth *
-                         Mathf.Sin(toAngle)));
+                    toLocalSpreadRotated;
 
                 if (updateWireHeight) {
                     wire.wireHeight = wireHeight;

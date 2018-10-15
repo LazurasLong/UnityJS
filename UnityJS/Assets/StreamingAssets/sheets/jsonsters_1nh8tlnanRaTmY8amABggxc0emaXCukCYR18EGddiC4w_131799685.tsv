@@ -1,9 +1,9 @@
 object				
 	object	object		
-		name	string	object
-		prefab	string	Prefabs/JSON_Object
-		indexed	boolean	TRUE
-		keyed	boolean	FALSE
+		name	string	1
+		prefab	string	2
+		indexed	boolean	3
+		keyed	boolean	4
 				
 				
 				

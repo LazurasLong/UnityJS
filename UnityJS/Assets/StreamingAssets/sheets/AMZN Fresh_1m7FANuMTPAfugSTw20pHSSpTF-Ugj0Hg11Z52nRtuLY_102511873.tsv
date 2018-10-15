@@ -1,133 +1,157 @@
-Name:	AMZN Fresh		Years:	1996	1997	1998	1999	2000	2001	2002	2003	2004	2005	2006	2007	2008	2009	2010	2011	2012	2013	2014	2015	2016	2017	2018
-																										
-Valuation:	PreMoney Valuation			157000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
-	Market Capitalization 			0	438000000	14700000000	300000000000	10000000000	2859000000	4311000000	10388488917	16322000000	10155000000	21098000000	39279000000	21253000000	59458000000	82080000000	79799000000	113644000000	185437000000	143382000000	322400000000	392937000000	576548710000	971960000000000
-																									 	
-Financials:	Revenue			15746000	147787000	609819000	1140000000	2761983000	3122433000	3932936000	5264000000	6921124000	8490000000	10711000000	14835000000	19166000000	24509000000	34204000000	48077000000	61093000000	74452000000	88988000000	107006000000	135987000000	177866000000	231226000000
-	   Net Profit/Loss 			-6000000	-31000000	-124546000	-720000000	-1411273000	-567277000	-149132000	35000000	588451000	359000000	190000000	476000000	645000000	902000000	1152000000	631000000	-39000000	274000000	-241000000	596000000	2371000000	3033000000	3943000000
-	   Debt			0			0				0				0			0							0	0
-	   Equity 			0			0				0				0			0							0	0
-																										
-Markets:	   ($)	E-Commerce		700000			  				11778000000				 			500000000000							2304000000000	3000000000000
-	   ($)	Online Ads		100000			 				 				 			200000							200000	200000
-	   ($)	Broadband Customers		100000			  				 				 			200000							200000	200000
-	   ($)	Mobile Smart Phone Customers 		100000			   				 				  			200000							200000	200000
-	   ($)	Cloud Services		100000			 				 				 			200000							200000	200000
-	   ($)	Retail 		100000			 				 				 			200000							200000	200000
-																										
-Units:	  Online Stores 	1996-2018	E-Commerce	15746000			 				5152000000				  			33215000000							108354000000	108354000000
-	      Media	1996-2018	E-Commerce	15746000			 				4049000000				 			14888000000							18420180000	18420000000
-	         Books	1996-2018	E-Commerce	15746000			 				2834000000				 			5955000000							7368072000	7368000000
-	         CDs and DVDs	 		0			 				1215000000				  			6700000000							5526054000	5526000000
-acquire	          Lovefilm	2011-2012		0			 								 			0							0	0
-	          Amazon Musis	 		0			  				 				 			744000000							2763027000	2763000000
-	          App Store	 		0			 				 				 			0							1842018000	0
-acquire	          Washington Post			0																					380000000	
-	          Other Media			0														1489000000							541009000	
-	   Electronics, Merchandise			0							1013000000							18363000000							89933820000	
-	      Amazon Kindle			0														367000000							8993382000	
-	      Amazon Fresh			0														18000000							359735280	
-acquire	      Acquire Zappos			0														735000000							2698014600	
-acquire	      Quidsi Diapers.com 	2017-2017		0														918000000							0	
-acquire	      Underground			0																					899338200	
-	      Amazon Alexa Echo			0																					1200000000	
-acquire	      Souq	2017-		0																			270000000	405000000	607500000	
-acquire	      Pillpack	2018-		0																					0	Acquired
-	      Other Electronics			0							1013000000							16325000000							150351699840	
-	   Other Merchandise			0																					601406799360	
-	  Services			0							112000000														59061000000	
-	      Third Party Services			0							64000000							286000000							31881000000	
-	         Amazon Marketplaces			0							32000000							57000000							118000000	
-	         Third Party Logistics			0							16000000	 						229000000	 						31763040300	
-	      Subscriptions			0														95000000							9721000000	
-acquired	        Audible			0														67000000							1458000000	
-	        Amazon Prime			0														28000000							7291000000	
-	        Amazon Instant Video			0																					972000000	
- 	   AWS			0														95000000							17459000000	
- 	      Mechanical Turk			0														10000000							174590000	
- 	      Amazon Lumberyard			0																					174590000	
- 	      AWS Hosting			0														85000000							17109820000	
-	        S3			0														0								
-	        EC2			0																						
-	 Physical Stores			0																					5798000000	
-	   Amazon Books - Retail			0																					1275560000	
-	   Whole Foods			0																					4522440000	
-	 Advertising and Other			0														477000000							4653000000	
-	   Amazon Marketing Services			0														429000000							4187700000	
-acquired	      Askville			0														4000000							0	
-acquired	      GoodReads			0																					46530000	
-acquired	      Twitch			0																					46530000	
-	      Amazon Search, other ads 			0														425000000							3629.34	
-	   Financing 			0														48000000							4650000	
-	      Co-Branded Credit Cards			0														48000000							2325000	
-	      Amazon Cash			0																					2325000	
-	   Acquisitions for Internal Ops			0																						
-	     Kiva Systems	2012-2012		0																						
-	 	 	 	0			80000				 				 			 							80000	80000
-																										
-Verbs:	???? acquisitions here? 	Bricks		TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-	Cure	Mortar		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-	Paint	Bricks		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-	Write	Code		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-	Debug	Code		FALSE			FALSE				FALSE				FALSE			FALSE							FALSE	FALSE
-	Ship	Code		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-																										
-Models:	E-Commerce			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-	Marketplaces			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-	Advertising			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-	Product Sales			FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE
-	Pay-Per-Use																									
-	Subscription																									
-	Content Licensing																									
-	Content Development																									
-	Transaction Fee																									
-	Original Content																									
-	Physical Stores																									
-																										
-																										
-																										
-																										
-																										
-	 																									
-	Online Stores 																									
-	   Online Media 																									
-	       Books 																									
-	       CDs DVDs																									
-	       Acquired CD Now 																									
-	       Acquired CreateSpace (self-publish books)																									
-	       Amazon Music																									
-	       App Store																									
-	       Other media																									
-	   Electronics, Tools, Other Online Merchandize																									
-	      Amazon Kindle																									
-	      Amazon Fresh																									
-	      Acquire Zappos																									
-	      Acquire Quidsi Diapers.com (shut down 2017)																									
-	      Amazon Fire Phone (discontinued 2012)																									
-	      Acquired Underground																									
-	      Amazon Alexa 																									
-	      Amazon Echo																									
-	      Other Electronics																									
-	Services 																									
-	   Third Party Seller Fufillment and Services																									
-	      Amazon Marketplaces																									
-	      Third Party Logistics																									
-	   Subscription Services																									
-	      Acquired Audible 																									
-	      Amazon Prime																									
-	      Amazon Instant Video 																									
-	   AWS																									
-	      Mechanical Turk																									
-	       Amazon Lumberyard																									
-	       AWS Hosting																									
-	Physical Stores																									
-	   Amazon Books (retail)																									
-	   Whole Foods																									
-	Other																									
-	   Amazon Marketing Services																									
-	      Askville 																									
-	      Acquired GoodReads																									
-	      Acquired Twitch 																									
-	      Amazon Search and Advertising																									
-	   Co-Branded Credit Cards																									
-	Check																									
+Name:	AMZN Fresh		Years:	1996	1997	1998	1999	2000	2001	2002	2003	2004	2005	2006	2007	2008	2009	2010	2011	2012	2013	2014	2015	2016	2017	2018			
+																													
+Valuation:	PreMoney Valuation			157000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0			
+	Market Capitalization 			0	438000000	14700000000	300000000000	10000000000	2859000000	4311000000	10388488917	16322000000	10155000000	21098000000	39279000000	21253000000	59458000000	82080000000	79799000000	113644000000	185437000000	143382000000	322400000000	392937000000	576548710000	971960000000000			
+																									 				
+Financials:	Revenue			15746000	147787000	609819000	1140000000	2761983000	3122433000	3932936000	5264000000	6921124000	8490000000	10711000000	14835000000	19166000000	24509000000	34204000000	48077000000	61093000000	74452000000	88988000000	107006000000	135987000000	177866000000	231226000000			
+	   Net Profit/Loss 			-6000000	-31000000	-124546000	-720000000	-1411273000	-567277000	-149132000	35000000	588451000	359000000	190000000	476000000	645000000	902000000	1152000000	631000000	-39000000	274000000	-241000000	596000000	2371000000	3033000000	3943000000			
+	   Debt			0			0				0				0			0							0	0			
+	   Equity 			0			0				0				0			0							0	0			
+																													
+Markets:	   ($)	E-Commerce		700000			  				11778000000				 			500000000000							2304000000000	3000000000000			
+	   ($)	Online Ads		100000			 				 				 			200000							200000	200000			
+	   ($)	Broadband Customers		100000			  				 				 			200000							200000	200000			
+	   ($)	Mobile Smart Phone Customers 		100000			   				 				  			200000							200000	200000			
+	   ($)	Cloud Services		100000			 				 				 			200000							200000	200000			
+	   ($)	Retail 		100000			 				 				 			200000							200000	200000			
+																													
+Units:	   Online Stores 	1996-2018	E-Commerce	15746000			 				5152000000				  			33215000000					76,863,000,000.00	91,431,000,000.00	108354000000	108354000000	page 69		
+	      Media	1996-2018	E-Commerce	15746000			 				4049000000				 			14888000000							18420180000	18420000000			
+	         Books	1996-2018	E-Commerce	15746000			 				2834000000				 			5955000000							7368072000	7368000000	 	 	
+absorbed	            Junglee (Amazon India)	1997-2017	E-Commerce			34000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	255000000	undisclosed
+absorbed	            Telebook (Amazon Germany)	1998	E-Commerce			42000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	14000000	undisclosed
+absorbed	            Bookpages (Amazon UK)	1998	E-Commerce			34000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	16000000	undisclosed
+absorbed	            E-Niche.com	1999	E-Commerce								14000000																acquired	148925000	disclosed
+absorbed	            MobiPocket	2005-2011	E-Commerce										23000000	27600000	33120000	39744000	47692800	57231360	68677632	82413158	98895790	118674948	142409938	170891925	205070310	246084372	acquired	25000000	undisclosed
+absorbed	            AbeBooks	2009-2009	E-Commerce														20000000	0	0	0	0	0	0	0	0	0	acquired	90000000	undisclosed
+	            Amazon Publishing 		E-Commerce																										
+absorbed	               Brilliance Audio	2007-2007	E-Commerce												67000000	0	0	0	0	0	0	0	0	0	0	0	acquired	25000000	undisclosed
+absorbed	               Toby Press	2010-2010	E-Commerce															2000000	0	0	0	0	0	0	0	0	acquired	5000000	undisclosed
+absorbed	               The Book Depository 	2011-2011	E-Commerce																5000000	0	0	0	0	0	0	0	acquired	20000000	undisclosed
+absorbed	               Avalon Books	2012-2012	E-Commerce																	5000000							acquired	10000000	undisclosed
+	         CDs and DVDs	 		0			 				1215000000				  			6700000000							5526054000	5526000000			
+absorbed	            CDNow.com	2002-2002	E-Commerce							130000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	117000000	disclosed
+absorbed	            CreateSpace	2005-2018	Self-publishing??										4500000	5400000	6480000	7776000	9331200	11197440	13436928	14780621	16258683	17884551	19673006	21640307	23804338	26184771	acquired	40000000	undisclosed
+absorbed	            Lovefilm	2011-2017	E-Commerce	0			 								 			0	40000000	41000000	42000000	43000000	44000000	45000000	46000000	0	acquired	200000000	disclosed
+absorbed	            Pushbutton 	2011-2011	E-Commerce																1000000	0	0	0	0	0	0	0	acquired	2000000	undisclosed
+	            Amazon Music	 		0			  				 				 			744000000							2763027000	2763000000			
+absorbed	               Amie Street 	2010-2010	E-Commerce 															200000	0	0	0	0	0	0	0	0	acquired	5000000	undisclosed
+	          App Store	 		0			 				 				 			0							1842018000	0			
+maintained	          Washington Post			0																					380000000				
+maintained	          ComiXology	2014-																				12000000	13000000	14000000	15000000	16000000	acquired	2000000	undisclosed
+	          Amazon Games																												
+	              Reflexive Entertainment	2008-2008	E-Commerce													15000000	0	0	0	0	0	0	0	0	0	0	aquired	30000000	undisclosed
+maintained	              Twitch	2014-		0																		30000000	35000000	40000000	46530000	48000000	acquired	970000000	disclosed
+absorbed	          Double Helix Games	2014-2014																				20000000	0	0	0	0	acquired	40000000	undisclosed
+	          Other Media			0														1489000000							495009000				
+	   Electronics, Merchandise			0							1013000000							18363000000							89933820000				
+absorbed	      Planetall	1998-2000				12000000	12000000	12000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	280000000	disclosed
+absorbed	      Livebid	1999					80000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	20000000	undisclosed
+	      Amazon Kindle			0														367000000							19000000000		 		
+absorbed	         Stanza	2010-2013															0	0	0	0	0	0	0	0	0	0	acquired	10000000	undisclosed
+absorbed	         Touchco	2010																500000	0	0	0	0	0	0	0	0	acquired	6000000	undisclosed
+absorbed	         Yap	2011-2011																	2000000	0	0	0	0	0	0	0	acquired	20000000	undisclosed
+absorbed	         TeachStreet 	2012-2012																		2000000	0	0	0	0	0	0	acquired	8000000	undisclosed
+absorbed	         TenMarks Education	2013-2019																			1000000	1000000	1000000	1000000	1000000	1000000	acquired	5000000	undisclosed
+absorbed	         Liquavista	2013-2013																			20000000	0	0	0	0	0	acquired	60000000	undisclosed
+absorbed	         Goodreads	2013-																			15000000	16000000	17000000	18000000	19000000	20000000	acquired	150000000	undisclosed
+absorbed	         IVONA Software	2013-2013																			2000000	0	0	0	0	0	acquired	5000000	undisclosed
+absorbed	      Tool Crib of the North	1999					12000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	70000000	undisclosed
+absorbed	      Egghead Software	2002-2002								4000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	6000000	disclosed
+acquired-spunout	      BacktoBasics Toys	1999-2003					40000	50000	50000	50000	50000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired-spunout	45000000	undisclosed
+maintained	      Joyo.com	2004-										9000000	11700000	15210000	19773000	25704900	33416370	43441281	56473665	73415765	95440494	124072643	161294435	209682766	272587596	354363875	acquired	75000000	undisclosed
+maintained	      Shopbop	2006-												12000000	14400000	17280000	20736000	24883200	29859840	35831808	42998170	51597804	61917364	74300837	89161004	106993205	acquired	70000000	undisclosed
+absorbed	      SmallParts.com	2005-2012											9000000	9900000	10890000	11979000	13176900	14494590	15944049	17538454							acquired	50000000	undisclosed
+	      Amazon Fresh			0														18000000							35000000				
+maintained	      Zappos	2009-		0													GET FROM BOOK 	735000000							270000000		GET FROM BOOK 	GET FROM BOOK 	GET FROM BOOK 
+absorbed	         Shoefitr 	2015-2015																					200000	0	0	0	acquired	5000000	undlsclosed
+absorbed	      BuyVIP 	2010-2017																20000000	21000000	22000000	23000000	24000000	25000000	26000000	27000000	0	acquired	96500000	disclosed
+absorbed	      Quidsi Diapers.com 	2010-2016		0														918000000	10000000000	12000000000	14000000000	16000000000	18000000000	20000000000	0	0	acquired	545000000	disclosed
+maintained	      Underground			0																					200000				
+maintained	      Woot	2010-																15000000	16500000	18150000	19965000	21961500	24157650	26573415	29230757	32153832		110000000	undisclosed
+	      Amazon Smart Home			0																					2219000000				
+absorbed	         Evi 	2012-2012																			5000000	0	0	0	0	0	acquired 	26000000	undisclosed
+maintained	         Blink Home	2017-																							9000000		acquired 	90000000	undisclosed
+absorbed	         Graphiq	2017-2017																							10000000		acquired 	50000000	undisclosed
+absorbed	         2lemetry IOT	2015-2015																					2000000	0	0	0	acquired 	20000000	undisclosed
+	         Amazon Echo																								2200000000				
+absorbed	         Ring	2018																								50000000	acquired 	1000000000	undisclosed
+maintained	      Souq	2017-		0																			270000000	405000000	20000000	607500000	acquired 	580000000	disclosed
+absorbed	         Wing.ae	2017-																							1000000		acquired 	2000000	undisclosed
+maintained	      Pillpack	2018-		0																					0	22000000	acquired 	980000000	undisclosed
+	      Other Electronics			0							1013000000							16325000000							34194910000				
+	   Other Merchandise			0																					34194910000				
+	Services			0							112000000														59061000000		 		
+	Third Party Services			0							64000000							286000000					16086000000	22993000000	31881000000				
+	         Amazon Marketplaces			0							32000000							57000000							3188100000				
+	         Third Party Logistics			0							16000000	 						229000000	 						28692900000				
+	Subscriptions			0														95000000					4467000000	6394000000	9721000000		 		
+maintained	        Audible	2008-		0												50000000	55000000	67000000	702000000	752000000	822000000	910000000	1100000000	1300000000	1458000000	1698000000	acquired	300000000	undisclosed
+	        Amazon Prime			0														28000000							8900000000		 		
+	        Amazon Video			0																					-637000000				
+ 	AWS			0														95000000					7880000000	12219000000	17459000000				
+ 	      Mechanical Turk			0														10000000							170500000				 
+ 	      Amazon Lumberyard			0																					140000000				
+absorbed	        Gamesparks	2017-2017																							5000000		acquired	10000000	
+ 	      AWS Hosting			0														85000000							17130970000				
+	        S3			0														0							0				
+	        EC2			0																					0				
+absorbed	    NICE 	2016-2016																					0	12000000	0	0	acquired	30000000	undisclosed
+absorbed	    Biba Systems	2016-2016																					0	12000000	0	0	acquired	40000000	undisclosed
+absorbed	    Cloud9	2016-2016																					0	3000000		0	acquired	20000000	undisclosed
+absorbed	    Harvest ai	2017-2017																					0	0	10000000	0	acquired	20000000	undisclosed
+absorbed	    Thinkbox Software	2017-2017																					0	0	10000	0	acquired	2000000	undisclosed
+absorbed	    'Do.com	2017-2017																					0	0	10000	0	acquired	2000000	undisclosed
+absorbed	    Body Labs	2017-2017																					0	0	2500000	0	acquired	50000000	undisclosed
+absorbed	    AppThwack	2015-2015																					100000	0	0	0	acquired	5000000	undisclosed
+absorbed	    Elemental Technologies	2015-2015																					80000000	0	0	0	acquired	500000000	disclosed
+absorbed	    Safaba Translation 	2015-2015																					100000	0	0	0	acquired	5000000	undisclosed
+absorbed	    ClusterK	2015-2015																					5000000	0	0	0	acquired	30000000	undisclosed
+absorbed	    Annapurna Labs	2015-2015																					2000000	0	0	0	acquired	350000000	undisclosed
+ 	    Amazon Sumerian 																						0	0	10000	10000			
+absorbed	      Goo Technologies	2017-2017																					0	0	10000	0	acquired	2000000	
+	Physical Stores	2017																							5798000000				
+	   Amazon Books - Retail			0																					1275560000		 		
+	   Whole Foods			0																					4522440000		aquired 	13700000000	disclosed
+	Other																	477000000					1710000000	2950000000	4653000000				
+	   Amazon Marketing Services			0														429000000							4187700000				
+maintained	      Alexa Internet	1999-					45000000	20000000	20000000	20000000	24000000	28800000	34560000	41472000	49766400	59719680	71663616	85996339	103195607	123834728	148601674	178322009	213986411	256783693	308140431	369768518	acquired	300000000	undisclosed
+maintained	      IMDB	1998-	Advertising, Subscription			3000000	300000000	150000000	150000000	165000000	181500000	199650000	219615000	241576500	265734150	292307565	321538322	353692154	389061369	427967506	470764257	517840682	569624750	626587225	689245948	758170543	acquired	16000000	undisclosed
+absorbed	          Box Office Mojo	2008-2008														300000	0	0	0	0	0	0	0	0	0	0	acquired	3000000	undisclosed
+maintained 	      DP Review	2007-													1200000	1440000	1728000	2073600	2488320	2985984	3583181	4299817	5159780	6191736	7430084	8916100	acquired	5000000	undisclosed
+absorbed 	      Snaptell																200000	0	0	0	0	0	0	0	0	0	acquired	10000000	undisclosed
+maintain	      Askville			0														4000000							0				
+maintain	      GoodReads			0																					46530000				
+absorbed	         Shelfari 	2008-2008														50000	0	0	0	0	0	0	0	0	0	0	acquired	150000000	undisclosed
+absorbed	         Curse, Inc.	2016-																						10000000	12000000		acquired	30000000	
+	      Amazon Search, other ads 			0														425000000							3629.34				
+	   Financing 			0														48000000							4650000				
+	      Co-Branded Credit Cards			0														48000000							2325000				
+	      Amazon Cash			0																					2325000				
+	      Other payments																							1000000	0				
+absorbed	         Emvantage Payments																							1000000	0		acquired	5000000	undisclosed
+	   Acquisitions for Internal Ops			0																									
+absorbed	     Accept.com 	1999					100000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	107000000	disclosed
+absorbed	     Mindcorps	1999					3000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	20000000	undisclosed
+absorbed	     Convergence Corporation	1999					2000000	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	acquired	30000000	undisclosed
+	     Logistics																												
+absorbed	       Kiva Systems	2012-2012																		40000000	0	0	0	0	0	0	acquired	775000000	undisclosed
+																													
+Verbs:	???? acquisitions here? 	Bricks		TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+	Cure	Mortar		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+	Paint	Bricks		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+	Write	Code		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+	Debug	Code		FALSE			FALSE				FALSE				FALSE			FALSE							FALSE	FALSE			
+	Ship	Code		FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+																													
+Models:	E-Commerce			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+	Marketplaces			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+	Advertising			TRUE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+	Product Sales			FALSE			TRUE				TRUE				TRUE			TRUE							TRUE	TRUE			
+	Pay-Per-Use																												
+	Subscription																												
+	Content Licensing																												
+	Content Development																												
+	Transaction Fee																												
+	Original Content																												
+	Physical Stores																												

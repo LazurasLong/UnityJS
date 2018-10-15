@@ -186,7 +186,13 @@ public class BridgeTransport : MonoBehaviour
     }
 
 
-    public virtual bool HasSharedTextures()
+    public virtual bool HasSharedTexture()
+    {
+        return false;
+    }
+
+
+    public virtual bool HasSharedData()
     {
         return false;
     }
@@ -195,6 +201,13 @@ public class BridgeTransport : MonoBehaviour
     public virtual Texture2D GetSharedTexture(int id)
     {
         Debug.LogError("BridgeTransport: TODO: GetSharedTexture: id: " + id);
+        return null;
+    }
+
+
+    public virtual byte[] GetSharedData(int id)
+    {
+        Debug.LogError("BridgeTransport: TODO: GetSharedData: id: " + id);
         return null;
     }
 

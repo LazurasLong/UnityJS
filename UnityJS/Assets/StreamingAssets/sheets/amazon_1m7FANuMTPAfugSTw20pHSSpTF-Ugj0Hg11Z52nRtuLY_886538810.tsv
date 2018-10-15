@@ -19,7 +19,7 @@ object
 		z	number	0	
 					
 	valuationMin	number	157460000		
-	valuationMax	number	576548710000		
+	valuationMax	number	576548710000000000		
 	unitValueMax	number	108354		
 					
 	years	range	number	row 0	Amazon_Year

@@ -9,6 +9,7 @@ object		Tuning parameters.
 	baseElevation	number	0	
 	baseEnableCollision	boolean	TRUE	
 	baseHeight	number	1	
+	baseMarketTilesEnabled	boolean	FALSE	
 	baseMass	number	1	
 	basePhysicMaterial	string	PhysicMaterials/LowFrictionLowBounce	
 	baseScale	number	1	
@@ -19,13 +20,21 @@ object		Tuning parameters.
 	bundleBudPrefab	string	Prefabs/RainbowBudBlock	
 	bundleBuds	boolean	TRUE	
 	bundleBudScale	number	2	
-	bundleElevationBase	number	5	
+	bundleElevationBase	number	10	
 	bundleElevationYear	number	0	
 	bundleEnabled	boolean	TRUE	
-	bundleGap	number	12	
+	bundleGap	number	20	
 	bundleTop	number	50	
+	bundleWireFromEndDirection	number	5	
+	bundleWireFromEndDistance	number	0	
+	bundleWireFromMiddleDirection	number	10	
+	bundleWireFromMiddleDistance	number	5	
 	bundleWireRadius	number	1	
 	bundleWireSpread	number	2	
+	bundleWireToEndDirection	number	2.5	
+	bundleWireToEndDistance	number	0	
+	bundleWireToMiddleDirection	number	5	
+	bundleWireToMiddleDistance	number	-5	
 	cameraMoveSpeed	number	80	
 	cameraOrbitPitchSpeed	number	60	
 	cameraOrbitYawSpeed	number	60	
@@ -116,10 +125,28 @@ object		Tuning parameters.
 	marketColorScheme	string	market	
 	marketHighlightEffect	string	Magic_Particle_Effects/Effects/Magic_Aura_02	
 	marketHighlightScale	number	20	
+	mergeBaseXOffset	number	-50	
+	mergeBaseZOffset	number	-50	
+	mergeBundleBudPrefab	string	Prefabs/RainbowBudBall	
+	mergeBundleBudScale	number	3	
+	mergeBundleHeightFrom	number	5	
+	mergeBundleHeightTo	number	25	
+	mergeBundleXOffset	number	0	
+	mergeBundleYOffset	number	0	
+	mergeEnabled	boolean	TRUE	
+	mergeHeight	number	25	
+	mergeWireFromEndDirection	number	5	
+	mergeWireFromEndDistance	number	0	
+	mergeWireFromMiddleDirection	number	10	
+	mergeWireFromMiddleDistance	number	5	
+	mergeWireToEndDirection	number	5	
+	mergeWireToEndDistance	number	0.5	
+	mergeWireToMiddleDirection	number	6	
+	mergeWireToMiddleDistance	number	-8	
 	modelColorScheme	string	model	
+	modelHighlightCameraAttraction	number	1	
+	modelHighlightCameraAttractionPieDistanceScale	number	0.5	
 	modelHighlightEffect	string	Prefabs/ModelHighlightEffect	
-	modelHighlightCameraAttraction	number	5	
-	modelHighlightCameraAttractionPieDistanceScale	number	1	
 	modelHighlightScale	number	2	
 	probe	boolean	FALSE	
 	probeColumns	number	8	
@@ -143,9 +170,9 @@ object		Tuning parameters.
 	unitDrag	number	2	
 	unitEnableCollision	boolean	TRUE	
 	unitEnabled	boolean	TRUE	
+	unitHighlightCameraAttraction	number	1	
+	unitHighlightCameraAttractionPieDistanceScale	number	0.5	
 	unitHighlightEffect	string	Prefabs/UnitHighlightEffect	
-	unitHighlightCameraAttraction	number	5	
-	unitHighlightCameraAttractionPieDistanceScale	number	1	
 	unitHighlightScale	number	2	
 	unitInitialDistance	number	20	
 	unitIsKinematic	boolean	FALSE	
@@ -173,8 +200,8 @@ object		Tuning parameters.
 	yearConstraints	string	FreezePositionX,FreezePositionY,FreezePositionZ,FreezeRotationX,FreezeRotationY,FreezeRotationZ	
 	yearCreateDelay	number	500	
 	yearEnabled	boolean	TRUE	
-	yearHeightMax	number	100	
-	yearHeightMin	number	40	
+	yearHeightMax	number	120	
+	yearHeightMin	number	50	
 	yearIsKinematic	boolean	FALSE	
 	yearLabelFontSize	number	80	
 	yearLabelHeight	number	30	

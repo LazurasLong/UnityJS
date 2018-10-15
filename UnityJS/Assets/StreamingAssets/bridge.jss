@@ -28,8 +28,69 @@ var globals = {
     unityToJSEventBytes: 0,
     unityToJSEventLog: "",
     content: null,
-    updateContent: false
+    updateContent: false,
+    tagged: [],
+    tags: []
 };
+
+
+////////////////////////////////////////////////////////////////////////
+// Debugging
+
+
+function Tag(obj, tag)
+{
+    var i = globals.tagged.indexOf(obj);
+    if (i == -1) {
+        console.log("TAG NEW", globals.tagged.length, tag, TagShow(obj, tag));
+        globals.tagged.push(obj);
+        globals.tags.push(tag);
+    } else {
+        console.log("TAG OLD", i, globals.tags[i], TagShow(obj, tag));
+    }
+}
+
+
+function TagShow(obj, tag)
+{
+    var str = '';
+    var keys = Object.keys(obj);
+    keys.sort();
+    for (var i in keys) {
+        var k = keys[i];
+        var val = obj[k];
+        str += k + ': ';
+        var tagIndex = globals.tagged.indexOf(val);
+        if (tagIndex != -1) {
+            str += 'TAG ' + tagIndex + ' ' + globals.tags[tagIndex] + ': ';
+        }
+        if (val && (typeof val === 'object') && (val.constructor === Array)) {
+            str += 'Array(' + val.length + '): [';
+            for (var j in val) {
+                if (j > 0) {
+                    str += ', ';
+                }
+                str += val[j];
+            }
+            str += ']';
+        } else if (val && (typeof val == 'object') && (val.constructor === Object)) {
+            var keys2 = Object.keys(val);
+            keys2.sort();
+            str += 'Object(' + keys2.length + '): {';
+            for (var jj in keys2) {
+                if (jj > 0) {
+                    str += ', ';
+                }
+                str += keys2[jj];
+            }
+            str += '}';
+        } else {
+            str += JSON.stringify(val);
+        }
+        str += '\n';
+    }
+    return obj + '(' + keys.length + '):\n' + str;
+}
 
 
 ////////////////////////////////////////////////////////////////////////
