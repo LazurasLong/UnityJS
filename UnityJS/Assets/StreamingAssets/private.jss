@@ -1931,7 +1931,13 @@ function CreateUnitTree(scope, unit)
                 update: {
                     "transform/localPosition": {x: dx, y: 0, z: dy},
                     //"component:MeshRenderer/materials": [tuning.material],
-                    "component:MeshRenderer/material/color": modelColor
+                    "component:MeshRenderer/material/method:UpdateMaterial": {
+                        "shader": "Foo",
+                        "texture_MainTex": "Textures/Foo",
+                        "textureOffset_MainTex": { x: 0.5, y: 0.5 },
+                        "textureScale_MainTex": { x: 2.0, y: 2.0 },
+                        "color_MainTex": modelColor,
+                    }
                 },
                 interests: {
                     MouseEnter: {

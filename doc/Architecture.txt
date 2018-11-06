@@ -368,7 +368,7 @@ Extension Methods
             texture<name>: "TextureResourceName"
                 Texture value; // texture resource name
                 material.SetTexture(name, value);
-            textureOffset: {x:0, y:0}
+            textureOffset<name>: {x:0, y:0}
                 Vector2 value;
                 material.SetTextureOffset(name, value);
             textureScale<name>: {x:1, y:1}
@@ -416,10 +416,6 @@ Extension Methods
             vectorArray<name>: [{x:0, y:0, z:0, w:0}, ...]
                 Vector4[] value;
                 material.SetVectorArray(name, value);
-
-----
-
-LeanTweenBridge
 
 ----
 
