@@ -2131,7 +2131,6 @@ function CreateUnitPies(company, parentPieID, pieID, unit)
         drawBackground = 'DrawBackground_Pie';
         slices = [];
         unit.children.forEach(function(subUnit, childIndex) {
-            var subUnit = unit.children[childIndex];
             var unitLabel = subUnit.name;
             var hasChildren = subUnit.children && subUnit.children.length;
             var subPieID = hasChildren ? pieID + '_' + subUnit.unitIndex : null;
@@ -2867,7 +2866,7 @@ function HighlightObject(obj, highlight, effect, update, alwaysUpdate)
 
     //console.log("HighlightObject", "obj", obj, "highlight", highlight, "effect", effect, "update", update, "alwaysUpdate", alwaysUpdate);
 
-    if (highlight != (obj.highlighted)) {
+    if (highlight != obj.highlighted) {
 
         if (highlight) {
 
