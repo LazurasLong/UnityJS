@@ -3,6 +3,7 @@
 
 
 var fs = require('fs');
+var path = require('path');
 var fetch = require('node-fetch');
 var csvParseSync = require('csv-parse/lib/sync');
 
@@ -27,7 +28,22 @@ var sheetsIndex = [];
 var spreadsheetPromises = [];
 var sheetPromises = [];
 
-var serialPromise = null;
+fs.readdir(sheetOutputDirectory, function (err, fileNames) {
+    if (err) {
+        throw err;
+    }
+    fileNames.forEach(function (file) {
+        var filePath = path.join(sheetOutputDirectory, file);
+        console.log("deleting", filePath);
+        fs.unlink(
+            filePath,
+            function (err) {
+                if (err) {
+                    throw err;
+                }
+            });
+    });
+});
 
 spreadsheets.forEach(function (spreadsheet, spreadsheetIndex) {
     console.log("spreadsheet:", spreadsheet);

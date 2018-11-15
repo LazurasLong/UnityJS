@@ -21,3 +21,8 @@ table
 	Merges	0	1	column	Merge_Outline
 	Merges	0	3	column	Merge_Models
 	Merges	0	4	grid	Merge_Verb
+	Terrarium	0	1	cell	Name
+	Terrarium	0	2	cell	Description
+	Terrarium	1	2	row	Year
+	Terrarium	2	1	column	Aspect
+	Terrarium	2	1	grid	Value

@@ -632,6 +632,13 @@ if (gGoogleSheets) {
                 
                 parts.forEach(function (part, partIndex) {
 
+                    // part:
+                    //     name string
+                    //     rowOffset number
+                    //     columnOffset number
+                    //     type string
+                    //     suffix string
+
                     var rangeRow = row + part.rowOffset;
                     var rangeColumn = column + part.columnOffset;
 

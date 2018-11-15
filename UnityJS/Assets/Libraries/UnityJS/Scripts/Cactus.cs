@@ -44,6 +44,7 @@ public class Cactus: Tracker {
     public bool updateMesh = true;
     public bool updateMeshAlways = false;
     public bool noSubSample = true;
+    public bool sideRidges = true;
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -144,11 +145,11 @@ public class Cactus: Tracker {
 
             for (int sliceDivision = 0; sliceDivision < thisSliceDivisions; sliceDivision++) {
 
-                float slicePart =
+                float slicePos =
                     (float)slice +
                     ((float)sliceDivision / (float)thisSliceDivisions);
                 float y =
-                    sliceHeight * slicePart;
+                    sliceHeight * slicePos;
 
                 int b = vertices.Count;
 
@@ -156,13 +157,13 @@ public class Cactus: Tracker {
 
                     for (int sideDivision = 0; sideDivision < sideDivisions; sideDivision++) {
 
-                        float sidePart = 
+                        float sidePos = 
                             (float)side +
                             ((float)sideDivision / (float)sideDivisions);
                         float angle = 
-                            sideTurn * sidePart;
+                            sideTurn * sidePos;
 
-                        float sample = GetSubSample(sidePart, slicePart);
+                        float sample = GetSubSample(sidePos, slicePos);
 
                         var radius =
                             radiusMin +
@@ -174,7 +175,7 @@ public class Cactus: Tracker {
                         vertices.Add(
                             new Vector3(x, y, z));
                         uv.Add(
-                            new Vector2(sidePart * uvScale.x, slicePart * uvScale.y));
+                            new Vector2(sidePos * uvScale.x, slicePos * uvScale.y));
                     }
 
                 }
@@ -214,27 +215,22 @@ public class Cactus: Tracker {
     }
 
 
-    public float GetSubSample(float sidePart, float slicePart)
+    public float GetSubSample(float sidePos, float slicePos)
     {
+        if (noSubSample) {
+            return GetSample(sidePos, slicePos);
+        }
+
         int row;
         int column;
         int index;
-        float sideFrac;
-        float sliceFrac;
+        float sideFrac = sidePos - Mathf.Floor(sidePos);
+        float sliceFrac = slicePos - Mathf.Floor(slicePos);
 
-        if (WrapSideSlice(sidePart, slicePart, out row, out column, out index, out sideFrac, out sliceFrac)) {
-        }
-
-        float sample00 = GetSample(sidePart,        slicePart);
-
-        int side
-        if (noSubSample) {
-            return sample00;
-        }
-
-        float sample01 = GetSample(sidePart,        slicePart + 1.0f);
-        float sample10 = GetSample(sidePart + 1.0f, slicePart);
-        float sample11 = GetSample(sidePart + 1.0f, slicePart + 1.0f);
+        float sample00 = GetSample(sidePos,        slicePos);
+        float sample01 = GetSample(sidePos,        slicePos + 1.0f);
+        float sample10 = GetSample(sidePos + 1.0f, slicePos);
+        float sample11 = GetSample(sidePos + 1.0f, slicePos + 1.0f);
 
         float sample0 =
             (sample00 * (1.0f - sideFrac)) +
@@ -247,49 +243,32 @@ public class Cactus: Tracker {
             (sample0 * (1.0f - sliceFrac)) +
             (sample1 * sliceFrac);
 
-#if false
-        float c = sideFrac; 
-        // 0 .. 1
-        if (c >= 0.5f) {
-            c -= 1.0f;
+        if (sideRidges) {
+            float c = sideFrac; 
+            // 0 .. 1
+            if (c >= 0.5f) {
+                c -= 1.0f;
+            }
+            // -0.5 .. 0.5
+            c *= 2.0f;
+            // -1.0 .. 1.0
+            if (c < 0.0f) {
+                c = -c;
+            }
+            c *= 1.0f - spineStrength;
+            c += spineStrength;
+            sample *= c;
         }
-        // -0.5 .. 0.5
-        c *= 2.0f;
-        // -1.0 .. 1.0
-        if (c < 0.0f) {
-            c = -c;
-        }
-        c *= 1.0f - spineStrength;
-        c += spineStrength;
-        sample *= c;
-#endif
 
         return sample;
     }
 
 
-    public void WrapSideSlice(float sidePart, float slicePart, out int row, out int column, out int index, out float sideFrac, out float sliceFrac)
+    public float GetSample(float sidePos, float slicePos)
     {
-        column = (int)Mathf.Floor(sidePart);
+        int column = (int)Mathf.Floor(sidePos);
         column = (column + sides) % sides;
-        row = (int)Mathf.Floor(slicePart);
-        if (row < 0) {
-            row = 0;
-        } else if (row > (slices - 1)) {
-            row = slices - 1;
-        }
-
-        index = (row * sides) + column;
-        sideFrac = sidePart - Math.floor(sidePart);
-        sliceFrac = slicePart - Math.floor(slicePart);
-    }
-
-
-    public float GetSample(float sidePart, float slicePart)
-    {
-        int column = (int)Mathf.Floor(sidePart);
-        column = (column + sides) % sides;
-        int row = (int)Mathf.Floor(slicePart);
+        int row = (int)Mathf.Floor(slicePos);
         if (row < 0) {
             row = 0;
         } else if (row > (slices - 1)) {

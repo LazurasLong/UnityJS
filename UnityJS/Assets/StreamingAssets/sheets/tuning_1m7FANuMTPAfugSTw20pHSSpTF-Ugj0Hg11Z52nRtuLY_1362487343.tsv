@@ -153,6 +153,11 @@ object		Tuning parameters.
 	probeHeight	number	30	
 	probeRows	number	4	
 	probeSpacing	number	100	
+	terrariumSpacing	number	50	
+	terrariumScale	number	4	
+	terrariumRadiusMin	number	0.1	
+	terrariumRadiusMax	number	4	
+	terrariumSliceHeight	number	4	
 	unitAngularDrag	number	0.7	
 	unitArrowRainbowType	string	arrow	
 	unitArrows	boolean	TRUE	

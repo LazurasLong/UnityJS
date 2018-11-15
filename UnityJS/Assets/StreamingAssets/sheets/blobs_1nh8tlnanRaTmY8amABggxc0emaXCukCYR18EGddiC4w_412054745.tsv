@@ -2,6 +2,7 @@ object
 					
 	blobData	object			
 		position	object		
+					
 			x	number	0
 			y	number	70
 			z	number	0

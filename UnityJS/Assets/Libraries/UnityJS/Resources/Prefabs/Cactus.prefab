@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4393178356877644}
   - component: {fileID: 33089112814525518}
   - component: {fileID: 23893572187150388}
-  - component: {fileID: 114934737370286218}
+  - component: {fileID: 114511873973718230}
   m_Layer: 0
   m_Name: Cactus
   m_TagString: Untagged
@@ -36,7 +36,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1561581965194146}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -84,7 +84,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1561581965194146}
   m_Mesh: {fileID: 0}
---- !u!114 &114934737370286218
+--- !u!114 &114511873973718230
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1561581965194146}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 133e69dd056fe4d66ba19e5e67cd0e43, type: 3}
+  m_Script: {fileID: 11500000, guid: fc56216afff654bbab1e7e4ce755068b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   id: 
@@ -151,21 +151,34 @@ MonoBehaviour:
   collisionEnteredChanged: 0
   height: 8
   sides: 8
-  sideDivisions: 8
+  sideDivisions: 2
   slices: 8
-  sliceDivisions: 8
+  sliceDivisions: 2
+  spineStrength: 0.5
   uvScale: {x: 1, y: 1}
   radiusMin: 0.5
-  radiusMax: 1
+  radiusMax: 1.5
   samples: []
+  sideLobeTypes: 01000000
+  sideLobeLows:
+  - 0.5
+  sideLobeHighs:
+  - 1.5
+  sliceLobeTypes: 01000000
+  sliceLobeLows:
+  - 0.5
+  sliceLobeHighs:
+  - 1.5
   textureOffset: {x: 0, y: 0}
   textureScale: {x: 1, y: 1}
   textureOffsetPerSecond: {x: 0, y: 0}
   updateMaterial: 0
   updateMaterialAlways: 0
   color: {r: 1, g: 1, b: 1, a: 1}
-  cactusMeshRender: {fileID: 23893572187150388}
-  cactusMeshFilter: {fileID: 33089112814525518}
+  cactusMeshRender: {fileID: 0}
+  cactusMeshFilter: {fileID: 0}
   cactusMesh: {fileID: 0}
-  updateMesh: 0
-  updateMeshAlways: 1
+  updateMesh: 1
+  updateMeshAlways: 0
+  noSubSample: 1
+  sideRidges: 1

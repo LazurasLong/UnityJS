@@ -53,6 +53,18 @@ function FormatDollars(dollars)
 }
 
 
+function CleanNumber(string)
+{
+    if ((string === null) || (string === undefined) || (string == "")) {
+        return 0;
+    }
+    var cleanString = string.replace(/[ $%,]/g, '');
+    var number = parseFloat(cleanString);
+    //console.log("CleanNumber", "string", string, "cleanString", cleanString, "number", number);
+    return number;
+}
+
+
 ////////////////////////////////////////////////////////////////////////
 // Create everything.
 
@@ -64,7 +76,235 @@ function CreatePrivate()
     var companies = world.companies;
     var effects = world.prefabMap.effects;
 
-    // Create "effects" pie.
+    var terrariumObject = globals.terrariumObject = {
+        sheetPrefix: "Norway ",
+        methodNames: ["Default", "Checklist", "Scorecard", "VC"],
+        methodInfos: [],
+        methodInfoByName: {},
+        methodIndex: 0,
+        startups: [],
+        startupByName: {},
+        startupIndex: 0
+    }
+
+    terrariumObject.methodNames.forEach(function (methodName, methodIndex) {
+
+        var sheetName = terrariumObject.sheetPrefix + methodName;
+        var sheet = globals.sheets[sheetName];
+        var source = sheet.values;
+        var methodInfo = {
+            methodName: methodName,
+            methodIndex: methodIndex,
+            minValues: {},
+            maxValues: {},
+            allValues: {}
+        };
+        terrariumObject.methodInfos.push(methodInfo);
+        terrariumObject.methodInfoByName[methodName] = methodInfo;
+
+        source.forEach(function (row, rowIndex) {
+
+            row.forEach(function (cell, colIndex) {
+
+                if (cell.trim() != "Startup:") {
+                    return;
+                }
+
+                var startupName = row[colIndex + 1].trim();
+                var startup = terrariumObject.startupByName[startupName];
+                if (!startup) {
+                    startup = {
+                        startupName: startupName,
+                        startupIndex: terrariumObject.startups.length,
+                        methods: [],
+                        methodByName: {}
+                    };
+                    terrariumObject.startups.push(startup);
+                    terrariumObject.startupByName[startupName] = startup;
+                }
+
+                var years = [];
+                var labels = [];
+                var values = [];
+                var method = {
+                    methodName: methodName,
+                    methodIndex: methodIndex,
+                    years: years,
+                    labels: labels,
+                    values: values
+                };
+                startup.methods.push(method);
+                startup.methodByName[methodName] = method;
+
+                var yearRow = source[rowIndex + 1];
+                var value;
+                var c = colIndex + 2;
+                while (value = yearRow[c]) {
+                    value = value.trim();
+                    if (value == "") {
+                        break;
+                    }
+                    years.push(value);
+                    c++;
+                }
+                var yearCount = years.length;
+
+                var r = rowIndex + 2;
+                c = colIndex + 1;
+                while (value = source[r][c]) {
+                    value = value.trim();
+                    if (value == "") {
+                        break;
+                    }
+                    labels.push(value);
+                    r++;
+                }
+                var labelCount = labels.length;
+
+                r = rowIndex + 2;
+                c = colIndex + 2;
+                for (var labelIndex = 0; labelIndex < labelCount; labelIndex++) {
+
+                    var label = labels[labelIndex];
+                    var rowValues = [];
+                    values.push(rowValues);
+
+                    for (var yearIndex = 0; yearIndex < yearCount; yearIndex++) {
+
+                        value = source[r + labelIndex][c + yearIndex];
+
+                        value = CleanNumber(value);
+                        rowValues.push(value);
+
+                        var methodInfo = terrariumObject.methodInfoByName[methodName];
+
+                        var allValues = methodInfo.allValues[label];
+                        if (allValues === undefined) {
+                            allValues = methodInfo.allValues[label] = [];
+                        }
+                        allValues.push(value);
+
+                        var minValue = methodInfo.minValues[label];
+                        if ((minValue === undefined) ||
+                            (value < minValue)) {
+                            methodInfo.minValues[label] = value;
+                        }
+
+                        var maxValue = methodInfo.maxValues[label];
+                        if ((maxValue === undefined) ||
+                            (value > maxValue)) {
+                            methodInfo.maxValues[label] = value;
+                        }
+
+                    }
+
+                }
+
+            });
+
+        });
+
+    });
+
+    var terrariumSlices = [
+        {
+            items: [
+                {
+                    label: 'Back',
+                    onselectitem: function() {
+                        HideTerrarium();
+                    }
+                }
+            ]
+        }
+    ];
+
+    terrariumObject.methodNames.forEach(function (methodName, methodIndex) {
+        //console.log("methodName", methodName, "methodIndex", methodIndex, "methodInfo", JSON.stringify(terrariumObject.methodInfos[methodIndex], null, 4));
+        terrariumSlices.push({
+            items: [
+                {
+                    label: methodName,
+                    onselectitem: function() {
+                        ShowTerrariumMethod(methodIndex);
+                    }
+                }
+            ]
+        });
+    });
+
+    // Create "terrarium" pie.
+    globals.pieTracker.pies.terrarium = {
+        label: 'Terrarium',
+        slices: terrariumSlices,
+        drawBackground:	'DrawBackground_Pie',
+        itemDistance: 100
+    };
+
+    // Create "companies" pie.
+    globals.pieTracker.pies.companies = {
+        label: 'Companies',
+        slices: [],
+        drawBackground:	'DrawBackground_Pie',
+        itemDistance: 100
+    };
+    globals.pieTracker.pies.companies.slices.push({
+        items: [
+            {
+                label: 'Terrarium',
+                onselectitem: function(item, slice, pie, target) {
+                    ShowTerrarium();
+                }
+            }
+        ]
+    });
+    companies.forEach(function(company) {
+        globals.pieTracker.pies.companies.slices.push({
+            items: [
+                {
+                    label: company.name,
+                    onselectitem: function(item, slice, pie, target) {
+                        ShowCompany(company);
+                    }
+                }
+            ]
+        });
+    });
+
+    globals.cuboid.pieID = 'companies';
+    globals.currentCompany = null;
+
+    UpdateObject(globals.proCamera, {
+        'component:ProCamera/moveSpeed': tuning.cameraMoveSpeed,
+        'component:ProCamera/yawSpeed': tuning.cameraYawSpeed,
+        'component:ProCamera/pitchSpeed': tuning.cameraPitchSpeed,
+        'component:ProCamera/orbitYawSpeed': tuning.cameraOrbitYawSpeed,
+        'component:ProCamera/orbitPitchSpeed': tuning.cameraOrbitPitchSpeed,
+        'component:ProCamera/wheelZoomSpeed': tuning.cameraWheelZoomSpeed,
+        'component:ProCamera/wheelPanSpeed': tuning.cameraWheelPanSpeed
+    });
+
+    if (tuning.probes) {
+        for (var row = 0; row < tuning.probeRows; row++) {
+            for (var column = 0; column < tuning.probeColumns; column++) {
+                var x = (column - (tuning.probeColumns / 2)) * tuning.probeSpacing;
+                var z = (row - (tuning.probeRows / 2)) * tuning.probeSpacing;
+                var probe = CreatePrefab({
+                    prefab: 'Prefabs/ReflectionProbe',
+                    update: {
+                        'transform/position': {
+                            x: x,
+                            y: tuning.probeHeight,
+                            z: z
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+/*
+    // Create "effects" pie for debugging effects.
     var effectsPie = globals.pieTracker.pies.effects = {
         label: 'Effects',
         pieLabelPosition: { x: 0, y: 160 },
@@ -162,7 +402,6 @@ function CreatePrivate()
                                         side
                                             ? (pie.scroll + (2 * pie.slicesPerSide) - 1 - i)
                                             : (pie.scroll + i)]
-
                                 }
                             ]
                         });
@@ -175,59 +414,7 @@ function CreatePrivate()
 
         }
     };
-
-    // Create "companies" pie.
-    globals.pieTracker.pies.companies = {
-        label: 'Companies',
-        slices: [],
-        drawBackground:	'DrawBackground_Pie',
-        itemDistance: 100
-    };
-    companies.forEach(function(company) {
-        globals.pieTracker.pies.companies.slices.push({
-            items: [
-                {
-                    label: company.name,
-                    itemDistance: 100,
-                    onselectitem: function(item, slice, pie, target) {
-                        ShowCompany(company);
-                    }
-                }
-            ]
-        });
-    });
-
-    globals.cuboid.pieID = 'companies';
-    globals.currentCompany = null;
-
-    UpdateObject(globals.proCamera, {
-        'component:ProCamera/moveSpeed': tuning.cameraMoveSpeed,
-        'component:ProCamera/yawSpeed': tuning.cameraYawSpeed,
-        'component:ProCamera/pitchSpeed': tuning.cameraPitchSpeed,
-        'component:ProCamera/orbitYawSpeed': tuning.cameraOrbitYawSpeed,
-        'component:ProCamera/orbitPitchSpeed': tuning.cameraOrbitPitchSpeed,
-        'component:ProCamera/wheelZoomSpeed': tuning.cameraWheelZoomSpeed,
-        'component:ProCamera/wheelPanSpeed': tuning.cameraWheelPanSpeed
-    });
-
-    if (tuning.probes) {
-        for (var row = 0; row < tuning.probeRows; row++) {
-            for (var column = 0; column < tuning.probeColumns; column++) {
-                var x = (column - (tuning.probeColumns / 2)) * tuning.probeSpacing;
-                var z = (row - (tuning.probeRows / 2)) * tuning.probeSpacing;
-                var probe = CreatePrefab({
-                    prefab: 'Prefabs/ReflectionProbe',
-                    update: {
-                        'transform/position': {
-                            x: x,
-                            y: tuning.probeHeight,
-                            z: z
-                        }
-                    }
-                });
-            }
-        }
-    }
+*/
 
 }
 
@@ -1931,13 +2118,7 @@ function CreateUnitTree(scope, unit)
                 update: {
                     "transform/localPosition": {x: dx, y: 0, z: dy},
                     //"component:MeshRenderer/materials": [tuning.material],
-                    "component:MeshRenderer/material/method:UpdateMaterial": {
-                        "shader": "Foo",
-                        "texture_MainTex": "Textures/Foo",
-                        "textureOffset_MainTex": { x: 0.5, y: 0.5 },
-                        "textureScale_MainTex": { x: 2.0, y: 2.0 },
-                        "color_MainTex": modelColor,
-                    }
+                    "component:MeshRenderer/material/color": modelColor
                 },
                 interests: {
                     MouseEnter: {
@@ -2004,6 +2185,127 @@ function CreateUnitTree(scope, unit)
 
 ////////////////////////////////////////////////////////////////////////
 // Navigation.
+
+
+function ShowTerrarium()
+{
+    var world = globals.world;
+    var tuning = world.tuning;
+    var terrariumObject = globals.terrariumObject;
+    if (terrariumObject &&
+        terrariumObject.showing) {
+        return;
+    }
+
+    if (terrariumObject.id) {
+        UpdateObject(terrariumObject, {
+            'gameObject/method:SetActive': [true]
+        });
+    } else {
+        CreatePrefab({
+            obj: terrariumObject,
+            prefab: "Prefabs/Terrarium",
+            config: {
+            }
+        });
+        var x = -0.5 * ((terrariumObject.startups.length - 1) * tuning.terrariumSpacing);
+        var z = 0;
+        var scale = { x: tuning.terrariumScale, y: tuning.terrariumScale, z: tuning.terrariumScale };
+        terrariumObject.startups.forEach(function (startup, startupIndex) {
+            CreatePrefab({
+                obj: startup,
+                prefab: "Prefabs/Cactus",
+                parent: 'object:' + terrariumObject.id,
+                update: {
+                    'transform/localPosition': { x: x, y: 0, z: z },
+                    'transform/localScale': scale
+                }
+            });
+            x += tuning.terrariumSpacing;
+        });
+        ShowTerrariumMethod(0);
+    }
+
+    globals.cuboid.pieID = 'terrarium';
+    terrariumObject.showing = true;
+}
+
+
+function HideTerrarium()
+{
+    var terrariumObject = globals.terrariumObject;
+    if (!terrariumObject ||
+        !terrariumObject.showing) {
+        return;
+    }
+
+    HidePopupText();
+    HideInfoPanel();
+
+    UpdateObject(terrariumObject, {
+        'gameObject/method:SetActive': [false]
+    });
+
+    globals.cuboid.pieID = 'companies';
+    terrariumObject.showing = false;
+}
+
+
+function ShowTerrariumMethod(methodIndex)
+{
+    var world = globals.world;
+    var tuning = world.tuning;
+    var terrariumObject = globals.terrariumObject;
+    var methodInfo = terrariumObject.methodInfos[methodIndex];
+
+    terrariumObject.startups.forEach(function (startup, startupIndex) {
+
+        var method = startup.methods[methodIndex];
+        var sides = method.labels.length;
+        var slices = method.years.length + 1;
+        var height = tuning.terrariumSliceHeight * slices;
+        var radiusMin = tuning.terrariumRadiusMin;
+        var radiusMax = tuning.terrariumRadiusMax;
+        var closedValue = -radiusMin / (radiusMax - radiusMin);
+        var samples = [];
+
+        method.years.forEach(function (year, yearIndex) {
+            method.labels.forEach(function (label, labelIndex) {
+                var minValue = methodInfo.minValues[label];
+                var maxValue = methodInfo.maxValues[label];
+                var allValues = methodInfo.allValues[label];
+                var range = maxValue - minValue;
+                var val = method.values[labelIndex][yearIndex];
+                var value = 
+                    (range == 0)
+                        ? 0.5
+                        : ((val - minValue) / range);
+
+                //console.log("startupIndex", startupIndex, "yearIndex", yearIndex, "year", year, "slices", slices, "labelIndex", labelIndex, "label", label, "sides", sides, "sampleIndex", samples.length, "minValue", minValue, "maxValue", maxValue, "range", range, "value", value, "val", val, "allValues", allValues);
+
+                samples.push(value);
+            });
+        });
+
+        method.labels.forEach(function (label, labelIndex) {
+            samples.push(closedValue);
+        });
+
+        //console.log("samples", JSON.stringify(samples));
+
+        UpdateObject(startup, {
+            height: height,
+            sides: sides,
+            slices: slices,
+            radiusMin: radiusMin,
+            radiusMax: radiusMax,
+            samples: samples,
+            updateMesh: true
+        });
+
+    });
+
+}
 
 
 function FocusCompany(company)
